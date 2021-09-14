@@ -8,8 +8,10 @@ export class ValidationService {
     private dictionnary = JSON.parse(JSON.stringify(data));
 
     findWord(word: string): boolean {
-        for (const val of this.dictionnary.words) {
-            if (word === this.dictionnary.words[val]) return true;
+        if (word.length >= 2 && (word.includes('-') || word.includes("'"))) {
+            for (const val of this.dictionnary.words) {
+                if (word === val) return true;
+            }
         }
         return false;
     }
