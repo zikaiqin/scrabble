@@ -1,0 +1,22 @@
+.container {
+    height: 60vh;
+    margin-top: 20vh;
+    margin-bottom: 20vh;
+}
+
+.justified {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.button {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.header-item {
+    justify-content: center;
+    text-align: center;
+}
