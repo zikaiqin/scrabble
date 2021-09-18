@@ -1,3 +1,1 @@
-<div class="textThread" id="thread"></div>
-<input class="textInput" id="message" type="text">
-<button class="send" type="button" (click)="sendMessage()">Send</button>
+<div class="textThread" id="thread"><div *ngFor="let message of messages">{{message.text}}</div></div>

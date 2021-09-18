@@ -1,18 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { TextboxService } from '@app/services/textbox.service';
 
 @Component({
     selector: 'app-textbox',
     templateUrl: './textbox.component.html',
     styleUrls: ['./textbox.component.scss'],
 })
-export class TextboxComponent {
-    sendMessage(){
-        let message = (<HTMLInputElement>document.getElementById("message")).value;
-        (<HTMLInputElement>document.getElementById("thread")).textContent = "User: " + message;
+export class TextboxComponent implements OnDestroy {
+    messages: any[] = [];
+    subscription: Subscription;
 
-        //let textArea = document.getElementById("thread");   
-        //let newMessage = document.createTextNode(message)
-        //document.getElementById("thread").innerText += newMessage;
+    constructor(private textboxService: TextboxService) {
+        this.subscription = this.textboxService.getMessage().subscribe(message => {
+            if(message) {
+                this.messages.push(message);
+            } else {
+                this.messages = [];
+            }
+        });
     }
-    
+
+    ngOnDestroy(){
+        this.subscription.unsubscribe();
+    }
 }
