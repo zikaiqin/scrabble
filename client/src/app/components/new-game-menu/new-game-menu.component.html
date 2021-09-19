@@ -1,0 +1,43 @@
+<mat-card class="menu-card center">
+    <div class="title-container center">
+        <h1 class="title">
+            {{ getTitle() }}
+        </h1>
+        <h2 class="subtitle">
+            {{ getSubTitle() }}
+        </h2>
+    </div>
+
+    <form class="stretch-column">
+        <mat-form-field appearance="standard">
+            <mat-label>Nom du joueur</mat-label>
+            <input required matInput>
+        </mat-form-field>
+
+        <mat-label>Temps de tour : 60 secondes</mat-label>
+        <mat-slider
+            thumbLabel
+            disabled
+            [displayWith]="timeFormat"
+            step="30"
+            min="30"
+            max="300"
+            value="60">
+        </mat-slider>
+
+        <!--TODO: get rid of magic number-->
+        <ng-template [ngIf]="gameType === 1">
+            <mat-label>Profil de l'adversaire</mat-label>
+            <mat-button-toggle-group name="difficulty" value="easy" disabled>
+                <mat-button-toggle value="easy">Novice</mat-button-toggle>
+                <mat-button-toggle value="hard">Expert</mat-button-toggle>
+            </mat-button-toggle-group>
+        </ng-template>
+
+        <button mat-raised-button color="primary" type="submit">Jouer</button>
+    </form>
+
+    <button mat-button class="back-button" (click)="this.goBack.emit('Back')">
+        Retour
+    </button>
+</mat-card>

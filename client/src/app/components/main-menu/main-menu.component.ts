@@ -20,7 +20,7 @@ export class MainMenuComponent {
     readonly secondMenu: MenuButton[] = [
         { name: 'Single', text: 'Jouer Solo' },
         { name: 'Multi', text: 'Jouer Ensemble' },
-        { name: 'BrowseGames', text: 'Joindre une Partie' },
+        { name: 'BrowseGames', text: 'Joindre une partie' },
         { name: 'Back' },
     ];
 

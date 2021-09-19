@@ -13,6 +13,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
+import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
 
 /**
  * Main module that is used in main.ts.
@@ -30,6 +31,7 @@ import { MainMenuComponent } from './components/main-menu/main-menu.component';
         PlayAreaComponent,
         SidebarComponent,
         MainMenuComponent,
+        NewGameMenuComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],

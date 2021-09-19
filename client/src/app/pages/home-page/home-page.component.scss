@@ -1,25 +1,26 @@
 button {
     font-size: 18pt;
     font-weight: normal;
-    padding: 10px 20px 10px 20px;
-    margin: 25px 0 0 0;
+    padding: 5px 30px 5px 30px;
+    margin: 20px 0 0 0;
     width: 100%;
-}
-
-.button-container {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    margin: 0 20px 0 20px;
 }
 
 .back-button {
     padding: 5px 0 5px 0;
 }
 
-.header {
+.title {
     font-size: 36pt;
-    margin-bottom: 45px;
+}
+
+.subtitle {
+    font-size: 24pt;
+    font-weight: lighter;
+}
+
+.title-container {
+    margin-bottom: 30px;
 }
 
 .menu-card {
@@ -31,12 +32,20 @@ button {
     height: 100vh;
 }
 
+.stretch-column {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 90%;
+}
+
 .center {
     display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
-.justified {
+.justify {
     display: flex;
     justify-content: center;
 }

@@ -28,7 +28,7 @@ export class HomePageComponent implements OnInit {
         this.gameType = GameType.None;
     }
 
-    navigate(menu: string): void {
+    navigateTo(menu: string): void {
         if (menu === 'Back') {
             if (this.gameType) {
                 this.gameType = GameType.None;
