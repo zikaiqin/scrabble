@@ -33,8 +33,7 @@
             (input)="setTurnLength($event.value)">
         </mat-slider>
 
-        <!--TODO: get rid of magic number-->
-        <ng-template [ngIf]="gameType === 1">
+        <ng-template [ngIf]="gameType === gameTypes.Single">
             <mat-label id="toggle-button">Profil de l'adversaire</mat-label>
             <mat-button-toggle-group disabled name="difficulty" value="easy">
                 <mat-button-toggle class="toggle-button" value="easy">Novice</mat-button-toggle>

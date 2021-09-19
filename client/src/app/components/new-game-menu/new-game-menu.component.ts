@@ -17,8 +17,10 @@ export class NewGameMenuComponent {
     @Input() gameType: number;
     @Output() readonly goBack = new EventEmitter<string>();
 
-    turnLength: number;
+    readonly gameModes = GameMode;
+    readonly gameTypes = GameType;
     readonly userName = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
+    turnLength: number;
 
     // eslint-disable-next-line @typescript-eslint/no-useless-constructor,@typescript-eslint/no-empty-function
     constructor() {}
