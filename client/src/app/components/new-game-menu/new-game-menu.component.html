@@ -11,33 +11,43 @@
     <form class="stretch-column">
         <mat-form-field appearance="standard">
             <mat-label>Nom du joueur</mat-label>
-            <input required matInput>
+            <input matInput [formControl]="userName">
+            <mat-hint>
+                {{ getNameHint() }}
+            </mat-hint>
+            <mat-error *ngIf="userName.invalid">
+                {{ getNameError() }}
+            </mat-error>
         </mat-form-field>
 
-        <mat-label>Temps de tour : 60 secondes</mat-label>
+        <mat-label>
+            {{ getTurnLabel() }}
+        </mat-label>
         <mat-slider
-            thumbLabel
             disabled
-            [displayWith]="timeFormat"
             step="30"
             min="30"
             max="300"
-            value="60">
+            [value]="turnLength"
+            [displayWith]="timeFormat"
+            (input)="setTurnLength($event.value)">
         </mat-slider>
 
         <!--TODO: get rid of magic number-->
         <ng-template [ngIf]="gameType === 1">
-            <mat-label>Profil de l'adversaire</mat-label>
-            <mat-button-toggle-group name="difficulty" value="easy" disabled>
-                <mat-button-toggle value="easy">Novice</mat-button-toggle>
-                <mat-button-toggle value="hard">Expert</mat-button-toggle>
+            <mat-label id="toggle-button">Profil de l'adversaire</mat-label>
+            <mat-button-toggle-group disabled name="difficulty" value="easy">
+                <mat-button-toggle class="toggle-button" value="easy">Novice</mat-button-toggle>
+                <mat-button-toggle class="toggle-button" value="hard">Expert</mat-button-toggle>
             </mat-button-toggle-group>
         </ng-template>
 
-        <button mat-raised-button color="primary" type="submit">Jouer</button>
-    </form>
+        <button mat-raised-button color="primary" type="submit" [disabled]="userName.invalid">
+            Jouer
+        </button>
 
-    <button mat-button class="back-button" (click)="this.goBack.emit('Back')">
-        Retour
-    </button>
+        <button mat-button (click)="this.goBack.emit('Back')">
+            Retour
+        </button>
+    </form>
 </mat-card>
