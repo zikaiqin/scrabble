@@ -1,42 +1,6 @@
-<div class="container justified">
-    <h1 class="header-item">{{ getTitle() }}</h1>
-
-    <div class="justified" *ngIf="menu === 'Main'; else modeSelection">
-        <button class="button"
-                (click)="menu = 'Classical'">
-            Scrabble Classique
-        </button>
-
-        <button class="button">
-            Scrabble LOG2990
-        </button>
-
-        <button class="button">
-            Meilleurs Scores
-        </button>
-
-    </div>
-
-    <ng-template #modeSelection>
-        <div class="justified">
-            <button class="button">
-                Jouer Solo
-            </button>
-
-            <button class="button">
-                Jouer Ensemble
-            </button>
-
-            <button class="button">
-                Joindre une Partie
-            </button>
-
-        </div>
-
-        <button class="button"
-                (click)="menu = 'Main'">
-            Retour
-        </button>
+<div class="container center justified">
+    <ng-template [ngIf]="!gameMode || !gameType">
+        <app-main-menu [gameMode]="gameMode" [gameType]="gameType" (navigationEvent)="navigate($event)"></app-main-menu>
     </ng-template>
 
 </div>

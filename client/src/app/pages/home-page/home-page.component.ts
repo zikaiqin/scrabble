@@ -1,9 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 
-enum Titles {
-    Main = 'Scrabble',
-    Classical = 'Scrabble Classique',
-    Log2990 = 'Scrabble LOG2990',
+export enum GameMode {
+    None,
+    Classical,
+    Log2990,
+}
+export enum GameType {
+    None,
+    Single,
+    Multi,
 }
 
 @Component({
@@ -12,16 +17,32 @@ enum Titles {
     styleUrls: ['./home-page.component.scss'],
 })
 export class HomePageComponent implements OnInit {
-    menu: keyof typeof Titles;
+    gameMode: number;
+    gameType: number;
 
     // eslint-disable-next-line @typescript-eslint/no-useless-constructor,@typescript-eslint/no-empty-function
     constructor() {}
 
     ngOnInit(): void {
-        this.menu = 'Main';
+        this.gameMode = GameMode.None;
+        this.gameType = GameType.None;
     }
 
-    getTitle(): string {
-        return Titles[this.menu];
+    navigate(menu: string): void {
+        if (menu === 'Back') {
+            if (this.gameType) {
+                this.gameType = GameType.None;
+            } else {
+                this.gameMode = GameMode.None;
+            }
+        }
+        // if (menu === 'Classical' || menu === 'Log2990') {
+        if (menu === 'Classical') {
+            this.gameMode = GameMode[menu];
+        }
+        // if (menu === 'Single' || menu === 'Multi') {
+        if (menu === 'Single') {
+            this.gameType = GameType[menu];
+        }
     }
 }

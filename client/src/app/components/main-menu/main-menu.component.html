@@ -1,0 +1,19 @@
+<mat-card class="menu-card center">
+    <h1 class="header">
+        {{ getTitle() }}
+    </h1>
+
+    <div class="button-container">
+        <ng-template ngFor let-button [ngForOf]="getButtons()">
+            <button mat-raised-button *ngIf="button.name !== 'Back'; else backButton" (click)="buttonClick(button.name)">
+                {{ button.text }}
+            </button>
+
+            <ng-template #backButton>
+                <button mat-button class="back-button" (click)="buttonClick('Back')">
+                    Retour
+                </button>
+            </ng-template>
+        </ng-template>
+    </div>
+</mat-card>
