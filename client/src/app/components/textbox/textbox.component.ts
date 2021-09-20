@@ -14,9 +14,10 @@ export class TextboxComponent implements OnDestroy {
     constructor(private textboxService: TextboxService) {
         this.subscription = this.textboxService.getMessage().subscribe(message => {
             if(message) {
-                this.messages.push(message);
-            } else {
-                this.messages = [];
+                this.messages.push(message); 
+                setTimeout(() => {
+                    document.getElementById('thread')?.scrollTo(0, document.getElementById('thread')?.scrollHeight??1);
+                }, 100);  
             }
         });
     }
