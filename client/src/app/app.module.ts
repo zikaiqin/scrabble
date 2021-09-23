@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
@@ -9,10 +9,13 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+// import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { HomePageComponent } from './pages/home-page/home-page.component';
+import { MainMenuComponent } from './components/main-menu/main-menu.component';
+import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
 import { TextboxComponent } from './components/textbox/textbox.component';
 import { InputbarComponent } from './components/inputbar/inputbar.component';
+import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -24,14 +27,17 @@ import { InputbarComponent } from './components/inputbar/inputbar.component';
     declarations: [
         AppComponent,
         GamePageComponent,
-        MainPageComponent,
+        // MainPageComponent,
+        HomePageComponent,
+        MainMenuComponent,
+        NewGameMenuComponent,
         MaterialPageComponent,
         PlayAreaComponent,
         SidebarComponent,
         TextboxComponent,
         InputbarComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
     providers: [],
     bootstrap: [AppComponent],
 })
