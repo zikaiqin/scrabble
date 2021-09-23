@@ -9,6 +9,7 @@ import { TextboxService, MessageType } from '@app/services/textbox.service';
 export class InputbarComponent {
     constructor(private messageService: TextboxService) {}
     buttonPressed = '';
+    messages: string;
 
     checkIfCommand(input: string) {
         if (input[0] == '!') {
@@ -30,15 +31,13 @@ export class InputbarComponent {
     }
 
     sendMessage(): void {
-        let input = (<HTMLInputElement>document.getElementById('message')).value;
-        if (input != '' && input.length <= 512) {
-            this.messageService.sendMessage(MessageType.User, input);
-            this.runCommand(input);
-        } else if (input.length > 512) {
+        if (this.messages != '' && this.messages.length <= 512) {
+            this.messageService.sendMessage(MessageType.User, this.messages);
+            this.runCommand(this.messages);
+        } else if (this.messages.length > 512) {
             this.messageService.sendMessage(MessageType.System, 'Votre message contient trop de caracteres');
         }
-
-        (<HTMLInputElement>document.getElementById('message')).value = '';
+        this.messages = '';
     }
 
     @HostListener('keydown', ['$event'])
