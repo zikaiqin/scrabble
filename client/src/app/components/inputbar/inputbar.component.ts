@@ -1,56 +1,50 @@
-import { Component, HostListener} from "@angular/core";
-import { TextboxService } from "@app/services/textbox.service";
+import { Component, HostListener } from '@angular/core';
+import { TextboxService, MessageType } from '@app/services/textbox.service';
 
-@Component({ 
+@Component({
     selector: 'app-inputbar',
     templateUrl: './inputbar.component.html',
-    styleUrls: ['./inputbar.component.scss']
+    styleUrls: ['./inputbar.component.scss'],
 })
 export class InputbarComponent {
-    
-    constructor(private messageService: TextboxService) { }
+    constructor(private messageService: TextboxService) {}
     buttonPressed = '';
 
-    checkIfCommand(input: string){
-        if(input[0]=="!") {
+    checkIfCommand(input: string) {
+        if (input[0] == '!') {
             return true;
         }
         return false;
     }
-    runCommand(input: string){
-        if(this.checkIfCommand(input)){
-            /*if(input == "!help"){
-                this.messageService.sendMessage('Systeme: ' + 'Voici une liste des commandes'.fontcolor("red"));
-            }*/
+
+    runCommand(input: string) {
+        if (this.checkIfCommand(input)) {
             switch (input) {
-                case "!help":
-                    this.messageService.sendMessage('Systeme: ' + 'Voici une liste des commandes'.fontcolor("red"));
+                case '!help':
+                    this.messageService.sendMessage(MessageType.System, 'Voici une liste des commandes');
                     break;
                 default:
-                    this.messageService.sendMessage('Systeme: ' + 'Cette commande n existe pas'.fontcolor("red"));
-
+                    this.messageService.sendMessage(MessageType.System, 'Cette commande n\'existe pas');
             }
         }
-
     }
 
     sendMessage(): void {
         let input = (<HTMLInputElement>document.getElementById('message')).value;
-        if(input != '' && input.length <= 512){
-            this.messageService.sendMessage('User: ' + input.fontcolor("blue"));
+        if (input != '' && input.length <= 512) {
+            this.messageService.sendMessage(MessageType.User, input);
             this.runCommand(input);
-            input = '';
-        (<HTMLInputElement>document.getElementById('message')).value = input;
-        }else if(input.length > 512){
-            this.messageService.sendMessage('Systeme: Votre message contient trop de caracteres')
+        } else if (input.length > 512) {
+            this.messageService.sendMessage(MessageType.System, 'Votre message contient trop de caracteres');
         }
 
+        (<HTMLInputElement>document.getElementById('message')).value = '';
     }
+
     @HostListener('keydown', ['$event'])
     buttonDetect(event: KeyboardEvent) {
-        if(event.keyCode === 13){
-           this.sendMessage(); 
+        if (event.keyCode === 13) {
+            this.sendMessage();
         }
     }
-    
 }

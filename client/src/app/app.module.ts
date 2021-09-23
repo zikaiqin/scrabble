@@ -14,7 +14,6 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { TextboxComponent } from './components/textbox/textbox.component';
 import { InputbarComponent } from './components/inputbar/inputbar.component';
 
-
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -22,7 +21,16 @@ import { InputbarComponent } from './components/inputbar/inputbar.component';
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, GamePageComponent, MainPageComponent, MaterialPageComponent, PlayAreaComponent, SidebarComponent, TextboxComponent, InputbarComponent],
+    declarations: [
+        AppComponent,
+        GamePageComponent,
+        MainPageComponent,
+        MaterialPageComponent,
+        PlayAreaComponent,
+        SidebarComponent,
+        TextboxComponent,
+        InputbarComponent,
+    ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
     bootstrap: [AppComponent],
