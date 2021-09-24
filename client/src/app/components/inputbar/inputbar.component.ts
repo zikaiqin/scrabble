@@ -1,5 +1,9 @@
-import { Component, HostListener } from '@angular/core';
-import { TextboxService, MessageType } from '@app/services/textbox.service';
+import { Component } from '@angular/core';
+import { TextboxService } from '@app/services/textbox.service';
+import { CommandService } from '@app/services/command.service';
+import { MessageType } from '@app/classes/message';
+
+const MAX_MESSAGE_LENGTH = 512;
 
 @Component({
     selector: 'app-inputbar',
@@ -7,43 +11,26 @@ import { TextboxService, MessageType } from '@app/services/textbox.service';
     styleUrls: ['./inputbar.component.scss'],
 })
 export class InputbarComponent {
-    constructor(private messageService: TextboxService) {}
-    buttonPressed = '';
-    messages: string;
+    message: string;
 
-    checkIfCommand(input: string) {
-        if (input[0] == '!') {
-            return true;
-        }
-        return false;
-    }
+    constructor(private textboxService: TextboxService, private commandService: CommandService) {}
 
-    runCommand(input: string) {
-        if (this.checkIfCommand(input)) {
-            switch (input) {
-                case '!help':
-                    this.messageService.sendMessage(MessageType.System, 'Voici une liste des commandes');
-                    break;
-                default:
-                    this.messageService.sendMessage(MessageType.System, 'Cette commande n\'existe pas');
-            }
-        }
+    isCommand(input: string): boolean {
+        return input[0] === '!';
     }
 
     sendMessage(): void {
-        if (this.messages != '' && this.messages.length <= 512) {
-            this.messageService.sendMessage(MessageType.User, this.messages);
-            this.runCommand(this.messages);
-        } else if (this.messages.length > 512) {
-            this.messageService.sendMessage(MessageType.System, 'Votre message contient trop de caracteres');
+        if (this.message === '') {
+            return;
         }
-        this.messages = '';
-    }
-
-    @HostListener('keydown', ['$event'])
-    buttonDetect(event: KeyboardEvent) {
-        if (event.keyCode === 13) {
-            this.sendMessage();
+        if (this.message.length > MAX_MESSAGE_LENGTH) {
+            this.textboxService.sendMessage(MessageType.System, 'Votre message dépasse 512 charactères');
         }
+        if (this.isCommand(this.message)) {
+            this.commandService.parseCommand(this.message);
+        } else {
+            this.textboxService.sendMessage(MessageType.User, this.message);
+        }
+        this.message = '';
     }
 }
