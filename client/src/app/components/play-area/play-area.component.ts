@@ -41,6 +41,13 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridCanvas.nativeElement.focus();
     }
 
+    AfficherMot(array: string[]) {
+        for (let i = 0; i < array.length; i++) {
+            if (i == -1) {
+                this.gridService.drawWord('A', 3, 4);
+            }
+        }
+    }
     get width(): number {
         return this.canvasSize.x;
     }
