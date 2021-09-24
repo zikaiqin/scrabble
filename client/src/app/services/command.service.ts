@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
+import { TextboxService } from '@app/services/textbox.service';
 
 @Injectable({
     providedIn: 'root',
