@@ -1,17 +1,9 @@
 <div class="container center justify">
     <ng-template [ngIf]="!gameMode || !gameType" [ngIfElse]="newGame">
-        <app-main-menu
-            [gameMode]="gameMode"
-            [gameType]="gameType"
-            (navigationEvent)="navigateTo($event)">
-        </app-main-menu>
+        <app-main-menu [gameMode]="gameMode" [gameType]="gameType" (navigationEvent)="navigateTo($event)"> </app-main-menu>
     </ng-template>
 
     <ng-template #newGame>
-        <app-new-game-menu
-            [gameMode]="gameMode"
-            [gameType]="gameType"
-            (goBack)="navigateTo($event)">
-        </app-new-game-menu>
+        <app-new-game-menu [gameMode]="gameMode" [gameType]="gameType" (goBack)="navigateTo($event)"> </app-new-game-menu>
     </ng-template>
 </div>

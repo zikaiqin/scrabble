@@ -1,0 +1,14 @@
+.passer {
+    background-color: white;
+    color: black;
+}
+
+.passer:active {
+    background-color: black;
+    color: white;
+}
+
+.passer:disabled {
+    background-color: red;
+    color: black;
+}

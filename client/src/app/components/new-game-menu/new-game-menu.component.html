@@ -11,7 +11,7 @@
     <form class="stretch-column">
         <mat-form-field appearance="standard">
             <mat-label>Nom du joueur</mat-label>
-            <input matInput [formControl]="userName">
+            <input matInput [formControl]="userName" />
             <mat-hint>
                 {{ getNameHint() }}
             </mat-hint>
@@ -23,14 +23,7 @@
         <mat-label>
             {{ getTurnLabel() }}
         </mat-label>
-        <mat-slider
-            disabled
-            step="30"
-            min="30"
-            max="300"
-            [value]="turnLength"
-            [displayWith]="timeFormat"
-            (input)="setTurnLength($event.value)">
+        <mat-slider disabled step="30" min="30" max="300" [value]="turnLength" [displayWith]="timeFormat" (input)="setTurnLength($event.value)">
         </mat-slider>
 
         <ng-template [ngIf]="gameType === gameTypes.Single">
@@ -41,12 +34,8 @@
             </mat-button-toggle-group>
         </ng-template>
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="userName.invalid" [routerLink]="['/game']">
-            Jouer
-        </button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="userName.invalid" [routerLink]="['/game']">Jouer</button>
 
-        <button mat-button (click)="this.goBack.emit('Back')">
-            Retour
-        </button>
+        <button mat-button (click)="this.goBack.emit('Back')">Retour</button>
     </form>
 </mat-card>
