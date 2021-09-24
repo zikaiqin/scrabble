@@ -37,9 +37,9 @@ export class CommandService {
 
         const exec: ((...args: string[]) => void) | undefined = this.commandLookup.get(command);
         if (!exec) {
-            this.textboxService.sendMessage(MessageType.System, `La commande ${input} n'existe pas`);
+            this.textboxService.sendMessage(MessageType.System, `La commande ${command} n'existe pas`);
         } else {
-            this.textboxService.sendMessage(MessageType.System, `Vous avez utilisé la commande ${input}`);
+            this.textboxService.sendMessage(MessageType.System, `Vous avez utilisé la commande ${command}`);
             exec(...params);
         }
     }
