@@ -1,0 +1,41 @@
+<mat-card class="menu-card center">
+    <div class="title-container center">
+        <h1 class="title">
+            {{ getTitle() }}
+        </h1>
+        <h2 class="subtitle">
+            {{ getSubTitle() }}
+        </h2>
+    </div>
+
+    <form class="stretch-column">
+        <mat-form-field appearance="standard">
+            <mat-label>Nom du joueur</mat-label>
+            <input matInput [formControl]="userName" />
+            <mat-hint>
+                {{ getNameHint() }}
+            </mat-hint>
+            <mat-error *ngIf="userName.invalid">
+                {{ getNameError() }}
+            </mat-error>
+        </mat-form-field>
+
+        <mat-label>
+            {{ getTurnLabel() }}
+        </mat-label>
+        <mat-slider disabled step="30" min="30" max="300" [value]="turnLength" [displayWith]="timeFormat" (input)="setTurnLength($event.value)">
+        </mat-slider>
+
+        <ng-template [ngIf]="gameType === gameTypes.Single">
+            <mat-label id="toggle-button">Profil de l'adversaire</mat-label>
+            <mat-button-toggle-group disabled name="difficulty" value="easy">
+                <mat-button-toggle class="toggle-button" value="easy">Novice</mat-button-toggle>
+                <mat-button-toggle class="toggle-button" value="hard">Expert</mat-button-toggle>
+            </mat-button-toggle-group>
+        </ng-template>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="userName.invalid" [routerLink]="['/game']">Jouer</button>
+
+        <button mat-button (click)="this.goBack.emit('Back')">Retour</button>
+    </form>
+</mat-card>
