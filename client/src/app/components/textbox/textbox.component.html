@@ -1,0 +1,7 @@
+<div class="textThread" id="thread">
+    <ng-template ngFor let-message [ngForOf]="messages">
+        <div [ngClass]="message.style">
+            {{ getMessage(message) }}
+        </div>
+    </ng-template>
+</div>

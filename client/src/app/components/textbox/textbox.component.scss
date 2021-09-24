@@ -1,0 +1,16 @@
+.textThread {
+    font-size: 15px;
+    border: 1px solid black;
+    height: 400px;
+    width: 450px;
+    overflow: auto;
+    overflow-wrap: break-word;
+}
+
+.system-message {
+    color: red;
+}
+
+.user-message {
+    color: cornflowerblue;
+}
