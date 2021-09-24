@@ -9,13 +9,14 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-// import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { HomePageComponent } from './pages/home-page/home-page.component';
+import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import { InputbarComponent } from './components/inputbar/inputbar.component';
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
+import { PassTurnComponent } from './components/pass-turn/pass-turn.component';
 import { TextboxComponent } from './components/textbox/textbox.component';
-import { InputbarComponent } from './components/inputbar/inputbar.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+// import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { HomePageComponent } from './pages/home-page/home-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -36,6 +37,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
         SidebarComponent,
         TextboxComponent,
         InputbarComponent,
+        PassTurnComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
     providers: [],
