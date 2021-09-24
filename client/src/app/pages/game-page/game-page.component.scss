@@ -14,7 +14,13 @@
     outline: none;
 }
 
-.chevalet{
+.chevalet {
     display: grid;
     width: 450px;
+}
+
+.paneau-container{
+    position: absolute;
+    top: 0;
+    right: 0;
 }
