@@ -1,5 +1,5 @@
 import { Component, HostListener } from '@angular/core';
-import { TextboxService, MessageType } from '@app/services/textbox.service';
+import { MessageType, TextboxService } from '@app/services/textbox.service';
 
 @Component({
     selector: 'app-inputbar',
@@ -24,13 +24,13 @@ export class InputbarComponent {
                     this.messageService.sendMessage(MessageType.System, 'Voici une liste des commandes');
                     break;
                 default:
-                    this.messageService.sendMessage(MessageType.System, 'Cette commande n\'existe pas');
+                    this.messageService.sendMessage(MessageType.System, "Cette commande n'existe pas");
             }
         }
     }
 
     sendMessage(): void {
-        let input = (<HTMLInputElement>document.getElementById('message')).value;
+        const input = (<HTMLInputElement>document.getElementById('message')).value;
         if (input != '' && input.length <= 512) {
             this.messageService.sendMessage(MessageType.User, input);
             this.runCommand(input);
