@@ -2,7 +2,7 @@ import { AfterViewInit, Component } from '@angular/core';
 import { TurnService } from '@app/services/turn.service';
 import { Subscription } from 'rxjs';
 
-const TIMER = 5000;
+const TIMER = 60000; // temporary value just here for demo
 const TIMER_INTERVAL = 1000;
 
 @Component({
