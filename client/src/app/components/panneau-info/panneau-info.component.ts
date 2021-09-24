@@ -1,17 +1,12 @@
-import { Component} from '@angular/core';
-
+import { Component } from '@angular/core';
+export const WIDTHPANEAU = 240;
+export const HEIGHTPANEAU = 500;
 @Component({
-  selector: 'app-panneau-info',
-  templateUrl: './panneau-info.component.html',
-  styleUrls: ['./panneau-info.component.scss']
+    selector: 'app-panneau-info',
+    templateUrl: './panneau-info.component.html',
+    styleUrls: ['./panneau-info.component.scss'],
 })
 export class PanneauInfoComponent {
-  width = 240;
-  height = 500;
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+    width = WIDTHPANEAU;
+    height = HEIGHTPANEAU;
 }
