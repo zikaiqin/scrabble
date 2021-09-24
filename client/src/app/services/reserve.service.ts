@@ -1,12 +1,7 @@
 import { Injectable } from '@angular/core';
 
-type Reserve = {
-  letters: string[];
-  quantity: number;
-};
-
-/*const baseReserve: Reserve = {
-  letters: ["a", "a", "a", "a", "a", "a", "a", "a", "a", 
+/*const baseReserve: string[] =
+  ["a", "a", "a", "a", "a", "a", "a", "a", "a", 
   "b", "b",
   "c", "c",
   "d", "d", "d",
@@ -32,14 +27,11 @@ type Reserve = {
   "x",
   "y",
   "z",
-  "*", "*"],
-  quantity: 102
-};*/
+  "*", "*"];
 
-//let currentReserve:Reserve = {letters:[], quantity:0};
-//currentReserve = baseReserve;
+  let currentReserve  = Object.assign([], baseReserve);
 
-//let hand: Reserve = {letters:[], quantity:0};
+  let hand:string[] = [];*/
 
 @Injectable({
   providedIn: 'root'
@@ -48,10 +40,9 @@ export class ReserveService {
 
   constructor() { }
 
-/*function reinitializeReserve(current: Reserve) {
-    current = baseReserve;
-    console.log(current);
-}*/
+  /*reinitializeReserve() {
+    currentReserve  = Object.assign([], baseReserve);
+  }*/
 
   getRandomInt(min:number, max:number): number {
     min = Math.ceil(min);
@@ -59,27 +50,38 @@ export class ReserveService {
     return Math.floor(Math.random() * (max - min) + min);
   }
 
-  removeLetterIndex(reserve:Reserve, index:number): string {
-    if (index > -1 && index < reserve.letters.length) {
-      let removedLetter:string = reserve.letters[index];
-      reserve.letters.splice(index, 1);
-      reserve.quantity--;
+  removeLetterIndex(reserve:string[], index:number): string {
+    if (index > -1 && index < reserve.length) {
+      let removedLetter:string = reserve[index];
+      reserve.splice(index, 1);
       return removedLetter;
     }
     else
       return "error";
   }
 
-  moveLettersToHand(hand:Reserve, reserve:Reserve, numberOfLetters:number) {
-      if (numberOfLetters <= reserve.quantity) {
+  moveLettersToHand(hand:string[], reserve:string[], numberOfLetters:number) {
+      if (numberOfLetters <= reserve.length) {
           for(let i = 0; i < numberOfLetters; i++) {
-              let index:number = this.getRandomInt(0, reserve.quantity);
+              let index:number = this.getRandomInt(0, reserve.length);
               let removedLetter = this.removeLetterIndex(reserve, index);
-              hand.letters.push(removedLetter);
-              hand.quantity++;
+              hand.push(removedLetter);
           }
       }
       else
           console.log("not enough letters left in the reserve");
+  }
+
+  exchangeLetters(hand:string[], lettersToBeRemoved:string[], reserve:string[]):number {
+    if (reserve.length < 7)
+      return -1;
+    else {
+      for(let i = 0; i < lettersToBeRemoved.length; i++) {
+        hand.splice(hand.indexOf(lettersToBeRemoved[i]), 1);
+      }
+      this.moveLettersToHand(hand, reserve, lettersToBeRemoved.length);
+      reserve.push(...lettersToBeRemoved);
+      return 1;
+    }
   }
 }
