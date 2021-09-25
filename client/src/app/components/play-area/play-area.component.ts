@@ -41,6 +41,7 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridCanvas.nativeElement.focus();
     }
 
+
     AfficherMot(array: string[]) {
         for (let i = 0; i < array.length; i++) {
             if (i == -1) {

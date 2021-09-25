@@ -12,13 +12,14 @@ export const STROKE_RANGE = 4;
     providedIn: 'root',
 })
 export class GridService {
+
     gridContext: CanvasRenderingContext2D;
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
     // TODO : pas de valeurs magiques!! Faudrait avoir une meilleure manière de le faire
     /* eslint-disable @typescript-eslint/no-magic-numbers */
     START_NUMBER_POS: number = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     START_LETTER_POS: number = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
-    TUILE_SIZE = DEFAULT_WIDTH / DEFAULT_NB_CASES;
+    readonly TUILE_SIZE = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     TUILE_POSX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     TUILE_POSY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
 
@@ -89,11 +90,17 @@ export class GridService {
         this.BetterBorder();
 
         this.gridContext.fillStyle = 'rgb(220, 73, 77)';
-        this.gridContext.fillRect(this.TUILE_POSX + 2, this.TUILE_POSY + 2, this.TUILE_SIZE - STROKE_RANGE, this.TUILE_SIZE - STROKE_RANGE);
+        this.gridContext.fillRect(
+            this.TUILE_POSX + 2, 
+            this.TUILE_POSY + 2, 
+            this.TUILE_SIZE - STROKE_RANGE, 
+            this.TUILE_SIZE - STROKE_RANGE);
 
         this.gridContext.fillStyle = 'white';
         this.gridContext.font = '7px serif';
-        this.gridContext.fillText('MOT X3', this.TUILE_POSX + 2, this.TUILE_POSY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2);
+        this.gridContext.fillText('MOT X3', 
+        this.TUILE_POSX + 2, 
+        this.TUILE_POSY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2);
     }
     drawMx2(){
 
@@ -113,6 +120,7 @@ export class GridService {
    
     }
     drawLx2(){
+
         this.BetterBorder();
 
         this.gridContext.fillStyle = 'rgb(159, 211, 215)';
@@ -125,10 +133,14 @@ export class GridService {
 
         this.gridContext.fillStyle = 'black';
         this.gridContext.font = '9px sans-serif';
-        this.gridContext.fillText('Let X2', this.TUILE_POSX + 3, this.TUILE_POSY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2);
+        this.gridContext.fillText('Let X2', 
+        this.TUILE_POSX + 3, 
+        this.TUILE_POSY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2
+        );
     
     }
     drawLx3(){
+
         this.BetterBorder();
 
         this.gridContext.fillStyle = 'blue';
@@ -139,10 +151,14 @@ export class GridService {
             this.TUILE_SIZE - STROKE_RANGE,
         )
         this.gridContext.fillStyle = 'white';
-                    this.gridContext.font = '9px serif';
-                    this.gridContext.fillText('Let  X3', this.TUILE_POSX + 2, this.TUILE_POSY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2);
+        this.gridContext.font = '9px serif';
+        this.gridContext.fillText('Let  X3', 
+        this.TUILE_POSX + 2, 
+        this.TUILE_POSY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2
+        );
     }
     drawNONE(){
+
         this.gridContext.fillStyle = 'rgb(255, 221, 189)';
         this.gridContext.fillRect(
             this.TUILE_POSX + 2,
@@ -152,6 +168,7 @@ export class GridService {
         );
     }
     drawBonus(x:number,y:number){
+
         // CASE MOT X 3
         if (tableau[x][y] === 'Wx3') {
             this.drawMx3();
@@ -175,6 +192,7 @@ export class GridService {
         }
     }
     drawGrid() {
+
         this.gridContext.lineWidth = 1;
         this.gridContext.fillStyle = 'black';
         this.gridContext.strokeStyle = 'black';
@@ -197,24 +215,51 @@ export class GridService {
             this.TUILE_POSY += this.TUILE_SIZE;
             this.TUILE_POSX = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         }
-
-        this.gridContext.fillStyle = 'white';
-        this.gridContext.fillRect(230, 302, this.TUILE_SIZE, this.TUILE_SIZE);
-
-        this.gridContext.fillStyle = 'black';
-        this.gridContext.font = '9px serif';
-        this.gridContext.fillText('A', 230, 332);
+        this.drawWord('A',5,1);
     }
 
-    drawWord(word: string, posX: number, posY: number) {
-        this.gridContext.fillStyle = 'white';
-        this.gridContext.fillRect(this.TUILE_POSX + 2, this.TUILE_POSY + 2, this.TUILE_SIZE - STROKE_RANGE, this.TUILE_SIZE - STROKE_RANGE);
+    drawWord(letter: string, posX: number, posY: number) {
 
-        this.gridContext.fillStyle = 'white';
-        this.gridContext.font = '9px serif';
-        this.gridContext.fillText(word, this.TUILE_POSX + 2, this.TUILE_POSY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2);
+        letter = letter.toUpperCase();
+
+        if(posY <= 15 && posX <=15 && posX >= 0 && posY >= 0){
+            
+            let tuileX = DEFAULT_WIDTH/DEFAULT_NB_CASES;
+            let tuileY = DEFAULT_HEIGHT/DEFAULT_NB_CASES;
+        
+            // Deplacer sa position en X
+            for(let i = 0; i < posX-1; i++){
+                tuileX+=this.TUILE_SIZE;
+            }
+
+            // Deplacer sa position en Y
+            for(let y = 0; y < posY-1; y++){
+                tuileY+=this.TUILE_SIZE; 
+            }
+
+            // Background de ce tuile
+            this.gridContext.fillStyle = 'white';
+            this.gridContext.fillRect(
+                tuileX + 2, 
+                tuileY + 2, 
+                this.TUILE_SIZE - STROKE_RANGE, 
+                this.TUILE_SIZE - STROKE_RANGE);
+
+            // Ecrire la lettre sur le tuile
+            this.gridContext.fillStyle = 'black';
+            this.gridContext.font = '20px serif';
+            this.gridContext.fillText(
+                letter, tuileX + STROKE_RANGE, 
+                tuileY + DEFAULT_HEIGHT / DEFAULT_NB_CASES/2 + STROKE_RANGE 
+            );
+
+        }
+        
+        
     }
-
+    //REMOVEGRID
+    //DRAWCHEVALET
+    //REMOVEWORDCHEVALET
     get width(): number {
         return this.canvasSize.x;
     }
