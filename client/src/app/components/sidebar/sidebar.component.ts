@@ -26,7 +26,7 @@ export class SidebarComponent implements AfterViewInit {
             if (element !== null) {
                 element.innerHTML = (time / TIMER_INTERVAL).toString();
                 time -= TIMER_INTERVAL;
-                if (time < 0 || this.turn === false) {
+                if (time < 0 || !this.turn) {
                     this.turnService.changeTurn(false);
                     element.innerHTML = 'Turn ended';
                     clearInterval(timer);

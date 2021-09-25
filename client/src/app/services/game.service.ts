@@ -1,33 +1,31 @@
 import { Injectable } from '@angular/core';
-import { Message } from '@app/classes/message';
-import { Observable } from 'rxjs';
-import { CommandService } from './command.service';
-import { TextboxService } from './textbox.service';
-import { TurnService } from './turn.service';
+import { Subject } from 'rxjs';
+import { Player } from '@app/classes/player';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameService {
-    constructor(private textbox: TextboxService, private command: CommandService, private turn: TurnService) {}
+    player0: Player;
+    player1: Player;
 
-    changeTurn(bool: boolean): void {
-        this.turn.changeTurn(bool);
-    }
+    // TODO: give me a type
+    hand0: unknown;
+    hand1: unknown;
 
-    sendMessage(type: string, text: string): void {
-        this.textbox.sendMessage(type, text);
-    }
+    // TODO: give me a type
+    letterReserve: unknown;
 
-    getState(): Observable<boolean> {
-        return this.turn.getState();
-    }
+    // TODO: give me a type
+    boardState: unknown;
 
-    getMessage(): Observable<Message> {
-        return this.textbox.getMessage();
-    }
+    turnState = new Subject<boolean>();
 
-    parseCommand(input: string): void {
-        this.command.parseCommand(input);
+    init(player0: Player, player1: Player): void {
+        this.player0 = player0;
+        this.player1 = player1;
+
+        const turnState = Boolean(Math.floor(Math.random() * 2));
+        this.turnState.next(turnState);
     }
 }
