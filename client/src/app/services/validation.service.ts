@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import * as data from 'src/assets/dictionnary.json';
 
+const WORD_BONUS = 50;
+const FULL_WORD = 7;
+
 enum Color {
     LIGHTBLUE = 'light_blue',
     DARKBLUE = 'dark_blue',
@@ -55,14 +58,17 @@ export class ValidationService {
         return false;
     }
 
-    calcPoints(word: string, square: string): number {
+    calcPoints(word: string, square: string[]): number {
         let counter = 0;
-        for (const val of word) {
-            const ascii: number = val.charCodeAt(0);
+        for (const char of word) {
+            const ascii: number = char.charCodeAt(0);
             if (ascii >= ASCII_A && ascii <= ASCII_E) counter += Points.A;
         }
-        if (square === Color.DARKBLUE || square === Color.RED) counter *= 3;
-        else if (square === Color.LIGHTBLUE || square === Color.PINK) counter *= 2;
+        for (const color in square) {
+            if (color === Color.DARKBLUE || color === Color.RED) counter *= 3;
+            else if (color === Color.LIGHTBLUE || color === Color.PINK) counter *= 2;
+        }
+        if (word.length === FULL_WORD) counter += WORD_BONUS; // Need to take into placed letter, not word length
 
         return counter;
     }

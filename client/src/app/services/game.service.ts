@@ -4,12 +4,15 @@ import { Observable } from 'rxjs';
 import { CommandService } from './command.service';
 import { TextboxService } from './textbox.service';
 import { TurnService } from './turn.service';
+import { ValidationService } from './validation.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameService {
-    constructor(private textbox: TextboxService, private command: CommandService, private turn: TurnService) {}
+    playerScore: number;
+
+    constructor(private textbox: TextboxService, private command: CommandService, private turn: TurnService, private validation: ValidationService) {}
 
     changeTurn(bool: boolean): void {
         this.turn.changeTurn(bool);
@@ -29,5 +32,13 @@ export class GameService {
 
     parseCommand(input: string): void {
         this.command.parseCommand(input);
+    }
+
+    checkWord(word: string, square: string[]): boolean {
+        if (this.validation.findWord(word)) {
+            this.playerScore = this.validation.calcPoints(word, square);
+            return true;
+        }
+        return false;
     }
 }
