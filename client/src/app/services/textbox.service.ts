@@ -1,0 +1,21 @@
+import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { Message } from '@app/classes/message';
+
+@Injectable({ providedIn: 'root' })
+export class TextboxService {
+    private subject = new Subject<Message>();
+
+    sendMessage(type: string, text: string) {
+        this.subject.next({ type, text });
+    }
+
+    // FIXME: dead code?
+    clearMessages() {
+        this.subject.next();
+    }
+
+    getMessage(): Observable<Message> {
+        return this.subject.asObservable();
+    }
+}
