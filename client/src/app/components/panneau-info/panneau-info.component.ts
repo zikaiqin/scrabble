@@ -1,12 +1,49 @@
 import { Component } from '@angular/core';
-export const WIDTHPANEAU = 240;
-export const HEIGHTPANEAU = 500;
+import { GameService } from '@app/services/game.service';
+
+
+
+
 @Component({
     selector: 'app-panneau-info',
     templateUrl: './panneau-info.component.html',
     styleUrls: ['./panneau-info.component.scss'],
 })
 export class PanneauInfoComponent {
-    width = WIDTHPANEAU;
-    height = HEIGHTPANEAU;
+   gameService: GameService; 
+   /*nomJoueur0: string;
+   nomJoueur1: string;
+   scoreJoueur0: string;
+   scoreJoueur1: string;
+   pieceChevalet1: string;
+   pieceChevalet2: string;
+   pieceReserve: string;*/
+   private joueur = new Map();
+   //joueur: string[]=[];
+   
+   
+
+   setJoueurInfo(){
+       //this.nomJoueur0 = this.gameService.player0.name;
+       //this.nomJoueur1 = this.gameService.player1.name;
+       //this.scoreJoueur0 = this.gameService.score0;
+       //this.scoreJoueur1 = this.gameService.score1;
+       this.joueur.set("Nom0", this.gameService.player0.name);
+       //.set("Nom1", this.nomJoueur1)
+       //.set("Score0", this.scoreJoueur0)
+       //.set("Score1", this.scoreJoueur1);
+       //this.joueur.push(this.nomJoueur0);
+       return this.joueur;
+       
+   }
+   
+   afficherNomJoueur(info: number){
+       return this.setJoueurInfo().get("Nom0");
+       //return this.setJoueurInfo()[info];
+   }
+
+   
+    
+   
+   
 }

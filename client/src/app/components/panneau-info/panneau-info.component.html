@@ -1,4 +1,10 @@
 <div id="grid-container">
-    <h2>VOTRE PANEAU D'INFORMATIONS</h2>
-    <canvas id="canvas" #gridCanvas [attr.width]="width" [attr.height]="height" style="float: right"> </canvas>
+    <div id="panneau">
+        <div id="joueur-container">Joueur 1</div>
+        <br>
+        <div id="joueur1">Nom: {{afficherNomJoueur(0)}}</div>
+        <div id="joueur1">Score: {{afficherNomJoueur(0)}}</div>
+        <br>
+        <div id="joueur2"></div>
+    </div>
 </div>

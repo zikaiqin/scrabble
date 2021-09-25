@@ -13,8 +13,15 @@ export class GameService {
     hand0: unknown;
     hand1: unknown;
 
+    hand0Num: string;
+    hand1Num: string;
+
+    score0: string;
+    score1: string;
+
     // TODO: give me a type
     letterReserve: unknown;
+    reserveAmount: string;
 
     // TODO: give me a type
     boardState: unknown;
