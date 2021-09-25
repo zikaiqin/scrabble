@@ -24,7 +24,7 @@ export class InputbarComponent {
             return;
         }
         if (this.message.length > MAX_MESSAGE_LENGTH) {
-            this.textboxService.sendMessage(MessageType.System, 'Votre message dépasse 512 charactères');
+            this.textboxService.sendMessage(MessageType.System, `Votre message dépasse ${MAX_MESSAGE_LENGTH} caractères`);
         }
         if (this.isCommand(this.message)) {
             this.commandService.parseCommand(this.message);

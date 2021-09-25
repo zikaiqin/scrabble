@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
 
@@ -8,7 +9,7 @@ import { MessageType } from '@app/classes/message';
 export class CommandService {
     readonly commandLookup = new Map<string, (...params: string[]) => boolean>([
         [
-            '!help',
+            '!aide',
             (): boolean => {
                 // eslint-disable-next-line no-invalid-this
                 this.textboxService.sendMessage(
@@ -22,20 +23,13 @@ export class CommandService {
         [
             '!placer',
             (position: string, word: string): boolean => {
-                const positionTemplate = /[a-o](?:1[0-5]|[1-9])[vh]/;
-                const wordTemplate = /[a-zA-Z]+/;
-
-                const simpleValidation: boolean = word !== undefined && positionTemplate.test(position) && wordTemplate.test(word);
-                if (!simpleValidation) {
-                    // eslint-disable-next-line no-invalid-this
-                    this.textboxService.sendMessage(MessageType.System, 'La commande !placer requiert des paramètres valides');
-                }
-                return simpleValidation;
+                // eslint-disable-next-line no-invalid-this
+                return this.placeLetterService.validateCommand(position, word);
             },
         ],
     ]);
 
-    constructor(private textboxService: TextboxService) {}
+    constructor(private textboxService: TextboxService, private placeLetterService: LetterPlacingService) {}
 
     parseCommand(message: string): void {
         let command: string;
