@@ -10,6 +10,9 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import { ChevaletComponent } from './components/chevalet/chevalet.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { PanneauInfoComponent } from './components/panneau-info/panneau-info.component';
 import { InputbarComponent } from './components/inputbar/inputbar.component';
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
@@ -28,18 +31,29 @@ import { HomePageComponent } from './pages/home-page/home-page.component';
     declarations: [
         AppComponent,
         GamePageComponent,
-        // MainPageComponent,
-        HomePageComponent,
-        MainMenuComponent,
-        NewGameMenuComponent,
         MaterialPageComponent,
         PlayAreaComponent,
         SidebarComponent,
+        ChevaletComponent,
+        PanneauInfoComponent,
         TextboxComponent,
         InputbarComponent,
         PassTurnComponent,
+        HomePageComponent,
+        MainMenuComponent,
+        NewGameMenuComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        DragDropModule,
+        ReactiveFormsModule,
+    ],
+
     providers: [],
     bootstrap: [AppComponent],
 })
