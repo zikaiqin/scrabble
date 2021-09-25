@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as data from 'src/assets/dictionnary.json';
-
-const WORD_BONUS = 50;
-const FULL_WORD = 7;
-
 enum Color {
     LIGHTBLUE = 'light_blue',
     DARKBLUE = 'dark_blue',
@@ -40,29 +36,91 @@ enum Points {
     Z = 1,
 }
 
-const ASCII_A = 97;
-const ASCII_E = 101;
+const ASCII_SMALL_A = 97;
+const ASCII_SMALL_E = 101;
+const WORD_BONUS = 50;
+const FULL_WORD = 7;
+const BOARD_SIZE = 14;
 
 @Injectable({
     providedIn: 'root',
 })
 export class ValidationService {
+    fieldBoard: string[][] = [];
     private dictionnary = JSON.parse(JSON.stringify(data));
 
-    findWord(word: string): boolean {
-        if (word.length >= 2 && (word.includes('-') || word.includes("'"))) {
-            for (const val of this.dictionnary.words) {
-                if (word === val) return true;
+    fetchWords(commandLine: string): string[] {
+        // Assuming we are working with small letters
+        const splitted = commandLine.split(' ');
+
+        // Assuming that !command is within the string
+        // Assuming index starts at 0
+        const x = splitted[1].charCodeAt(0) - ASCII_SMALL_A;
+        const y = Number(splitted[2]) - 1;
+
+        const container: string[] = [];
+        let word = '';
+        let i = 0;
+        let j = 0;
+        // Negative horizontal axis
+        for (i; y - i >= 0; i++) {
+            if (this.fieldBoard[x][y - i] === null) {
+                break;
             }
         }
-        return false;
+        for (i; i >= 0; i--) {
+            word += this.fieldBoard[x][y - i];
+        }
+
+        // Positive horizontal axis
+        for (i; y + i <= BOARD_SIZE; i++) {
+            if (this.fieldBoard[x][y + i] !== null) {
+                word += this.fieldBoard[x][y + i];
+            }
+        }
+        container.push(word);
+        word = '';
+        /* ---------------------------------------------------- */
+        // Negative vertical axis
+        for (j; x - j >= 0; j++) {
+            if (this.fieldBoard[x - j][y] === null) {
+                break;
+            }
+        }
+        for (j; j >= 0; j--) {
+            word += this.fieldBoard[x - j][y];
+        }
+
+        // Positive vertical axis
+        for (j; x + j <= BOARD_SIZE; j++) {
+            if (this.fieldBoard[x + j][y] !== null) {
+                word += this.fieldBoard[x + j][y];
+            }
+        }
+        container.push(word);
+
+        return container;
     }
 
-    calcPoints(word: string, square: string[]): number {
+    findWord(words: string[]): boolean {
+        let temp = false;
+        for (const itr of words) {
+            if (itr.length >= 2 && !(itr.includes('-') || itr.includes("'"))) {
+                for (const val of this.dictionnary.words) {
+                    if (itr === val) temp = true;
+                }
+                if (temp === false) return false;
+            }
+        }
+        return true;
+    }
+
+    calcPoints(word: string[], square: string[]): number {
+        // CHANGE FUNCTION FOR ARRAY OF WORDS AND NOT A WORD
         let counter = 0;
         for (const char of word) {
             const ascii: number = char.charCodeAt(0);
-            if (ascii >= ASCII_A && ascii <= ASCII_E) counter += Points.A;
+            if (ascii >= ASCII_SMALL_A && ascii <= ASCII_SMALL_E) counter += Points.A;
         }
         for (const color in square) {
             if (color === Color.DARKBLUE || color === Color.RED) counter *= 3;

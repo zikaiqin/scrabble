@@ -34,9 +34,10 @@ export class GameService {
         this.command.parseCommand(input);
     }
 
-    checkWord(word: string, square: string[]): boolean {
-        if (this.validation.findWord(word)) {
-            this.playerScore = this.validation.calcPoints(word, square);
+    checkWord(commandLine: string, square: string[]): boolean {
+        const words = this.validation.fetchWords(commandLine);
+        if (this.validation.findWord(words)) {
+            this.playerScore = this.validation.calcPoints(words, square);
             return true;
         }
         return false;
