@@ -20,9 +20,6 @@ export class HomePageComponent implements OnInit {
     gameMode: number;
     gameType: number;
 
-    // eslint-disable-next-line @typescript-eslint/no-useless-constructor,@typescript-eslint/no-empty-function
-    constructor() {}
-
     ngOnInit(): void {
         this.gameMode = GameMode.None;
         this.gameType = GameType.None;
