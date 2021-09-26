@@ -1,10 +1,12 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
-
+import { GridChevalet } from '@app/services/chevalet.service';
 // TODO : Avoir un fichier séparé pour les constantes!
 export const DEFAULT_WIDTH = 500;
 export const DEFAULT_HEIGHT = 500;
+export const HAND_WIDTH:number = 385;
+export const HAND_HEIGHT:number = 55;
 
 // TODO : Déplacer ça dans un fichier séparé accessible par tous
 export enum MouseButton {
@@ -22,12 +24,16 @@ export enum MouseButton {
 })
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
+    private ChevaletSize = {ChevaletX:HAND_WIDTH,ChevaletY:HAND_HEIGHT };
+
+    @ViewChild('gridChevalet_lol', { static: false }) private gridChevalet_lol!: ElementRef<HTMLCanvasElement>;
+    private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
 
     mousePosition: Vec2 = { x: 0, y: 0 };
     buttonPressed = '';
-    private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
+    
 
-    constructor(private readonly gridService: GridService) {}
+    constructor(private readonly gridService: GridService, private readonly gridServiceChevalet:GridChevalet) {}
 
     @HostListener('keydown', ['$event'])
     buttonDetect(event: KeyboardEvent) {
@@ -39,6 +45,13 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         /* this.gridService.drawWord('Scrabble'); */
         this.gridCanvas.nativeElement.focus();
+
+
+        //123
+        this.gridServiceChevalet.gridHand = this.gridChevalet_lol.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        this.gridServiceChevalet.drawSomethign();
+        this.gridChevalet_lol.nativeElement.focus();
+
     }
 
 
@@ -56,7 +69,13 @@ export class PlayAreaComponent implements AfterViewInit {
     get height(): number {
         return this.canvasSize.y;
     }
+    get Chevaletwidth(): number {
+        return this.ChevaletSize.ChevaletX;
+    }
 
+    get Chevaletheight(): number {
+        return this.ChevaletSize.ChevaletY;
+    }
     // TODO : déplacer ceci dans un service de gestion de la souris!
     mouseHitDetect(event: MouseEvent) {
         if (event.button === MouseButton.Left) {
