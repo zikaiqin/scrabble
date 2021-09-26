@@ -10,7 +10,7 @@ import { GameService } from '@app/services/game.service';
     styleUrls: ['./panneau-info.component.scss'],
 })
 export class PanneauInfoComponent {
-   gameService: GameService; 
+   constructor(private gameService: GameService){} 
    /*nomJoueur0: string;
    nomJoueur1: string;
    scoreJoueur0: string;
@@ -28,7 +28,8 @@ export class PanneauInfoComponent {
        //this.nomJoueur1 = this.gameService.player1.name;
        //this.scoreJoueur0 = this.gameService.score0;
        //this.scoreJoueur1 = this.gameService.score1;
-       this.joueur.set("Nom0", this.gameService.player0.name);
+       this.joueur.set("Nom0", this.gameService.player)
+       .set("Score0", this.gameService.playerScore);
        //.set("Nom1", this.nomJoueur1)
        //.set("Score0", this.scoreJoueur0)
        //.set("Score1", this.scoreJoueur1);
@@ -37,8 +38,8 @@ export class PanneauInfoComponent {
        
    }
    
-   afficherNomJoueur(info: number){
-       return this.setJoueurInfo().get("Nom0");
+   afficherNomJoueur(info: string){
+       return this.setJoueurInfo().get(info);
        //return this.setJoueurInfo()[info];
    }
 

@@ -16,11 +16,13 @@ export class GameService {
     playerHand: unknown;
     opponentHand: unknown;
 
-    hand0Num: string;
-    hand1Num: string;
+    //TODO: temp value of number of pieces in hand
+    playerHandNum: number;
+    opponentHandNum: number;
 
-    score0: string;
-    score1: string;
+    //TODO: temp value of current score
+    playerScore: number;
+    opponentScore: number;
 
     // TODO: give me a type
     letterReserve: unknown;
