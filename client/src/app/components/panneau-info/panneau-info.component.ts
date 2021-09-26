@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { GameService } from '@app/services/game.service';
 
-
+export const DEFAULT_HAND_CAP = 7;
 
 
 @Component({
@@ -11,40 +11,45 @@ import { GameService } from '@app/services/game.service';
 })
 export class PanneauInfoComponent {
    constructor(private gameService: GameService){} 
-   /*nomJoueur0: string;
-   nomJoueur1: string;
-   scoreJoueur0: string;
-   scoreJoueur1: string;
-   pieceChevalet1: string;
-   pieceChevalet2: string;
-   pieceReserve: string;*/
-   private joueur = new Map();
-   //joueur: string[]=[];
+   private player = new Map();
+   isVisiblePlayer: Boolean = true;
+   isVisibleOpponent: Boolean = true;
+   color: boolean;
+   
    
    
 
-   setJoueurInfo(){
-       //this.nomJoueur0 = this.gameService.player0.name;
-       //this.nomJoueur1 = this.gameService.player1.name;
-       //this.scoreJoueur0 = this.gameService.score0;
-       //this.scoreJoueur1 = this.gameService.score1;
-       this.joueur.set("Nom0", this.gameService.player)
-       .set("Score0", this.gameService.playerScore);
-       //.set("Nom1", this.nomJoueur1)
-       //.set("Score0", this.scoreJoueur0)
-       //.set("Score1", this.scoreJoueur1);
-       //this.joueur.push(this.nomJoueur0);
-       return this.joueur;
+   setPlayerInfo(){
+       this.player.set("PlayerName", this.gameService.player)
+       .set("PlayerScore", this.gameService.playerScore)
+       .set("OpponentName", this.gameService.opponent)
+       .set("OpponentScore", this.gameService.opponentScore)
+       .set("PlayerHandNum", this.gameService.playerHandNum)
+       .set("OpponentHandNum", this.gameService.opponentHandNum)
+       .set("ReserveAmount", this.gameService.reserveAmount);
+       return this.player;
        
    }
    
-   afficherNomJoueur(info: string){
-       return this.setJoueurInfo().get(info);
-       //return this.setJoueurInfo()[info];
+   showPlayerInfo(info: string){
+    if(info == "PlayerHandNum" && this.gameService.playerHandNum > DEFAULT_HAND_CAP){
+        this.isVisiblePlayer = false;
+        return " ";
+    }
+    if(info == "OpponentHandNum" && this.gameService.opponentHandNum > DEFAULT_HAND_CAP){
+        this.isVisibleOpponent = false;
+        return " ";
+    }
+       return this.setPlayerInfo().get(info);
    }
 
-   
-    
-   
+   turnState(){
+        if(this.gameService.turnState){
+            this.color = true
+            return "Votre tour";
+        }
+        this.color = false;
+        return "Tour de l'adversaire";
+   }
    
 }

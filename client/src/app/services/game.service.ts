@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
 const botNames: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
+export const DEFAULT_SCORE = 0;
 
 @Injectable({
     providedIn: 'root',
@@ -21,12 +22,12 @@ export class GameService {
     opponentHandNum: number;
 
     //TODO: temp value of current score
-    playerScore: number;
-    opponentScore: number;
+    playerScore: number = DEFAULT_SCORE;
+    opponentScore: number = DEFAULT_SCORE;
 
     // TODO: give me a type
     letterReserve: unknown;
-    reserveAmount: string;
+    reserveAmount: number;
 
     // TODO: give me a type
     boardState: unknown;

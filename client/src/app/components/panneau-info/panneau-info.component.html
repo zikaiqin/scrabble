@@ -1,10 +1,29 @@
 <div id="grid-container">
     <div id="panneau">
-        <div id="joueur-container">Joueur 1</div>
-        <br>
-        <div id="joueur1">Nom: {{afficherNomJoueur("Nom0")}}</div>
-        <div id="joueur1">Score: {{afficherNomJoueur("Nom0")}}</div>
-        <br>
-        <div id="joueur2"></div>
+        <div id="joueur-container">
+            <div id="joueur">Joueur</div>
+            <div id="nom-joueur">{{showPlayerInfo("PlayerName")}} </div>
+            <div id="score-container">
+                <span>Score</span>
+                <div>{{showPlayerInfo("PlayerScore")}} point(s)</div>
+            </div>
+            <div id="main" [style.display]="isVisiblePlayer ? 'block' : 'none'">{{showPlayerInfo("PlayerHandNum")}} piece(s) en main</div>
+        </div>
+        <div id="adversaire-container">
+            <div id="adversaire">Adversaire</div>
+            <div id="nom-joueur">{{showPlayerInfo("OpponentName")}}</div>
+            <div id="score-container">
+                <span>Score</span>
+                <div>{{showPlayerInfo("OpponentScore")}} point(s)</div>
+            </div>
+            <div id="main" [style.display]="isVisibleOpponent ? 'block' : 'none'">{{showPlayerInfo("OpponentHandNum")}} piece(s) en main</div>
+        </div>
+        <div id="reserve">Il reste {{showPlayerInfo("ReserveAmount")}} piece(s) dans la reserve</div>
+        <div id="tour" [style.backgroundColor]="color ? 'green': 'red'">{{turnState()}}</div>
+        <p id="timer">----</p>
+        <br />
+        <br />
+        <app-pass-turn id="passer" [activePlayer]="true"></app-pass-turn>
     </div>
 </div>
+
