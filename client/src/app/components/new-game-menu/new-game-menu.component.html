@@ -11,11 +11,11 @@
     <form class="stretch-column">
         <mat-form-field appearance="standard">
             <mat-label>Nom du joueur</mat-label>
-            <input matInput [formControl]="userName" />
+            <input matInput [formControl]="nameControl" [(ngModel)]="username"/>
             <mat-hint>
                 {{ getNameHint() }}
             </mat-hint>
-            <mat-error *ngIf="userName.invalid">
+            <mat-error *ngIf="nameControl.invalid">
                 {{ getNameError() }}
             </mat-error>
         </mat-form-field>
@@ -34,7 +34,7 @@
             </mat-button-toggle-group>
         </ng-template>
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="userName.invalid" [routerLink]="['/game']">Jouer</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="nameControl.invalid" (click)="newGame()">Jouer</button>
 
         <button mat-button (click)="this.goBack.emit('Back')">Retour</button>
     </form>

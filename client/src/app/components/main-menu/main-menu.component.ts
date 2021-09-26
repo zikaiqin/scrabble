@@ -24,9 +24,6 @@ export class MainMenuComponent {
         { name: 'Back' },
     ];
 
-    // eslint-disable-next-line @typescript-eslint/no-useless-constructor,@typescript-eslint/no-empty-function
-    constructor() {}
-
     getTitle(): string {
         if (!this.gameMode) {
             return 'Scrabble';
