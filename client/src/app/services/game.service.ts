@@ -18,11 +18,11 @@ export class GameService {
     playerHand: PlayerHand;
     opponentHand: PlayerHand;
 
-    //TODO: temp value of number of pieces in hand
+    // TODO: temp value of number of pieces in hand
     playerHandNum: number;
     opponentHandNum: number;
 
-    //TODO: temp value of current score
+    // TODO: temp value of current score
     playerScore: number = DEFAULT_SCORE;
     opponentScore: number = DEFAULT_SCORE;
 
