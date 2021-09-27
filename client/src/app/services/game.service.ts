@@ -6,6 +6,7 @@ import { Reserve } from '@app/classes/reserve';
 
 const BOT_NAMES: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
 const STARTING_HAND_SIZE = 7;
+export const DEFAULT_SCORE = 0;
 
 @Injectable({
     providedIn: 'root',
@@ -18,6 +19,9 @@ export class GameService {
 
     playerHand: PlayerHand;
     opponentHand: PlayerHand;
+
+    playerScore: number = DEFAULT_SCORE;
+    opponentScore: number = DEFAULT_SCORE;
 
     reserve: Reserve;
 
