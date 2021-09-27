@@ -5,7 +5,7 @@ import { GameBoard } from '@app/classes/game-board';
 import { Reserve } from '@app/classes/reserve';
 
 const BOT_NAMES: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
-const STARTING_HAND_SIZE = 7;
+export const DEFAULT_HAND_SIZE = 7;
 export const DEFAULT_SCORE = 0;
 
 @Injectable({
@@ -50,9 +50,12 @@ export class GameService {
         const turnState = Boolean(Math.floor(Math.random() * 2));
         this.turnState.next(turnState);
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.playerHand.addAll(this.reserve.draw(STARTING_HAND_SIZE)!);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.opponentHand.addAll(this.reserve.draw(STARTING_HAND_SIZE)!);
+        const playerHand = this.reserve.draw(DEFAULT_HAND_SIZE);
+        const opponentHand = this.reserve.draw(DEFAULT_HAND_SIZE);
+
+        if (playerHand !== undefined && opponentHand !== undefined) {
+            this.playerHand.addAll(playerHand);
+            this.opponentHand.addAll(opponentHand);
+        }
     }
 }

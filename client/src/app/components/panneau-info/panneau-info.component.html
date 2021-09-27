@@ -19,7 +19,7 @@
             <div id="main" [style.display]="isVisibleOpponent ? 'block' : 'none'">{{showPlayerInfo("OpponentHandNum")}} piece(s) en main</div>
         </div>
         <div id="reserve">Il reste {{showPlayerInfo("ReserveAmount")}} piece(s) dans la reserve</div>
-        <div id="tour" [style.backgroundColor]="color ? 'green': 'red'">{{turnState()}}</div>
+        <div id="tour" [style.backgroundColor]="isMyTurn ? 'green': 'red'">{{turnState()}}</div>
         <p id="timer">----</p>
         <br />
         <br />
