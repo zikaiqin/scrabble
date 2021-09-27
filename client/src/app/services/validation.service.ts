@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
+import { BoardCoords } from '@app/classes/board-coords';
 import * as data from 'src/assets/dictionnary.json';
+import { GameService } from './game.service';
+import { tableau } from './tableau.config';
+
 enum Color {
     LIGHTBLUE = 'light_blue',
     DARKBLUE = 'dark_blue',
@@ -46,60 +50,39 @@ const BOARD_SIZE = 14;
     providedIn: 'root',
 })
 export class ValidationService {
-    fieldBoard: string[][] = [];
     private dictionnary = JSON.parse(JSON.stringify(data));
+    private board = tableau;
 
-    fetchWords(commandLine: string): string[] {
-        // Assuming we are working with small letters
-        const splitted = commandLine.split(' ');
+    constructor(private gameService: GameService) {}
 
-        // Assuming that !command is within the string
-        // Assuming index starts at 0
-        const x = splitted[1].charCodeAt(0) - ASCII_SMALL_A;
-        const y = Number(splitted[2]) - 1;
+    fetchWords(): string[] {
+        let tempWord = '';
+        const wordContainer: string[] = [];
+        // Assuming I have the placing coords
+        const coord: BoardCoords = { x: 0, y: 0 };
 
-        const container: string[] = [];
-        let word = '';
-        let i = 0;
-        let j = 0;
-        // Negative horizontal axis
-        for (i; y - i >= 0; i++) {
-            if (this.fieldBoard[x][y - i] === null) {
-                break;
-            }
+        // Horizontal negative check
+        let i = 1;
+        for (i; coord.x - i >= 0; i++) {
+            if (this.gameService.boardState.has({ x: coord.x - i, y: coord.y })) continue;
+            else break;
         }
-        for (i; i >= 0; i--) {
-            word += this.fieldBoard[x][y - i];
+        for (i; i > 0; i--) {
+            tempWord += this.gameService.boardState.get({ x: coord.x - i, y: coord.y });
         }
 
-        // Positive horizontal axis
-        for (i; y + i <= BOARD_SIZE; i++) {
-            if (this.fieldBoard[x][y + i] !== null) {
-                word += this.fieldBoard[x][y + i];
-            }
+        // Horizontal positive check
+        for (i; coord.x + i <= BOARD_SIZE; i++) {
+            if (this.gameService.boardState.has({ x: coord.x + i, y: coord.y })) continue;
+            else break;
         }
-        container.push(word);
-        word = '';
-        /* ---------------------------------------------------- */
-        // Negative vertical axis
-        for (j; x - j >= 0; j++) {
-            if (this.fieldBoard[x - j][y] === null) {
-                break;
-            }
+        for (let j = 0; j <= i; j++) {
+            tempWord += this.gameService.boardState.get({ x: coord.x + j, y: coord.y });
         }
-        for (j; j >= 0; j--) {
-            word += this.fieldBoard[x - j][y];
-        }
+        wordContainer.push(tempWord);
+        tempWord = '';
 
-        // Positive vertical axis
-        for (j; x + j <= BOARD_SIZE; j++) {
-            if (this.fieldBoard[x + j][y] !== null) {
-                word += this.fieldBoard[x + j][y];
-            }
-        }
-        container.push(word);
-
-        return container;
+        return wordContainer;
     }
 
     findWord(words: string[]): boolean {
