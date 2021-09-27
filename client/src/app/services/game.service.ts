@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BoardCoords } from '@app/classes/board-coords';
+import { GameBoard } from '@app/classes/game-board';
 import { PlayerHand } from '@app/classes/player-hand';
+import { Reserve } from '@app/classes/reserve';
 import { Subject } from 'rxjs';
 
-const botNames: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
+const BOT_NAMES: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
+export const DEFAULT_HAND_SIZE = 7;
 export const DEFAULT_SCORE = 0;
 
 @Injectable({
@@ -18,27 +20,28 @@ export class GameService {
     playerHand: PlayerHand;
     opponentHand: PlayerHand;
 
-    // TODO: temp value of current score
     playerScore: number = DEFAULT_SCORE;
     opponentScore: number = DEFAULT_SCORE;
 
-    // TODO: give me a type
-    letterReserve: unknown;
-    reserveAmount: number;
+    reserve: Reserve;
 
-    boardState: Map<BoardCoords, string>;
+    gameBoard: GameBoard;
 
     turnState = new Subject<boolean>();
 
     init(username: string): void {
+        const validBotNames = BOT_NAMES.filter((name) => name !== username);
+
         this.player = username;
-        const validBotNames = botNames.filter((name) => name !== username);
         this.opponent = validBotNames[Math.floor(Math.random() * validBotNames.length)];
 
         this.playerHand = new PlayerHand();
         this.opponentHand = new PlayerHand();
-        this.boardState = new Map<BoardCoords, string>();
-        // TODO: Init reserve
+
+        this.reserve = new Reserve();
+
+        // TODO: Assign type to bonuses and inject default bonus map
+        this.gameBoard = new GameBoard(new Map<string, unknown>());
 
         this.isInit = true;
     }
@@ -47,6 +50,12 @@ export class GameService {
         const turnState = Boolean(Math.floor(Math.random() * 2));
         this.turnState.next(turnState);
 
-        // TODO: Fill hands from reserve
+        const playerHand = this.reserve.draw(DEFAULT_HAND_SIZE);
+        const opponentHand = this.reserve.draw(DEFAULT_HAND_SIZE);
+
+        if (playerHand !== undefined && opponentHand !== undefined) {
+            this.playerHand.addAll(playerHand);
+            this.opponentHand.addAll(opponentHand);
+        }
     }
 }

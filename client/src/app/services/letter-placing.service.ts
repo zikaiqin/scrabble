@@ -3,10 +3,10 @@ import { TextboxService } from '@app/services/textbox.service';
 import { GameService } from '@app/services/game.service';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
-import { BoardCoords } from '@app/classes/board-coords';
 
-const CHARCODE_OF_A = 97;
 const BOUNDARY = 16;
+const CHARCODE_OF_A = 97;
+const CENTER_TILE = 'h8';
 const WILDCARD = '*';
 
 @Injectable({
@@ -17,7 +17,7 @@ export class LetterPlacingService {
     private word: string;
     private turnState: boolean;
 
-    private letters: Map<BoardCoords, string>;
+    private letters: Map<string, string>;
 
     constructor(private textboxService: TextboxService, private gameService: GameService) {
         this.gameService.turnState.subscribe({
@@ -29,16 +29,17 @@ export class LetterPlacingService {
         this.position = position;
         this.word = word;
 
-        if (!(this.isValidParam() && this.isMyTurn() && this.isInBounds() && this.isInDict())) {
+        if (!(this.isMyTurn() && this.isValidParam() && this.isInBounds() && this.isInDict())) {
             return false;
         }
+        this.letters = new Map<string, string>();
         this.generateLetters();
 
         const canPlace = this.isChaining() && this.isInHand();
         if (canPlace) {
             this.placeLetters();
-            this.replenishHand();
             this.updateScore();
+            this.gameService.turnState.next(!this.turnState);
         }
         return canPlace;
     }
@@ -47,30 +48,33 @@ export class LetterPlacingService {
         const wildCard = /[A-Z]/;
 
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        const startX = Number(this.position.slice(1, -1)) - 1;
-        const startY = this.position.charCodeAt(0) - CHARCODE_OF_A;
+        const startX = Number(this.position.slice(1, -1));
+        const startY = this.position.charAt(0);
         const direction = this.position.charAt(this.position.length - 1);
         const letters = this.word.split('');
 
         if (direction === 'h') {
             letters.forEach((letter, index) => {
-                this.letters.set({ x: startX + index, y: startY }, wildCard.test(letter) ? WILDCARD : letter);
+                this.letters.set(startY + String(startX + index), wildCard.test(letter) ? WILDCARD : letter);
             });
         } else {
             letters.forEach((letter, index) => {
-                this.letters.set({ x: startX, y: startY + index }, wildCard.test(letter) ? WILDCARD : letter);
+                this.letters.set(String.fromCharCode(startY.charCodeAt(0) + index) + String(startX), wildCard.test(letter) ? WILDCARD : letter);
             });
         }
     }
 
     placeLetters(): void {
         Array.from(this.letters.entries()).forEach((entry) => {
-            this.gameService.boardState.set(entry[0], entry[1]);
+            this.gameService.gameBoard.placeLetter(entry[0], entry[1]);
+            this.gameService.playerHand.remove(entry[1]);
+
+            const letter = this.gameService.reserve.drawOne();
+            if (letter !== undefined) {
+                this.gameService.playerHand.add(letter);
+            }
         });
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    replenishHand(): void {}
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     updateScore(): void {}
@@ -95,19 +99,13 @@ export class LetterPlacingService {
 
     isInBounds(): boolean {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        const startX = Number(this.position.slice(1, -1)) - 1;
+        const startX = Number(this.position.slice(1, -1));
         const startY = this.position.charCodeAt(0) - CHARCODE_OF_A;
         const direction = this.position.charAt(this.position.length - 1);
 
-        let inBounds: boolean;
-        if (direction === 'h') {
-            inBounds = startX + this.word.length < BOUNDARY;
-        } else {
-            inBounds = startY + this.word.length < BOUNDARY;
-        }
-
+        const inBounds: boolean = direction === 'h' ? startX + this.word.length <= BOUNDARY : startY + this.word.length < BOUNDARY;
         if (!inBounds) {
-            this.textboxService.sendMessage(MessageType.System, 'Le mot ne peut être placé à cet endroit car il dépasserait plateau');
+            this.textboxService.sendMessage(MessageType.System, 'Le mot ne peut être placé à cet endroit car il dépasserait le plateau');
         }
         return inBounds;
     }
@@ -118,16 +116,16 @@ export class LetterPlacingService {
 
     isChaining(): boolean {
         let isChaining: boolean;
-        if (this.gameService.boardState.size === 0) {
-            isChaining = this.letters.has({ x: 7, y: 7 });
+        if (this.gameService.gameBoard.size() === 0) {
+            isChaining = this.letters.has(CENTER_TILE);
             if (!isChaining) {
                 this.textboxService.sendMessage(MessageType.System, 'Le mot doit toucher la case H8 lors du premier tour');
             }
             return isChaining;
         }
-        const overlaps = Array.from(this.letters.entries()).filter((entry) => this.gameService.boardState.has(entry[0]));
+        const overlaps = Array.from(this.letters.entries()).filter((entry) => this.gameService.gameBoard.hasLetter(entry[0]));
         if (overlaps) {
-            isChaining = overlaps.every((entry) => this.gameService.boardState.get(entry[0]) === entry[1]);
+            isChaining = overlaps.every((entry) => this.gameService.gameBoard.getLetter(entry[0]) === entry[1]);
             if (!isChaining) {
                 this.textboxService.sendMessage(MessageType.System, 'Le mot cause un conflit avec des lettres déjà placées');
             }
@@ -144,7 +142,12 @@ export class LetterPlacingService {
         const testHand = new PlayerHand();
         letters.forEach((letter) => testHand.add(letter));
 
-        const isInHand = [...new Set<string>(letters)].every((letter) => testHand.get(letter) === this.gameService.playerHand.get(letter));
+        // using unique set of letters in word as key, compare to amount of letters in hand
+        const isInHand = [...new Set<string>(letters)].every((letter) => {
+            const amountRequired = testHand.get(letter);
+            const amountInHand = this.gameService.playerHand.get(letter);
+            return amountRequired !== undefined && amountInHand !== undefined ? amountRequired <= amountInHand : false;
+        });
         if (!isInHand) {
             this.textboxService.sendMessage(
                 MessageType.System,
