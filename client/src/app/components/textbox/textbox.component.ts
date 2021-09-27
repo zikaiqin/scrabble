@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Message, MessageType } from '@app/classes/message';
-import { GameService } from '@app/services/game.service';
+import { TextboxService } from '@app/services/textbox.service';
 import { Subscription } from 'rxjs';
 
 const MESSAGE_REFRESH_DELAY = 100;
@@ -19,8 +19,8 @@ export class TextboxComponent implements OnDestroy {
     messages: Message[] = [];
     subscription: Subscription;
 
-    constructor(private gameService: GameService) {
-        this.subscription = this.gameService.getMessage().subscribe((message) => {
+    constructor(private textboxService: TextboxService) {
+        this.subscription = this.textboxService.getMessage().subscribe((message) => {
             if (message) {
                 this.messages.push(message);
                 setTimeout(() => {
