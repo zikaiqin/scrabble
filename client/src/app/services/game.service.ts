@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { PlayerHand } from '@app/classes/player-hand';
-import { BoardCoords } from '@app/classes/board-coords';
+import { GameBoard } from '@app/classes/game-board';
+import { Reserve } from '@app/classes/reserve';
 
 const botNames: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
 
@@ -17,22 +18,25 @@ export class GameService {
     playerHand: PlayerHand;
     opponentHand: PlayerHand;
 
-    // TODO: give me a type
-    letterReserve: unknown;
+    reserve: Reserve;
 
-    boardState: Map<BoardCoords, string>;
+    gameBoard: GameBoard;
 
     turnState = new Subject<boolean>();
 
     init(username: string): void {
-        this.player = username;
         const validBotNames = botNames.filter((name) => name !== username);
+
+        this.player = username;
         this.opponent = validBotNames[Math.floor(Math.random() * validBotNames.length)];
 
         this.playerHand = new PlayerHand();
         this.opponentHand = new PlayerHand();
-        this.boardState = new Map<BoardCoords, string>();
-        // TODO: Init reserve
+
+        this.reserve = new Reserve();
+
+        // TODO: Assign type to bonuses and inject default bonus map
+        this.gameBoard = new GameBoard(new Map<string, unknown>());
 
         this.isInit = true;
     }
