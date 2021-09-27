@@ -1,6 +1,7 @@
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
@@ -9,9 +10,15 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { ReserveComponent } from './components/reserve/reserve.component';
+import { ChevaletComponent } from './components/chevalet/chevalet.component';
+import { InputbarComponent } from './components/inputbar/inputbar.component';
+import { MainMenuComponent } from './components/main-menu/main-menu.component';
+import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
+import { PanneauInfoComponent } from './components/panneau-info/panneau-info.component';
+import { PassTurnComponent } from './components/pass-turn/pass-turn.component';
+import { TextboxComponent } from './components/textbox/textbox.component';
+import { HomePageComponent } from './pages/home-page/home-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -20,8 +27,32 @@ import { ReserveComponent } from './components/reserve/reserve.component';
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, GamePageComponent, MainPageComponent, MaterialPageComponent, PlayAreaComponent, SidebarComponent, ReserveComponent],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
+    declarations: [
+        AppComponent,
+        GamePageComponent,
+        MaterialPageComponent,
+        PlayAreaComponent,
+        SidebarComponent,
+        ChevaletComponent,
+        PanneauInfoComponent,
+        TextboxComponent,
+        InputbarComponent,
+        PassTurnComponent,
+        HomePageComponent,
+        MainMenuComponent,
+        NewGameMenuComponent,
+    ],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        DragDropModule,
+        ReactiveFormsModule,
+    ],
+
     providers: [],
     bootstrap: [AppComponent],
 })

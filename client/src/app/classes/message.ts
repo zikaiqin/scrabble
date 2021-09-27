@@ -1,4 +1,8 @@
 export interface Message {
-    title: string;
-    body: string;
+    type: string;
+    text: string;
+}
+export enum MessageType {
+    System = 'system-message',
+    User = 'user-message',
 }
