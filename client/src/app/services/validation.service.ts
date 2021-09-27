@@ -15,59 +15,77 @@ const BOARD_SIZE = 14;
 export class ValidationService {
     private dictionnary = JSON.parse(JSON.stringify(data));
     private board = tableau;
+    index = 1;
+    startCoord = { x: 0, y: 0 }; // Assuming I have the command line available
+    tempWord = '';
+    checkWord = '';
 
     constructor(private gameService: GameService) {}
 
     fetchWords(): string[] {
-        let tempWord = '';
-        let checkWord = '';
         const wordContainer: string[] = [];
-        // Assuming I have the placing coords
-        const coord = { x: 0, y: 0 };
 
-        // Horizontal negative check
-        let i = 1;
-        for (i; coord.x - i >= 0; i++) {
-            if (this.gameService.gameBoard.hasLetter((checkWord = String(coord.x - i) + String(coord.y)))) continue;
-            else break;
-        }
-        for (i; i > 0; i--) {
-            tempWord += this.gameService.gameBoard.getLetter((checkWord = String(coord.x - i) + String(coord.y)));
-        }
+        // TODO code checks for word forming for every placed letter and not just the first one
+        // Will need the command line to accomplish it
+        this.horizontalNegativeCheck();
+        this.horizontalPositiveCheck();
+        wordContainer.push(this.tempWord);
 
-        // Horizontal positive check
-        for (i; coord.x + i <= BOARD_SIZE; i++) {
-            if (this.gameService.gameBoard.hasLetter((checkWord = String(coord.x + i) + String(coord.y)))) continue;
-            else break;
-        }
-        for (let j = 0; j <= i; j++) {
-            tempWord += this.gameService.gameBoard.getLetter((checkWord = String(coord.x + i) + String(coord.y)));
-        }
-        wordContainer.push(tempWord);
+        this.tempWord = '';
+        this.index = 1;
 
-        tempWord = '';
-        i = 1;
-
-        // Vertical negative check
-        for (i; coord.y - i >= 0; i++) {
-            if (this.gameService.gameBoard.hasLetter((checkWord = String(coord.x) + String(coord.y - i)))) continue;
-            else break;
-        }
-        for (i; i > 0; i--) {
-            tempWord += this.gameService.gameBoard.getLetter((checkWord = String(coord.x) + String(coord.y - i)));
-        }
-
-        // Vertical positive check
-        for (i; coord.y + i <= BOARD_SIZE; i++) {
-            if (this.gameService.gameBoard.hasLetter((checkWord = String(coord.x) + String(coord.y + i)))) continue;
-            else break;
-        }
-        for (let j = 0; j <= i; j++) {
-            tempWord += this.gameService.gameBoard.getLetter((checkWord = String(coord.x) + String(coord.y + i)));
-        }
-        wordContainer.push(tempWord);
+        this.verticalNegativeCheck();
+        this.verticalPositiveCheck();
+        wordContainer.push(this.tempWord);
 
         return wordContainer;
+    }
+
+    horizontalNegativeCheck(): void {
+        for (this.index; this.startCoord.x - this.index >= 0; this.index++) {
+            if (this.gameService.gameBoard.hasLetter((this.checkWord = String(this.startCoord.x - this.index) + String(this.startCoord.y)))) continue;
+            else break;
+        }
+        for (this.index; this.index > 0; this.index--) {
+            this.tempWord += this.gameService.gameBoard.getLetter(
+                (this.checkWord = String(this.startCoord.x - this.index) + String(this.startCoord.y)),
+            );
+        }
+    }
+
+    horizontalPositiveCheck(): void {
+        for (this.index; this.startCoord.x + this.index <= BOARD_SIZE; this.index++) {
+            if (this.gameService.gameBoard.hasLetter((this.checkWord = String(this.startCoord.x + this.index) + String(this.startCoord.y)))) continue;
+            else break;
+        }
+        for (let j = 0; j <= this.index; j++) {
+            this.tempWord += this.gameService.gameBoard.getLetter(
+                (this.checkWord = String(this.startCoord.x + this.index) + String(this.startCoord.y)),
+            );
+        }
+    }
+
+    verticalNegativeCheck(): void {
+        for (this.index; this.startCoord.y - this.index >= 0; this.index++) {
+            if (this.gameService.gameBoard.hasLetter((this.checkWord = String(this.startCoord.x) + String(this.startCoord.y - this.index)))) continue;
+            else break;
+        }
+        for (this.index; this.index > 0; this.index--) {
+            this.tempWord += this.gameService.gameBoard.getLetter(
+                (this.checkWord = String(this.startCoord.x) + String(this.startCoord.y - this.index)),
+            );
+        }
+    }
+    verticalPositiveCheck(): void {
+        for (this.index; this.startCoord.y + this.index <= BOARD_SIZE; this.index++) {
+            if (this.gameService.gameBoard.hasLetter((this.checkWord = String(this.startCoord.x) + String(this.startCoord.y + this.index)))) continue;
+            else break;
+        }
+        for (let j = 0; j <= this.index; j++) {
+            this.tempWord += this.gameService.gameBoard.getLetter(
+                (this.checkWord = String(this.startCoord.x) + String(this.startCoord.y + this.index)),
+            );
+        }
     }
 
     findWord(words: string[]): boolean {
