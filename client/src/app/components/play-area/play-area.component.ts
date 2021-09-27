@@ -41,7 +41,13 @@ export class PlayAreaComponent implements AfterViewInit {
     }
     maximize():void{
         this.gridService.clearGrid();
+        this.gridService.maxGrid();
 
+
+    }
+    minimize():void{
+        this.gridService.clearGrid();
+        this.gridService.minGrid();
     }
 
     ngAfterViewInit(): void {

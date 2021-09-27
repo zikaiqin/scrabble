@@ -31,24 +31,6 @@ export class GridService {
     private tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
     
     drawGrid() {
-        this.gridContext.scale(1.2,1.2);
-
-        //this.indexChevalet = 0;
-        //1 == maximize
-        
-        // if(x == 1 ){
-        //     if (DEFAULT_WIDTH <= (REFERENCE_DEFAULT + ADD*2)  &&  DEFAULT_HEIGHT <= (REFERENCE_DEFAULT+ ADD*2)){
-        //     DEFAULT_WIDTH + ADD;
-        //     DEFAULT_HEIGHT + ADD;
-        //     }
-        // }
-        // // 2 = minimize
-        // if (x === 2 ){
-        //     if (DEFAULT_WIDTH >= REFERENCE_DEFAULT  &&  DEFAULT_HEIGHT >= REFERENCE_DEFAULT ){
-        //         DEFAULT_HEIGHT - ADD;
-        //         DEFAULT_WIDTH - ADD;
-        //     }
-        // }
         this.gridContext.lineWidth = 1;
         this.gridContext.fillStyle = 'black';
         this.gridContext.strokeStyle = 'black';
@@ -75,16 +57,16 @@ export class GridService {
         this.drawWord('B', 10, 12);
         this.drawChevalet();
 
-        this.drawOnChevalet('A');
-        this.drawOnChevalet('A');
+        this.drawOnChevalet('B');
+        this.drawOnChevalet('B');
         this.drawEmpty();
-        this.drawOnChevalet('A');
 
         this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
     
 
     }
+
     drawGridCol() {
         const START_GRID_POS = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         for (let i = 1; i < DEFAULT_NB_CASES + 1; i++) {
@@ -211,6 +193,7 @@ export class GridService {
             this.drawNONE();
         }
     }
+    
     drawOnChevalet(lettre: string) {
         this.handContext.font = 'bold 40px serif';
         this.handContext.fillStyle = '#EBDDE2';
@@ -224,25 +207,28 @@ export class GridService {
     }
     drawEmpty(i?: number) {
         this.handContext.fillStyle = '#E42217';
+        // pour draw 7 cases
         if (i) {
-            
+            i--;
             this.handContext.fillRect(
                 this.tuileSize + this.tuileSizeChevalet * i,
                 DEFAULT_HEIGHT + this.tuileSize + STROKE_RANGE,
                 this.tuileSizeChevalet,
                 this.tuileSizeChevalet,
-            );
-        } else {
+                );
+            }
+        // pour empty le dernier case
+        else {
             this.indexChevalet--;
             this.handContext.fillRect(
                 this.tuileSize + this.tuileSizeChevalet * this.indexChevalet,
                 DEFAULT_HEIGHT + this.tuileSize + STROKE_RANGE,
                 this.tuileSizeChevalet,
                 this.tuileSizeChevalet,
-            );
+                );
+            }
         }
-    }
-    drawChevalet() {
+        drawChevalet() {
         this.handContext.shadowColor = '#566D7E';
         this.handContext.shadowBlur = 20;
         this.handContext.lineJoin = 'bevel';
@@ -289,9 +275,28 @@ export class GridService {
             this.gridContext.fillText(letter, tuileX + STROKE_RANGE, tuileY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2 + STROKE_RANGE);
         }
     }
+    private scale:number = 0.05;
+    private temp:number = 0;
     clearGrid(){
-        this.gridContext.scale(9,3);
-        //this.gridContext.clearRect(0,0,DEFAULT_WIDTH*2,DEFAULT_HEIGHT*2);
+        this.gridContext.clearRect(0,0,DEFAULT_WIDTH*2,DEFAULT_HEIGHT*2);
+    }
+
+    maxGrid(){
+        if( this.temp < 5){
+            this.gridContext.scale(1 + this.scale , 1 + this.scale);
+            this.temp++;
+        }
+        this.indexChevalet--; // pour garder la meme place vu que drawGrid reappele index++
+        this.drawGrid();
+    }
+    minGrid(){
+        if( this.temp >= 0){
+            this.gridContext.scale(1 - this.scale , 1 - this.scale);
+            this.temp--;
+        }
+        this.indexChevalet--; // pour garder la meme place vu que drawGrid reappele index++
+        this.drawGrid();
+
     }
     // REMOVEGRID
     // DRAWCHEVALET
