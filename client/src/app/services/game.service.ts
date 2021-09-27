@@ -1,45 +1,52 @@
 import { Injectable } from '@angular/core';
-import { Message } from '@app/classes/message';
-import { Observable } from 'rxjs';
-import { CommandService } from './command.service';
-import { TextboxService } from './textbox.service';
-import { TurnService } from './turn.service';
-import { ValidationService } from './validation.service';
+import { BoardCoords } from '@app/classes/board-coords';
+import { PlayerHand } from '@app/classes/player-hand';
+import { Subject } from 'rxjs';
+
+const botNames: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
+export const DEFAULT_SCORE = 0;
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameService {
-    playerScore: number;
+    isInit: boolean;
 
-    constructor(private textbox: TextboxService, private command: CommandService, private turn: TurnService, private validation: ValidationService) {}
+    player: string;
+    opponent: string;
 
-    changeTurn(bool: boolean): void {
-        this.turn.changeTurn(bool);
+    playerHand: PlayerHand;
+    opponentHand: PlayerHand;
+
+    // TODO: temp value of current score
+    playerScore: number = DEFAULT_SCORE;
+    opponentScore: number = DEFAULT_SCORE;
+
+    // TODO: give me a type
+    letterReserve: unknown;
+    reserveAmount: number;
+
+    boardState: Map<BoardCoords, string>;
+
+    turnState = new Subject<boolean>();
+
+    init(username: string): void {
+        this.player = username;
+        const validBotNames = botNames.filter((name) => name !== username);
+        this.opponent = validBotNames[Math.floor(Math.random() * validBotNames.length)];
+
+        this.playerHand = new PlayerHand();
+        this.opponentHand = new PlayerHand();
+        this.boardState = new Map<BoardCoords, string>();
+        // TODO: Init reserve
+
+        this.isInit = true;
     }
 
-    sendMessage(type: string, text: string): void {
-        this.textbox.sendMessage(type, text);
-    }
+    start(): void {
+        const turnState = Boolean(Math.floor(Math.random() * 2));
+        this.turnState.next(turnState);
 
-    getState(): Observable<boolean> {
-        return this.turn.getState();
-    }
-
-    getMessage(): Observable<Message> {
-        return this.textbox.getMessage();
-    }
-
-    parseCommand(input: string): void {
-        this.command.parseCommand(input);
-    }
-
-    checkWord(commandLine: string, square: string[]): boolean {
-        const words = this.validation.fetchWords(commandLine);
-        if (this.validation.findWord(words)) {
-            this.playerScore = this.validation.calcPoints(words, square);
-            return true;
-        }
-        return false;
+        // TODO: Fill hands from reserve
     }
 }

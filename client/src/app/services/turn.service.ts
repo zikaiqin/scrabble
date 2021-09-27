@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
+import { GameService } from './game.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TurnService {
-    private subject = new Subject<boolean>();
+    constructor(private gameService: GameService) {}
 
     changeTurn(bool: boolean): void {
-        this.subject.next(bool);
+        this.gameService.turnState.next(bool);
     }
 
     getState(): Observable<boolean> {
-        return this.subject.asObservable();
+        return this.gameService.turnState.asObservable();
     }
 }

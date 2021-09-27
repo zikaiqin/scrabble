@@ -1,4 +1,29 @@
 <div id="grid-container">
-    <h2>VOTRE PANEAU D'INFORMATIONS</h2>
-    <canvas id="canvas" #gridCanvas [attr.width]="width" [attr.height]="height" style="float: right"> </canvas>
+    <div id="panneau">
+        <div id="joueur-container">
+            <div id="joueur">Joueur</div>
+            <div id="nom-joueur">{{showPlayerInfo("PlayerName")}} </div>
+            <div id="score-container">
+                <span>Score</span>
+                <div>{{showPlayerInfo("PlayerScore")}} point(s)</div>
+            </div>
+            <div id="main" [style.display]="isVisiblePlayer ? 'block' : 'none'">{{showPlayerInfo("PlayerHandNum")}} piece(s) en main</div>
+        </div>
+        <div id="adversaire-container">
+            <div id="adversaire">Adversaire</div>
+            <div id="nom-joueur">{{showPlayerInfo("OpponentName")}}</div>
+            <div id="score-container">
+                <span>Score</span>
+                <div>{{showPlayerInfo("OpponentScore")}} point(s)</div>
+            </div>
+            <div id="main" [style.display]="isVisibleOpponent ? 'block' : 'none'">{{showPlayerInfo("OpponentHandNum")}} piece(s) en main</div>
+        </div>
+        <div id="reserve">Il reste {{showPlayerInfo("ReserveAmount")}} piece(s) dans la reserve</div>
+        <div id="tour" [style.backgroundColor]="color ? 'green': 'red'">{{turnState()}}</div>
+        <p id="timer">----</p>
+        <br />
+        <br />
+        <app-pass-turn id="passer"></app-pass-turn>
+    </div>
 </div>
+

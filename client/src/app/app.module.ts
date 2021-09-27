@@ -18,7 +18,6 @@ import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
 import { PassTurnComponent } from './components/pass-turn/pass-turn.component';
 import { TextboxComponent } from './components/textbox/textbox.component';
-// import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 
 /**
