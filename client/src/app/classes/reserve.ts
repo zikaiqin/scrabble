@@ -7,14 +7,23 @@ export class Reserve {
         this.size = this.letters.length;
     }
 
-    draw(): string | undefined {
+    drawOne(): string | undefined {
         if (this.size <= 0) {
             return undefined;
         }
         const index = Math.floor(Math.random() * this.size);
-        const removedLetter: string = this.letters[index];
-        this.letters.splice(index, 1);
-        return removedLetter;
+        return this.letters.splice(index, 1)[0];
+    }
+
+    draw(amount: number): string[] | undefined {
+        const letters: string[] = [];
+        for (let i = 0; i < amount; i++) {
+            const letter = this.drawOne();
+            if (letter !== undefined) {
+                letters.push(letter);
+            } else return undefined;
+        }
+        return letters;
     }
 
     exchangeLetters(hand: string[], lettersToBeRemoved: string[], reserve: string[]): number {

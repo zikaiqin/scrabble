@@ -38,8 +38,8 @@ export class LetterPlacingService {
         const canPlace = this.isChaining() && this.isInHand();
         if (canPlace) {
             this.placeLetters();
-            this.replenishHand();
             this.updateScore();
+            this.gameService.turnState.next(!this.turnState);
         }
         return canPlace;
     }
@@ -67,11 +67,14 @@ export class LetterPlacingService {
     placeLetters(): void {
         Array.from(this.letters.entries()).forEach((entry) => {
             this.gameService.gameBoard.placeLetter(entry[0], entry[1]);
+            this.gameService.playerHand.remove(entry[1]);
+
+            const letter = this.gameService.reserve.drawOne();
+            if (letter !== undefined) {
+                this.gameService.playerHand.add(letter);
+            }
         });
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    replenishHand(): void {}
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     updateScore(): void {}
@@ -88,9 +91,6 @@ export class LetterPlacingService {
     }
 
     isMyTurn(): boolean {
-        // FIXME: temp bypass
-        return true;
-        // eslint-disable-next-line no-unreachable
         if (!this.turnState) {
             this.textboxService.sendMessage(MessageType.System, 'La commande !placer peut seulement être utilisé lors de votre tour');
         }
