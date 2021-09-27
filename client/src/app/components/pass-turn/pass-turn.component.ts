@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { GameService } from '@app/services/game.service';
+import { Component } from '@angular/core';
+import { TurnService } from '@app/services/turn.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -8,16 +8,16 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./pass-turn.component.scss'],
 })
 export class PassTurnComponent {
-    @Input() activePlayer: boolean;
+    activePlayer: boolean;
     subscription: Subscription;
 
-    constructor(private gameService: GameService) {
-        this.subscription = this.gameService.getState().subscribe((turn) => {
+    constructor(private turnService: TurnService) {
+        this.subscription = this.turnService.getState().subscribe((turn) => {
             this.activePlayer = turn;
         });
     }
 
-    passTurn() {
-        this.gameService.changeTurn(!this.activePlayer);
+    passTurn(): void {
+        this.turnService.changeTurn(!this.activePlayer);
     }
 }

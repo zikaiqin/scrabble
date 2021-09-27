@@ -1,6 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { GameMode, GameType } from '@app/pages/home-page/home-page.component';
+import { GameService } from '@app/services/game.service';
+import { Router } from '@angular/router';
 
 const MINUTE = 60;
 const MIN_NAME_LENGTH = 2;
@@ -12,20 +14,21 @@ const DEFAULT_TURN_LENGTH = MINUTE;
     templateUrl: './new-game-menu.component.html',
     styleUrls: ['../../pages/home-page/home-page.component.scss', './new-game-menu.component.scss'],
 })
-export class NewGameMenuComponent {
+export class NewGameMenuComponent implements OnInit {
     @Input() gameMode: number;
     @Input() gameType: number;
     @Output() readonly goBack = new EventEmitter<string>();
 
     readonly gameModes = GameMode;
     readonly gameTypes = GameType;
-    readonly userName = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
+
+    readonly nameControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
+
+    username: string;
     turnLength: number;
 
-    // eslint-disable-next-line @typescript-eslint/no-useless-constructor,@typescript-eslint/no-empty-function
-    constructor() {}
+    constructor(private router: Router, private gameService: GameService) {}
 
-    // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
     ngOnInit(): void {
         this.turnLength = DEFAULT_TURN_LENGTH;
     }
@@ -43,13 +46,13 @@ export class NewGameMenuComponent {
     }
 
     getNameError(): string {
-        if (this.userName.hasError('required')) {
+        if (this.nameControl.hasError('required')) {
             return 'Veuillez entrer un nom';
         }
-        if (this.userName.hasError('minlength')) {
+        if (this.nameControl.hasError('minlength')) {
             return `Le nom doit contenir au moins ${MIN_NAME_LENGTH} caractères`;
         }
-        if (this.userName.hasError('maxlength')) {
+        if (this.nameControl.hasError('maxlength')) {
             return `Le nom ne peut dépasser ${MAX_NAME_LENGTH} caractères`;
         }
         return '';
@@ -70,5 +73,10 @@ export class NewGameMenuComponent {
             return min + `:${sec === 0 ? '00' : sec}`;
         }
         return value + 's';
+    }
+
+    newGame(): void {
+        this.gameService.init(this.username);
+        this.router.navigateByUrl('/game');
     }
 }

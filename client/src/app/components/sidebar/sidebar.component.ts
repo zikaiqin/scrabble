@@ -1,8 +1,8 @@
 import { AfterViewInit, Component } from '@angular/core';
-import { GameService } from '@app/services/game.service';
+import { TurnService } from '@app/services/turn.service';
 import { Subscription } from 'rxjs';
 
-const TIMER = 5000; // temporary value just here for demo
+const TIMER = 60000; // temporary value just here for demo
 const TIMER_INTERVAL = 1000;
 
 @Component({
@@ -13,8 +13,8 @@ const TIMER_INTERVAL = 1000;
 export class SidebarComponent implements AfterViewInit {
     subscription: Subscription;
     turn: boolean;
-    constructor(private gameService: GameService) {
-        this.subscription = this.gameService.getState().subscribe((turn) => {
+    constructor(private turnService: TurnService) {
+        this.subscription = this.turnService.getState().subscribe((turn) => {
             this.turn = turn;
         });
     }
@@ -26,8 +26,8 @@ export class SidebarComponent implements AfterViewInit {
             if (element !== null) {
                 element.innerHTML = (time / TIMER_INTERVAL).toString();
                 time -= TIMER_INTERVAL;
-                if (time < 0 || this.turn === false) {
-                    this.gameService.changeTurn(false);
+                if (time < 0 || !this.turn) {
+                    this.turnService.changeTurn(false);
                     element.innerHTML = 'Turn ended';
                     clearInterval(timer);
                 }

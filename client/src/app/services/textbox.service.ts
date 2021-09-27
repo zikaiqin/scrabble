@@ -10,11 +10,6 @@ export class TextboxService {
         this.subject.next({ type, text });
     }
 
-    // FIXME: dead code?
-    clearMessages() {
-        this.subject.next();
-    }
-
     getMessage(): Observable<Message> {
         return this.subject.asObservable();
     }
