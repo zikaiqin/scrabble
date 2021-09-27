@@ -3,22 +3,22 @@ import * as data from 'src/assets/dictionnary.json';
 import { GameService } from './game.service';
 import { tableau } from './tableau.config';
 
-const ASCII_SMALL_A = 97;
-const ASCII_SMALL_E = 101;
-const WORD_BONUS = 50;
-const FULL_WORD = 7;
+// const ASCII_SMALL_A = 97;
+// const ASCII_SMALL_E = 101;
+// const WORD_BONUS = 50;
+// const FULL_WORD = 7;
 const BOARD_SIZE = 14;
 
 @Injectable({
     providedIn: 'root',
 })
 export class ValidationService {
-    private dictionnary = JSON.parse(JSON.stringify(data));
-    private board = tableau;
     index = 1;
     startCoord = { x: 0, y: 0 }; // Assuming I have the command line available
     tempWord = '';
     checkWord = '';
+    private dictionnary = JSON.parse(JSON.stringify(data));
+    private board = tableau;
 
     constructor(private gameService: GameService) {}
 
@@ -27,21 +27,19 @@ export class ValidationService {
 
         // TODO code checks for word forming for every placed letter and not just the first one
         // Will need the command line to accomplish it
-        this.horizontalNegativeCheck();
-        this.horizontalPositiveCheck();
+        this.horizontalCheck();
         wordContainer.push(this.tempWord);
 
         this.tempWord = '';
         this.index = 1;
 
-        this.verticalNegativeCheck();
-        this.verticalPositiveCheck();
+        this.verticalCheck();
         wordContainer.push(this.tempWord);
 
         return wordContainer;
     }
 
-    horizontalNegativeCheck(): void {
+    horizontalCheck(): void {
         for (this.index; this.startCoord.x - this.index >= 0; this.index++) {
             if (this.gameService.gameBoard.hasLetter((this.checkWord = String(this.startCoord.x - this.index) + String(this.startCoord.y)))) continue;
             else break;
@@ -51,9 +49,6 @@ export class ValidationService {
                 (this.checkWord = String(this.startCoord.x - this.index) + String(this.startCoord.y)),
             );
         }
-    }
-
-    horizontalPositiveCheck(): void {
         for (this.index; this.startCoord.x + this.index <= BOARD_SIZE; this.index++) {
             if (this.gameService.gameBoard.hasLetter((this.checkWord = String(this.startCoord.x + this.index) + String(this.startCoord.y)))) continue;
             else break;
@@ -65,7 +60,7 @@ export class ValidationService {
         }
     }
 
-    verticalNegativeCheck(): void {
+    verticalCheck(): void {
         for (this.index; this.startCoord.y - this.index >= 0; this.index++) {
             if (this.gameService.gameBoard.hasLetter((this.checkWord = String(this.startCoord.x) + String(this.startCoord.y - this.index)))) continue;
             else break;
@@ -75,8 +70,6 @@ export class ValidationService {
                 (this.checkWord = String(this.startCoord.x) + String(this.startCoord.y - this.index)),
             );
         }
-    }
-    verticalPositiveCheck(): void {
         for (this.index; this.startCoord.y + this.index <= BOARD_SIZE; this.index++) {
             if (this.gameService.gameBoard.hasLetter((this.checkWord = String(this.startCoord.x) + String(this.startCoord.y + this.index)))) continue;
             else break;
@@ -101,19 +94,19 @@ export class ValidationService {
         return true;
     }
 
-    calcPoints(words: string[], square: string[]): number {
-        // CHANGE FUNCTION FOR ARRAY OF WORDS AND NOT A WORD
-        // let counter = 0;
-        // for (const char of checkWord) {
-        //     const ascii: number = char.charCodeAt(0);
-        //     if (ascii >= ASCII_SMALL_A && ascii <= ASCII_SMALL_E) counter += Points.A;
-        // }
-        // for (const color in square) {
-        //     if (color === Color.DARKBLUE || color === Color.RED) counter *= 3;
-        //     else if (color === Color.LIGHTBLUE || color === Color.PINK) counter *= 2;
-        // }
-        // if  checkWord.length === FULL_WORD) counter += WORD_BONUS; // Need to take into placed letter, not checkWord length
+    // calcPoints(words: string[], square: string[]): number {
+    //     CHANGE FUNCTION FOR ARRAY OF WORDS AND NOT A WORD
+    //     let counter = 0;
+    //     for (const char of checkWord) {
+    //         const ascii: number = char.charCodeAt(0);
+    //         if (ascii >= ASCII_SMALL_A && ascii <= ASCII_SMALL_E) counter += Points.A;
+    //     }
+    //     for (const color in square) {
+    //         if (color === Color.DARKBLUE || color === Color.RED) counter *= 3;
+    //         else if (color === Color.LIGHTBLUE || color === Color.PINK) counter *= 2;
+    //     }
+    //     if  checkWord.length === FULL_WORD) counter += WORD_BONUS; // Need to take into placed letter, not checkWord length
 
-        return 1;
-    }
+    //     return 1;
+    // }
 }
