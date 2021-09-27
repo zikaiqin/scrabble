@@ -3,8 +3,8 @@ import { Vec2 } from '@app/classes/vec2';
 import { tableau } from './tableau.config';
 
 // TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
-export let DEFAULT_WIDTH = 500;
-export let DEFAULT_HEIGHT = 500;
+export const DEFAULT_WIDTH = 500;
+export const DEFAULT_HEIGHT = 500;
 export const REFERENCE_DEFAULT = 500;
 
 export const ADD = 50;
@@ -29,7 +29,8 @@ export class GridService {
     private startLetterPos: number = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
     private tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
-    
+    private scale: number = 0.05;
+    private temp: number = 0;
     drawGrid() {
         this.gridContext.lineWidth = 1;
         this.gridContext.fillStyle = 'black';
@@ -63,8 +64,6 @@ export class GridService {
 
         this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
-    
-
     }
 
     drawGridCol() {
@@ -123,7 +122,7 @@ export class GridService {
             this.startLetterPos += DEFAULT_WIDTH / DEFAULT_NB_CASES;
         }
         // reset les pos pour si jamais reappeler cette methode
-        this.startLetterPos =DEFAULT_HEIGHT / DEFAULT_NB_CASES;
+        this.startLetterPos = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         this.startNumberPos = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     }
 
@@ -193,7 +192,7 @@ export class GridService {
             this.drawNONE();
         }
     }
-    
+
     drawOnChevalet(lettre: string) {
         this.handContext.font = 'bold 40px serif';
         this.handContext.fillStyle = '#EBDDE2';
@@ -203,7 +202,6 @@ export class GridService {
             DEFAULT_HEIGHT + this.tuileSize * 2 + STROKE_RANGE * 3,
         );
         this.indexChevalet++;
-
     }
     drawEmpty(i?: number) {
         this.handContext.fillStyle = '#E42217';
@@ -215,8 +213,8 @@ export class GridService {
                 DEFAULT_HEIGHT + this.tuileSize + STROKE_RANGE,
                 this.tuileSizeChevalet,
                 this.tuileSizeChevalet,
-                );
-            }
+            );
+        }
         // pour empty le dernier case
         else {
             this.indexChevalet--;
@@ -225,10 +223,10 @@ export class GridService {
                 DEFAULT_HEIGHT + this.tuileSize + STROKE_RANGE,
                 this.tuileSizeChevalet,
                 this.tuileSizeChevalet,
-                );
-            }
+            );
         }
-        drawChevalet() {
+    }
+    drawChevalet() {
         this.handContext.shadowColor = '#566D7E';
         this.handContext.shadowBlur = 20;
         this.handContext.lineJoin = 'bevel';
@@ -241,12 +239,10 @@ export class GridService {
             DEFAULT_HEIGHT_CHEVALET,
         );
         for (let i = 0; i < NB_CASE_CHEVALET; i++) {
-            this.drawEmpty(i+1);
+            this.drawEmpty(i + 1);
         }
         this.handContext.shadowBlur = 0;
-
     }
-
 
     drawWord(letter: string, posX: number, posY: number) {
         letter = letter.toUpperCase();
@@ -275,28 +271,26 @@ export class GridService {
             this.gridContext.fillText(letter, tuileX + STROKE_RANGE, tuileY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2 + STROKE_RANGE);
         }
     }
-    private scale:number = 0.05;
-    private temp:number = 0;
-    clearGrid(){
-        this.gridContext.clearRect(0,0,DEFAULT_WIDTH*2,DEFAULT_HEIGHT*2);
+
+    clearGrid() {
+        this.gridContext.clearRect(0, 0, DEFAULT_WIDTH * 2, DEFAULT_HEIGHT * 2);
     }
 
-    maxGrid(){
-        if( this.temp < 5){
-            this.gridContext.scale(1 + this.scale , 1 + this.scale);
+    maxGrid() {
+        if (this.temp < 5) {
+            this.gridContext.scale(1 + this.scale, 1 + this.scale);
             this.temp++;
         }
         this.indexChevalet--; // pour garder la meme place vu que drawGrid reappele index++
         this.drawGrid();
     }
-    minGrid(){
-        if( this.temp >= 0){
-            this.gridContext.scale(1 - this.scale , 1 - this.scale);
+    minGrid() {
+        if (this.temp >= 0) {
+            this.gridContext.scale(1 - this.scale, 1 - this.scale);
             this.temp--;
         }
         this.indexChevalet--; // pour garder la meme place vu que drawGrid reappele index++
         this.drawGrid();
-
     }
     // REMOVEGRID
     // DRAWCHEVALET

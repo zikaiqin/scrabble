@@ -3,8 +3,8 @@ import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
 // import { GridChevalet } from '@app/services/chevalet.service';
 // TODO : Avoir un fichier séparé pour les constantes!
-export const DEFAULT_WIDTH_ALL =650; //525
-export const DEFAULT_HEIGHT_ALL = 800; //625
+export const DEFAULT_WIDTH_ALL = 650; // 525
+export const DEFAULT_HEIGHT_ALL = 800; // 625
 export const HAND_WIDTH = 385;
 export const HAND_HEIGHT = 55;
 
@@ -39,13 +39,11 @@ export class PlayAreaComponent implements AfterViewInit {
     buttonDetect(event: KeyboardEvent) {
         this.buttonPressed = event.key;
     }
-    maximize():void{
+    maximize(): void {
         this.gridService.clearGrid();
         this.gridService.maxGrid();
-
-
     }
-    minimize():void{
+    minimize(): void {
         this.gridService.clearGrid();
         this.gridService.minGrid();
     }
