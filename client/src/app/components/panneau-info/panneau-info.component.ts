@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-export const WIDTHPANEAU = 240;
-export const HEIGHTPANEAU = 500;
+export const WIDTHPANEAU = 380; //350
+export const HEIGHTPANEAU = 800;
 @Component({
     selector: 'app-panneau-info',
     templateUrl: './panneau-info.component.html',

@@ -1,12 +1,12 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
-//import { GridChevalet } from '@app/services/chevalet.service';
+// import { GridChevalet } from '@app/services/chevalet.service';
 // TODO : Avoir un fichier séparé pour les constantes!
-export const DEFAULT_WIDTH = 525;
-export const DEFAULT_HEIGHT = 625;
-export const HAND_WIDTH:number = 385;
-export const HAND_HEIGHT:number = 55;
+export const DEFAULT_WIDTH_ALL =650; //525
+export const DEFAULT_HEIGHT_ALL = 800; //625
+export const HAND_WIDTH = 385;
+export const HAND_HEIGHT = 55;
 
 // TODO : Déplacer ça dans un fichier séparé accessible par tous
 export enum MouseButton {
@@ -25,21 +25,23 @@ export enum MouseButton {
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
 
-    //@ViewChild('canvasChevalet', { static: false }) private gridChevalet_lol : ElementRef<HTMLCanvasElement>;
+    // @ViewChild('canvasChevalet', { static: false }) private gridChevalet_lol : ElementRef<HTMLCanvasElement>;
 
-    //private ChevaletSize = {ChevaletX:HAND_WIDTH,ChevaletY:HAND_HEIGHT };
-
-    private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
-
+    // private ChevaletSize = {ChevaletX:HAND_WIDTH,ChevaletY:HAND_HEIGHT };
     mousePosition: Vec2 = { x: 0, y: 0 };
     buttonPressed = '';
-    
+
+    private canvasSize = { x: DEFAULT_WIDTH_ALL, y: DEFAULT_HEIGHT_ALL };
 
     constructor(private readonly gridService: GridService) {}
 
     @HostListener('keydown', ['$event'])
     buttonDetect(event: KeyboardEvent) {
         this.buttonPressed = event.key;
+    }
+    maximize():void{
+        this.gridService.clearGrid();
+
     }
 
     ngAfterViewInit(): void {
@@ -49,18 +51,10 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         this.gridCanvas.nativeElement.focus();
 
-        //this.gridServiceChevalet.gridHand = this.gridChevalet_lol.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        //this.gridServiceChevalet.drawSomethign();
-
+        // this.gridServiceChevalet.gridHand = this.gridChevalet_lol.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        // this.gridServiceChevalet.drawSomethign();
     }
 
-    AfficherMot(array: string[]) {
-        for (let i = 0; i < array.length; i++) {
-            if (i == -1) {
-                this.gridService.drawWord('A', 3, 4);
-            }
-        }
-    }
     get width(): number {
         return this.canvasSize.x;
     }
