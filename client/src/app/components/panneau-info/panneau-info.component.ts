@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { GameService } from '@app/services/game.service';
 
 export const DEFAULT_HAND_CAP = 7;
 
 @Component({
+    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: 'app-panneau-info',
     templateUrl: './panneau-info.component.html',
     styleUrls: ['./panneau-info.component.scss'],
