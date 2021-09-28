@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
+import { TurnService } from './turn.service';
 
 @Injectable({
     providedIn: 'root',
@@ -46,9 +47,18 @@ export class CommandService {
                 return true;
             },
         ],
+        [
+            '!passer',
+            (): boolean => {
+                this.turnService.changeTurn(false);
+                // eslint-disable-next-line no-invalid-this
+                this.textboxService.sendMessage(MessageType.System, 'Votre tour a été passé');
+                return true;
+            },
+        ],
     ]);
 
-    constructor(private textboxService: TextboxService, private placeLetterService: LetterPlacingService) {}
+    constructor(private textboxService: TextboxService, private placeLetterService: LetterPlacingService, private turnService: TurnService) {}
 
     parseCommand(message: string): void {
         let command: string;
