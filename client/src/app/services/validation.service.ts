@@ -29,14 +29,18 @@ export class ValidationService {
         // Will need the command line to accomplish it
         this.horizontalCheck();
         wordContainer.push(this.tempWord);
-
-        this.tempWord = '';
-        this.index = 1;
+        this.variableReset();
 
         this.verticalCheck();
         wordContainer.push(this.tempWord);
+        this.variableReset();
 
         return wordContainer;
+    }
+
+    variableReset(): void {
+        this.tempWord = '';
+        this.index = 1;
     }
 
     horizontalCheck(): void {
@@ -94,14 +98,17 @@ export class ValidationService {
         return true;
     }
 
-    // calcPoints(words: string[], square: string[]): number {
+    // calcPoints(words: string[]): number {
     //     CHANGE FUNCTION FOR ARRAY OF WORDS AND NOT A WORD
     //     let counter = 0;
-    //     for (const char of checkWord) {
+    //     for (const char of words) {
     //         const ascii: number = char.charCodeAt(0);
     //         if (ascii >= ASCII_SMALL_A && ascii <= ASCII_SMALL_E) counter += Points.A;
     //     }
-    //     for (const color in square) {
+    //     this.gameService.gameBoard.bonuses.forEach((value: unknown, key: string) => {
+    //         /* Do something*/
+    //     });
+    //     {
     //         if (color === Color.DARKBLUE || color === Color.RED) counter *= 3;
     //         else if (color === Color.LIGHTBLUE || color === Color.PINK) counter *= 2;
     //     }
