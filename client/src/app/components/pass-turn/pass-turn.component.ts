@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, Input, AfterViewInit } from '@angular/core';
 import { TurnService } from '@app/services/turn.service';
 import { Subscription } from 'rxjs';
 
@@ -10,8 +10,9 @@ const TIMER_INTERVAL = 1000;
     templateUrl: './pass-turn.component.html',
     styleUrls: ['./pass-turn.component.scss'],
 })
-export class PassTurnComponent implements AfterViewInit {
-    activePlayer: boolean;
+
+export class PassTurnComponent, implements AfterViewInit {
+    @Input() activePlayer: boolean;
     subscription: Subscription;
     turn: boolean;
 
@@ -40,3 +41,7 @@ export class PassTurnComponent implements AfterViewInit {
         this.turnService.changeTurn(!this.activePlayer);
     }
 }
+function ngAfterViewInit() {
+    throw new Error('Function not implemented.');
+}
+

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { MessageType } from '@app/classes/message';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
-import { MessageType } from '@app/classes/message';
 import { TurnService } from './turn.service';
 
 @Injectable({

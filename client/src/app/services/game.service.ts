@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
-import { PlayerHand } from '@app/classes/player-hand';
 import { GameBoard } from '@app/classes/game-board';
+import { PlayerHand } from '@app/classes/player-hand';
 import { Reserve } from '@app/classes/reserve';
+import { Subject } from 'rxjs';
 
 const BOT_NAMES: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
 export const DEFAULT_HAND_SIZE = 7;
@@ -50,7 +50,7 @@ export class GameService {
         this.reserve = new Reserve();
 
         // TODO: Assign type to bonuses and inject default bonus map
-        this.gameBoard = new GameBoard(new Map<string, unknown>());
+        this.gameBoard = new GameBoard(new Map<string, string>());
 
         const playerHand = this.reserve.draw(DEFAULT_HAND_SIZE);
         const opponentHand = this.reserve.draw(DEFAULT_HAND_SIZE);

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { TextboxService } from '@app/services/textbox.service';
-import { CommandService } from '@app/services/command.service';
 import { MessageType } from '@app/classes/message';
+import { CommandService } from '@app/services/command.service';
+import { TextboxService } from '@app/services/textbox.service';
 
 const MAX_MESSAGE_LENGTH = 512;
 

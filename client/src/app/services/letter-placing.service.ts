@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { TextboxService } from '@app/services/textbox.service';
-import { GameService } from '@app/services/game.service';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
+import { GameService } from '@app/services/game.service';
+import { TextboxService } from '@app/services/textbox.service';
 
 const BOUNDARY = 16;
 const CHARCODE_OF_A = 97;
@@ -23,6 +23,10 @@ export class LetterPlacingService {
         this.gameService.turnState.subscribe({
             next: (turn: boolean) => (this.turnState = turn),
         });
+    }
+
+    getLetters(): Map<string, string> {
+        return this.letters;
     }
 
     validateCommand(position: string, word: string): boolean {
