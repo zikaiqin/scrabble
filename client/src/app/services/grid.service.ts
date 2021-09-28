@@ -29,8 +29,8 @@ export class GridService {
     private startLetterPos: number = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
     private tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
-    private scale: number = 0.05;
-    private temp: number = 0;
+    private scale: number = 0.04;
+    private scaleCounter: number = 0;
     drawGrid() {
         this.gridContext.lineWidth = 1;
         this.gridContext.fillStyle = 'black';
@@ -277,17 +277,17 @@ export class GridService {
     }
 
     maxGrid() {
-        if (this.temp < 5) {
+        if (this.scaleCounter < NB_CASE_CHEVALET - 1) {
             this.gridContext.scale(1 + this.scale, 1 + this.scale);
-            this.temp++;
+            this.scaleCounter++;
         }
         this.indexChevalet--; // pour garder la meme place vu que drawGrid reappele index++
         this.drawGrid();
     }
     minGrid() {
-        if (this.temp >= 0) {
+        if (this.scaleCounter >= 0) {
             this.gridContext.scale(1 - this.scale, 1 - this.scale);
-            this.temp--;
+            this.scaleCounter--;
         }
         this.indexChevalet--; // pour garder la meme place vu que drawGrid reappele index++
         this.drawGrid();
