@@ -1,49 +1,68 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { GameService } from '@app/services/game.service';
+import { Component } from '@angular/core';
+import { GameService, DEFAULT_HAND_SIZE } from '@app/services/game.service';
 
-export const DEFAULT_HAND_CAP = 7;
+enum PlayerType {
+    Human,
+    Bot,
+}
 
 @Component({
-    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: 'app-panneau-info',
     templateUrl: './panneau-info.component.html',
     styleUrls: ['./panneau-info.component.scss'],
 })
 export class PanneauInfoComponent {
-    isVisiblePlayer: boolean = true;
-    isVisibleOpponent: boolean = true;
-    color: boolean;
-    private player = new Map();
-    constructor(private gameService: GameService) {}
-    setPlayerInfo() {
-        this.player
-            .set('PlayerName', this.gameService.player)
-            .set('PlayerScore', this.gameService.playerScore)
-            .set('OpponentName', this.gameService.opponent)
-            .set('OpponentScore', this.gameService.opponentScore)
-            .set('PlayerHandNum', this.gameService.playerHand.size)
-            .set('OpponentHandNum', this.gameService.opponentHand.size)
-            .set('ReserveAmount', this.gameService.reserveAmount);
-        return this.player;
-    }
-    showPlayerInfo(info: string) {
-        if (info === 'PlayerHandNum' && this.gameService.playerHand.size > DEFAULT_HAND_CAP) {
-            this.isVisiblePlayer = false;
-            return ' ';
-        }
-        if (info === 'OpponentHandNum' && this.gameService.opponentHand.size > DEFAULT_HAND_CAP) {
-            this.isVisibleOpponent = false;
-            return ' ';
-        }
-        return this.setPlayerInfo().get(info);
+    readonly playerType = PlayerType;
+
+    isVisiblePlayer: boolean;
+    isVisibleOpponent: boolean;
+    isMyTurn: boolean;
+
+    constructor(private gameService: GameService) {
+        this.gameService.turnState.subscribe({
+            next: (turn: boolean) => (this.isMyTurn = turn),
+        });
+        this.isVisiblePlayer = true;
+        this.isVisibleOpponent = true;
     }
 
-    turnState() {
-        if (this.gameService.turnState) {
-            this.color = true;
-            return 'Votre tour';
+    getTurnMessage(): string {
+        return this.isMyTurn === undefined ? 'Initiez la partie' : this.isMyTurn ? 'Votre tour' : "Tour de l'adversaire";
+    }
+
+    getTurnColor(): string {
+        return this.isMyTurn === undefined ? 'LightGray' : this.isMyTurn ? 'Green' : 'Red';
+    }
+
+    getReserveSize(): number {
+        return this.gameService.reserve === undefined ? 0 : this.gameService.reserve.size;
+    }
+
+    getHandSize(player: number): number | null {
+        if (player === PlayerType.Human) {
+            if (this.gameService.playerHand.size > DEFAULT_HAND_SIZE) {
+                this.isVisiblePlayer = false;
+                return null;
+            }
+            return this.gameService.playerHand.size;
+        } else {
+            if (this.gameService.opponentHand.size > DEFAULT_HAND_SIZE) {
+                this.isVisibleOpponent = false;
+                return null;
+            }
+            return this.gameService.opponentHand.size;
         }
-        this.color = false;
-        return "Tour de l'adversaire";
+    }
+
+    getScore(player: number): number {
+        return player === PlayerType.Human ? this.gameService.playerScore : this.gameService.opponentScore;
+    }
+
+    getName(player: number): string {
+        return player === PlayerType.Human ? this.gameService.player : this.gameService.opponent;
+    }
+
+    startGame(): void {
+        this.gameService.start();
     }
 }
