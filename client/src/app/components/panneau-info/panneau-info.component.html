@@ -1,29 +1,34 @@
-<div id="grid-container">
-    <div id="panneau">
-        <div id="joueur-container">
-            <div id="joueur">Joueur</div>
-            <div id="nom-joueur">{{showPlayerInfo("PlayerName")}} </div>
-            <div id="score-container">
+<div class="grid-container">
+    <div class="panneau">
+        <div class="joueur-container">
+            <div class="joueur">Joueur</div>
+            <div class="nom-joueur">{{ getName(playerType.Human) }} </div>
+            <div class="score-container">
                 <span>Score</span>
-                <div>{{showPlayerInfo("PlayerScore")}} point(s)</div>
+                <div>{{ getScore(playerType.Human) }} point(s)</div>
             </div>
-            <div id="main" [style.display]="isVisiblePlayer ? 'block' : 'none'">{{showPlayerInfo("PlayerHandNum")}} piece(s) en main</div>
+            <div class="main" [style.display]="isVisiblePlayer ? 'block' : 'none'">{{ getHandSize(playerType.Human) }} piece(s) en main</div>
         </div>
-        <div id="adversaire-container">
-            <div id="adversaire">Adversaire</div>
-            <div id="nom-joueur">{{showPlayerInfo("OpponentName")}}</div>
-            <div id="score-container">
+        <div class="adversaire-container">
+            <div class="adversaire">Adversaire</div>
+            <div class="nom-joueur">{{ getName(playerType.Bot) }}</div>
+            <div class="score-container">
                 <span>Score</span>
-                <div>{{showPlayerInfo("OpponentScore")}} point(s)</div>
+                <div>{{ getScore(playerType.Bot) }} point(s)</div>
             </div>
-            <div id="main" [style.display]="isVisibleOpponent ? 'block' : 'none'">{{showPlayerInfo("OpponentHandNum")}} piece(s) en main</div>
+            <div class="main" [style.display]="isVisibleOpponent ? 'block' : 'none'">{{ getHandSize(playerType.Bot) }} piece(s) en main</div>
         </div>
-        <div id="reserve">Il reste {{showPlayerInfo("ReserveAmount")}} piece(s) dans la reserve</div>
-        <div id="tour" [style.backgroundColor]="color ? 'green': 'red'">{{turnState()}}</div>
-        <p id="timer">----</p>
-        <br />
-        <br />
-        <app-pass-turn id="passer"></app-pass-turn>
+        <div class="reserve">Il reste {{ getReserveSize() }} piece(s) dans la reserve</div>
+        <div class="tour" [style.backgroundColor]="getTurnColor()">{{ getTurnMessage() }}</div>
+        <ng-template [ngIf]="isMyTurn !== undefined" [ngIfElse]="startButton">
+            <p id="timer">----</p>
+            <app-pass-turn id="passer"></app-pass-turn>
+        </ng-template>
+        <ng-template #startButton>
+            <button mat-raised-button (click)="startGame()">
+                Commencer
+            </button>
+        </ng-template>
     </div>
 </div>
 
