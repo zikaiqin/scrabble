@@ -27,7 +27,7 @@ export class GameBoard {
     }
 
     // TODO: assign a type to bonuses
-    getBonus(coords: string): unknown | undefined {
+    getBonus(coords: string): string | undefined {
         return this.bonuses.get(coords);
     }
 }

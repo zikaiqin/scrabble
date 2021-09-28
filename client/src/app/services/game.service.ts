@@ -50,7 +50,7 @@ export class GameService {
         this.reserve = new Reserve();
 
         // TODO: Assign type to bonuses and inject default bonus map
-        this.gameBoard = new GameBoard(new Map<string, unknown>());
+        this.gameBoard = new GameBoard(new Map<string, string>());
 
         const playerHand = this.reserve.draw(DEFAULT_HAND_SIZE);
         const opponentHand = this.reserve.draw(DEFAULT_HAND_SIZE);

@@ -23,6 +23,7 @@ enum Bonuses {
 export class ValidationService {
     startCoord: Vec2 = { x: 0, y: 0 };
     index = 1;
+    coordContainer: Map<string, number>;
     points: Map<string, number> = new Map()
         .set('a', 1)
         .set('b', 3)
@@ -50,7 +51,6 @@ export class ValidationService {
         .set('x', 10)
         .set('y', 10)
         .set('z', 10);
-
     private dictionnary = JSON.parse(JSON.stringify(data));
 
     constructor(private gameService: GameService, private letterPlacingService: LetterPlacingService) {
@@ -72,15 +72,15 @@ export class ValidationService {
                 tempWord += i[1].toLowerCase();
             }
             wordContainer.push(tempWord);
-        }
-
-        if (orientation === 0) {
-            for (const i of this.letterPlacingService.getLetters()) {
-                wordContainer.push(this.verticalCheck(i[0]));
-            }
-        } else if (orientation > 0) {
-            for (const i of this.letterPlacingService.getLetters()) {
-                wordContainer.push(this.horizontalCheck(i[0]));
+            this.coordContainer.set(tempWord, 0);
+            if (orientation === 0) {
+                for (const i of this.letterPlacingService.getLetters()) {
+                    wordContainer.push(this.verticalCheck(i[0]));
+                }
+            } else if (orientation > 0) {
+                for (const i of this.letterPlacingService.getLetters()) {
+                    wordContainer.push(this.horizontalCheck(i[0]));
+                }
             }
         } else {
             wordContainer.push(this.verticalCheck(String.fromCharCode(this.startCoord.x) + String(this.startCoord.y)));
@@ -95,12 +95,13 @@ export class ValidationService {
 
     verticalCheck(coord: string): string {
         const xIndex = coord.toLowerCase()[0].charCodeAt(0);
-        const yIndex = String(this.startCoord.y);
+        const yIndex = coord.slice(1, coord.length);
         let tempWord = '';
         for (this.index; xIndex - this.index >= ASCII_SMALL_A; this.index++) {
             if (this.gameService.gameBoard.hasLetter(String.fromCharCode(xIndex - this.index) + yIndex)) continue;
             else break;
         }
+        const stringIndex = this.index - 1;
         for (this.index - 1; this.index > 0; this.index--) {
             tempWord += this.gameService.gameBoard.getLetter(String.fromCharCode(xIndex - this.index) + yIndex);
         }
@@ -112,17 +113,19 @@ export class ValidationService {
             tempWord += this.gameService.gameBoard.getLetter(String.fromCharCode(this.startCoord.x + this.index) + yIndex);
         }
         this.variableReset();
+        this.coordContainer.set(tempWord, stringIndex);
         return tempWord;
     }
 
     horizontalCheck(coord: string): string {
-        const xIndex = String.fromCharCode(this.startCoord.x);
+        const xIndex = coord[0];
         const yIndex = Number(coord.slice(1, coord.length));
         let tempWord = '';
         for (this.index; yIndex - this.index >= 0; this.index++) {
             if (this.gameService.gameBoard.hasLetter(xIndex + String(yIndex - this.index))) continue;
             else break;
         }
+        const stringIndex = this.index - 1;
         for (this.index - 1; this.index > 0; this.index--) {
             tempWord += this.gameService.gameBoard.getLetter(xIndex + String(yIndex - this.index));
         }
@@ -134,6 +137,7 @@ export class ValidationService {
             tempWord += this.gameService.gameBoard.getLetter(xIndex + String(yIndex + this.index));
         }
         this.variableReset();
+        this.coordContainer.set(tempWord, stringIndex);
         return tempWord;
     }
 
@@ -150,76 +154,56 @@ export class ValidationService {
         return temp;
     }
 
-    calcPoints(words: string[]): number {
+    calcPoints(): number {
         let counter = 0;
-        let l2 = false;
-        let l3 = false;
         let w2 = false;
         let w3 = false;
+        const tempMap: Map<string, string | undefined> = new Map();
+
+        for (const letter of this.letterPlacingService.getLetters()) {
+            if (this.gameService.gameBoard.bonuses.has(letter[0])) {
+                tempMap.set(letter[1], this.gameService.gameBoard.getBonus(letter[0]));
+            }
+        }
+
+        for (const word of this.coordContainer) {
+            let tempPoints = 0;
+            for (let letter = 0; letter < word[0].length; letter++) {
+                if (letter === word[1]) {
+                    const bonus = tempMap.get(word[0][letter]);
+                    switch (bonus) {
+                        case Bonuses.L2: {
+                            tempPoints += (this.points.get(word[0][letter]) as number) * 2;
+                            break;
+                        }
+                        case Bonuses.L3: {
+                            tempPoints += (this.points.get(word[0][letter]) as number) * 3;
+                            break;
+                        }
+                        case Bonuses.W2: {
+                            w2 = true;
+                            break;
+                        }
+                        case Bonuses.W3: {
+                            w3 = true;
+                            break;
+                        }
+                    }
+                    counter += tempPoints;
+                }
+            }
+            if (w2) {
+                counter *= 2;
+                w2 = false;
+            }
+            if (w3) {
+                counter *= 3;
+                w3 = false;
+            }
+        }
 
         const size = this.letterPlacingService.getLetters().size;
         if (size === BINGO_WORD) counter += BINGO_BONUS;
-        else if (size === 1) {
-            // Only 2 possible word formed
-            const bonus = this.gameService.gameBoard.bonuses.get(String.fromCharCode(this.startCoord.x) + String(this.startCoord.y));
-            switch (bonus) {
-                case Bonuses.L2: {
-                    l2 = true;
-                    break;
-                }
-                case Bonuses.L3: {
-                    l3 = true;
-                    break;
-                }
-                case Bonuses.W2: {
-                    w2 = true;
-                    break;
-                }
-                case Bonuses.W3: {
-                    w3 = true;
-                    break;
-                }
-            }
-        }
-
-        for (const itr of this.letterPlacingService.getLetters()) {
-            if (this.gameService.gameBoard.bonuses.has(itr[0].toLowerCase())) {
-                const bonus = this.gameService.gameBoard.bonuses.get(itr[0].toLowerCase());
-                switch (bonus) {
-                    case Bonuses.L2: {
-                        const temp = (this.points.get(itr[1].toLowerCase()) as number) * 2;
-                        counter += temp;
-                        l2 = true;
-                        break;
-                    }
-                    case Bonuses.L3: {
-                        const temp = (this.points.get(itr[1].toLowerCase()) as number) * 3;
-                        counter += temp;
-                        l3 = true;
-                        break;
-                    }
-                    case Bonuses.W2: {
-                        w2 = true;
-                        break;
-                    }
-                    case Bonuses.W3: {
-                        w3 = true;
-                        break;
-                    }
-                }
-            }
-        }
-        if (w2) counter *= 2;
-        if (w3) counter *= 3;
-
-        return counter;
-    }
-
-    calcWordPoints(word: string): number {
-        let counter = 0;
-        for (const itr of word) {
-            counter += this.points.get(itr[1].toLowerCase()) as number;
-        }
 
         return counter;
     }
