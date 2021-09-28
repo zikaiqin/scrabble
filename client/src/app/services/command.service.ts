@@ -7,6 +7,7 @@ import { MessageType } from '@app/classes/message';
     providedIn: 'root',
 })
 export class CommandService {
+    debugActive: boolean = false;
     readonly commandLookup = new Map<string, (...params: string[]) => boolean>([
         [
             '!aide',
@@ -25,6 +26,24 @@ export class CommandService {
             (position: string, word: string): boolean => {
                 // eslint-disable-next-line no-invalid-this
                 return this.placeLetterService.validateCommand(position, word);
+            },
+        ],
+        [
+            '!debug',
+            (): boolean => {
+                // eslint-disable-next-line no-invalid-this
+                if (!this.debugActive) {
+                    // eslint-disable-next-line no-invalid-this
+                    this.textboxService.sendMessage(MessageType.System, 'Affichages de déboguage activés');
+                    // eslint-disable-next-line no-invalid-this
+                    this.debugActive = true;
+                } else {
+                    // eslint-disable-next-line no-invalid-this
+                    this.textboxService.sendMessage(MessageType.System, 'Affichages de déboguage désactivés');
+                    // eslint-disable-next-line no-invalid-this
+                    this.debugActive = false;
+                }
+                return true;
             },
         ],
     ]);
