@@ -25,6 +25,10 @@ export class PlayerHand {
         this.size++;
     }
 
+    addAll(letters: string[]): void {
+        letters.forEach((letter) => this.add(letter));
+    }
+
     remove(letter: string): void {
         const number = this.letters.get(letter);
         if (number) {
