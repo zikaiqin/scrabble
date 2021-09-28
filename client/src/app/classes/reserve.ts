@@ -11,6 +11,7 @@ export class Reserve {
         if (this.size <= 0) {
             return undefined;
         }
+        this.size--;
         const index = Math.floor(Math.random() * this.size);
         return this.letters.splice(index, 1)[0];
     }
@@ -26,6 +27,7 @@ export class Reserve {
         return letters;
     }
 
+    // FIXME: not the actual implementation
     exchangeLetters(hand: string[], lettersToBeRemoved: string[], reserve: string[]): number {
         if (reserve.length < 7) return -1;
         else {

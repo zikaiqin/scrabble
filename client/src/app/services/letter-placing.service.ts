@@ -25,6 +25,10 @@ export class LetterPlacingService {
         });
     }
 
+    getLetters(): Map<string, string> {
+        return this.letters;
+    }
+
     validateCommand(position: string, word: string): boolean {
         this.position = position;
         this.word = word;
@@ -45,8 +49,6 @@ export class LetterPlacingService {
     }
 
     generateLetters() {
-        const wildCard = /[A-Z]/;
-
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const startX = Number(this.position.slice(1, -1));
         const startY = this.position.charAt(0);
@@ -55,11 +57,11 @@ export class LetterPlacingService {
 
         if (direction === 'h') {
             letters.forEach((letter, index) => {
-                this.letters.set(startY + String(startX + index), wildCard.test(letter) ? WILDCARD : letter);
+                this.letters.set(startY + String(startX + index), letter);
             });
         } else {
             letters.forEach((letter, index) => {
-                this.letters.set(String.fromCharCode(startY.charCodeAt(0) + index) + String(startX), wildCard.test(letter) ? WILDCARD : letter);
+                this.letters.set(String.fromCharCode(startY.charCodeAt(0) + index) + String(startX), letter);
             });
         }
     }
@@ -138,9 +140,10 @@ export class LetterPlacingService {
     }
 
     isInHand(): boolean {
+        const wildCard = /[A-Z]/;
         const letters = Array.from(this.letters.values());
         const testHand = new PlayerHand();
-        letters.forEach((letter) => testHand.add(letter));
+        letters.forEach((letter) => testHand.add(wildCard.test(letter) ? WILDCARD : letter));
 
         // using unique set of letters in word as key, compare to amount of letters in hand
         const isInHand = [...new Set<string>(letters)].every((letter) => {

@@ -1,11 +1,11 @@
 export class GameBoard {
     // TODO: assign a type to bonuses
     readonly letters: Map<string, string>;
-    readonly bonuses: Map<string, unknown>;
+    readonly bonuses: Map<string, string>;
 
-    constructor(bonuses: Map<string, unknown>) {
+    constructor(bonuses: Map<string, string>) {
         this.letters = new Map<string, string>();
-        this.bonuses = new Map<string, unknown>(bonuses);
+        this.bonuses = new Map<string, string>(bonuses);
     }
 
     size(): number {

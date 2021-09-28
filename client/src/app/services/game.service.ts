@@ -13,6 +13,7 @@ export const DEFAULT_SCORE = 0;
 })
 export class GameService {
     isInit: boolean;
+    isStarted: boolean;
 
     player: string;
     opponent: string;
@@ -38,17 +39,18 @@ export class GameService {
         this.playerHand = new PlayerHand();
         this.opponentHand = new PlayerHand();
 
-        this.reserve = new Reserve();
-
-        // TODO: Assign type to bonuses and inject default bonus map
-        this.gameBoard = new GameBoard(new Map<string, unknown>());
-
         this.isInit = true;
+        this.isStarted = false;
     }
 
     start(): void {
         const turnState = Boolean(Math.floor(Math.random() * 2));
         this.turnState.next(turnState);
+
+        this.reserve = new Reserve();
+
+        // TODO: Assign type to bonuses and inject default bonus map
+        this.gameBoard = new GameBoard(new Map<string, unknown>());
 
         const playerHand = this.reserve.draw(DEFAULT_HAND_SIZE);
         const opponentHand = this.reserve.draw(DEFAULT_HAND_SIZE);
