@@ -26,6 +26,11 @@ export enum MouseButton {
 })
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
+<<<<<<< HEAD
+=======
+    
+
+>>>>>>> b1e51ecfdec765604830240553362c76e23b0bb9
     mousePosition: Vec2 = { x: 0, y: 0 };
     buttonPressed = '';
 
@@ -36,6 +41,10 @@ export class PlayAreaComponent implements AfterViewInit {
     @HostListener('keydown', ['$event'])
     buttonDetect(event: KeyboardEvent) {
         this.buttonPressed = event.key;
+    }
+    surrender(){
+        this.router.navigateByUrl('/home');
+
     }
     maximize(): void {
         this.gridService.clearGrid();
@@ -52,6 +61,8 @@ export class PlayAreaComponent implements AfterViewInit {
 
         this.gridService.drawGrid();
         this.gridCanvas.nativeElement.focus();
+        // this.gridServiceChevalet.gridHand = this.gridChevalet_lol.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        // this.gridServiceChevalet.drawSomethign();
     }
 
     get width(): number {

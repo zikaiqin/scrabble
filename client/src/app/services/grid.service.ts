@@ -55,9 +55,16 @@ export class GridService {
             this.tuilePosY += this.tuileSize;
             this.tuilePosX = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         }
+<<<<<<< HEAD
         this.drawWord('B', 10, 11);
         this.drawWord('O', 10, 12);
         this.drawWord('B', 10, 13);
+=======
+        this.drawWord('A', 5, 1);
+        this.drawWord('B', 10, 12);
+        this.drawChevalet();
+
+>>>>>>> b1e51ecfdec765604830240553362c76e23b0bb9
 
         this.drawChevalet();
         
