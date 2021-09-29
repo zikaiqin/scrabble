@@ -1,7 +1,7 @@
 export class Reserve {
     readonly letters: string[];
     size: number;
-
+    private handSize = 7;
     constructor() {
         this.letters = Object.assign([], BASE_RESERVE);
         this.size = this.letters.length;
@@ -29,7 +29,7 @@ export class Reserve {
 
     // FIXME: not the actual implementation
     exchangeLetters(hand: string[], lettersToBeRemoved: string[], reserve: string[]): number {
-        if (reserve.length < 7) return -1;
+        if (reserve.length < this.handSize) return -1;
         else {
             for (let i = 0; i < lettersToBeRemoved.length; i++) {
                 hand.splice(hand.indexOf(lettersToBeRemoved[i]), 1);

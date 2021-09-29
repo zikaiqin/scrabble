@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
-
+//import { Exchange } from './exchange.service';
 @Injectable({
     providedIn: 'root',
 })

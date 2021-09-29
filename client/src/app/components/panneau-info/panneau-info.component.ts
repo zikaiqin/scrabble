@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { GameService, DEFAULT_HAND_SIZE } from '@app/services/game.service';
-
 enum PlayerType {
     Human,
     Bot,
@@ -17,7 +16,7 @@ export class PanneauInfoComponent {
     isVisiblePlayer: boolean;
     isVisibleOpponent: boolean;
     isMyTurn: boolean;
-
+    
     constructor(private gameService: GameService) {
         this.gameService.turnState.subscribe({
             next: (turn: boolean) => (this.isMyTurn = turn),
