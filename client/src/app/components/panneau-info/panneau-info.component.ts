@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { DEFAULT_HAND_SIZE, GameService } from '@app/services/game.service';
+// import { EndGameService } from '@app/services/end-game.service';
 
 enum PlayerType {
     Human,
@@ -14,6 +15,7 @@ enum PlayerType {
 export class PanneauInfoComponent {
     readonly playerType = PlayerType;
 
+    isVisibleWinner: boolean;
     isVisiblePlayer: boolean;
     isVisibleOpponent: boolean;
     isMyTurn: boolean;
@@ -24,6 +26,7 @@ export class PanneauInfoComponent {
         });
         this.isVisiblePlayer = true;
         this.isVisibleOpponent = true;
+        this.isVisibleWinner = false;
     }
 
     getTurnMessage(): string {
@@ -65,4 +68,17 @@ export class PanneauInfoComponent {
     startGame(): void {
         this.gameService.start();
     }
+
+    /* getWinner(): string {
+        if (this.endGameService.gameHasEnded) {
+            this.isVisibleWinner = true;
+            if (this.gameService.playerScore > this.gameService.opponentScore) {
+                return this.gameService.player;
+            } else if (this.gameService.playerScore < this.gameService.opponentScore) {
+                return this.gameService.opponent;
+            } else if (this.gameService.playerScore === this.gameService.opponentScore)
+                return this.gameService.player + ' et ' + this.gameService.opponent;
+        }
+        return '';
+    }*/
 }

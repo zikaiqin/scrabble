@@ -19,6 +19,7 @@ import { PanneauInfoComponent } from './components/panneau-info/panneau-info.com
 import { PassTurnComponent } from './components/pass-turn/pass-turn.component';
 import { TextboxComponent } from './components/textbox/textbox.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
+import { EndGameComponent } from './components/end-game/end-game.component';
 
 /**
  * Main module that is used in main.ts.
@@ -41,6 +42,7 @@ import { HomePageComponent } from './pages/home-page/home-page.component';
         HomePageComponent,
         MainMenuComponent,
         NewGameMenuComponent,
+        EndGameComponent,
     ],
     imports: [
         AppMaterialModule,
