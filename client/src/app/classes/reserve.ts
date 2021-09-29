@@ -28,34 +28,10 @@ export class Reserve {
         return letters;
     }
 
-    // FIXME: not the actual implementation
-    // exchangeLetters(hand: string[], lettersToBeRemoved: string[], reserve: string[]): number {
-    //     if (reserve.length < this.handSize) return -1;
-    //     else {
-    //         for (let i = 0; i < lettersToBeRemoved.length; i++) {
-    //             hand.splice(hand.indexOf(lettersToBeRemoved[i]), 1);
-    //         }
-    //         // this.moveLettersToHand(hand, reserve, lettersToBeRemoved.length);
-    //         reserve.push(...lettersToBeRemoved);
-    //         return 1;
-    //     }
     receiveOne(word: string): void {
         BASE_RESERVE.push(word);
         this.size++;
     }
-    // FIXME: not the actual implementation
-    // No fix just remove it
-    // exchangeLetters(hand: string[], lettersToBeRemoved: string[], reserve: string[]): number {
-    //     if (reserve.length < 7) return -1;
-    //     else {
-    //         for (let i = 0; i < lettersToBeRemoved.length; i++) {
-    //             hand.splice(hand.indexOf(lettersToBeRemoved[i]), 1);
-    //         }
-    //         // this.moveLettersToHand(hand, reserve, lettersToBeRemoved.length);
-    //         reserve.push(...lettersToBeRemoved);
-    //         return 1;
-    //     }
-    // }
 }
 
 const BASE_RESERVE: string[] = [
