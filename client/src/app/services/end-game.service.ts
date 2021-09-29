@@ -83,8 +83,8 @@ export class EndGameService {
         return EMPTY;
     }
 
-    /* showLettersLeft(): void {
-    }*/
+    showLettersLeft(): void {
+    }
 
     endGame(): void {
         if (this.checkIfGameEnd()) {
