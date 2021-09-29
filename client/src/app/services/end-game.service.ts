@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { GameService } from '@app/services/game.service';
-import { ValidationService } from './validation.service';
-// import { TextboxService } from './textbox.service';
+// import { ValidationService } from './validation.service';
+import { TextboxService } from './textbox.service';
+import { MessageType } from '@app/classes/message';
 
 export const DEFAULT_TURN_COUNT = 0;
-export const MAX_TURN_SKIP_COUNT = 6;
+export const MAX_TURN_SKIP_COUNT = 7;
 export const DEFAULT_POINT = 0;
 export const EMPTY = 0;
 export const PLAYER = 1;
@@ -22,7 +23,7 @@ export class EndGameService {
     playerLettersLeft: string[] = [];
     opponentLettersLeft: string[] = [];
     gameHasEnded: boolean = false;
-    constructor(private gameService: GameService, private validationService: ValidationService /* , private textboxService: TextboxService*/) {}
+    constructor(private gameService: GameService/*, private validationService: ValidationService*/, private textboxService: TextboxService) {}
 
     turnSkipCount(): void {
         this.turnSkipCounter++;
@@ -48,18 +49,18 @@ export class EndGameService {
     }
 
     deductPoint(): void {
-        for (const i of this.gameService.playerHand.letters) {
+        /*for (const i of this.gameService.playerHand.letters) {
             this.pointDeductedPlayer += this.validationService.points.get(i[0]) as number;
         }
         this.gameService.playerScore -= this.pointDeductedPlayer;
         for (const i of this.gameService.opponentHand.letters) {
             this.pointDeductedOpponent += this.validationService.points.get(i[0]) as number;
         }
-        this.gameService.opponentScore -= this.pointDeductedOpponent;
+        this.gameService.opponentScore -= this.pointDeductedOpponent;*/
     }
 
     addPoint(player: number): void {
-        if (player === PLAYER) {
+        /*if (player === PLAYER) {
             for (const i of this.gameService.opponentHand.letters) {
                 this.pointAddedPlayer += this.validationService.points.get(i[0]) as number;
             }
@@ -70,7 +71,7 @@ export class EndGameService {
                 this.pointAddedOpponent += this.validationService.points.get(i[0]) as number;
             }
             this.gameService.opponentScore += this.pointAddedOpponent;
-        }
+        }*/
     }
 
     checkWhoEmptiedHand(): number {
@@ -87,8 +88,9 @@ export class EndGameService {
 
     endGame(): void {
         if (this.checkIfGameEnd()) {
-            this.deductPoint();
-            this.addPoint(this.checkWhoEmptiedHand());
+            this.textboxService.sendMessage(MessageType.System, 'Game has ended');
+            /*this.deductPoint();
+            this.addPoint(this.checkWhoEmptiedHand());*/
         }
     }
 }
