@@ -5,7 +5,7 @@ export class Reserve {
         this.letters = Object.assign([], BASE_RESERVE);
         this.size = this.letters.length;
     }
-    getSize():number{
+    getSize(): number {
         return this.size;
     }
     drawOne(): string | undefined {
@@ -39,7 +39,7 @@ export class Reserve {
     //         reserve.push(...lettersToBeRemoved);
     //         return 1;
     //     }
-    receiveOne(word :string):void{
+    receiveOne(word: string): void {
         BASE_RESERVE.push(word);
         this.size++;
     }

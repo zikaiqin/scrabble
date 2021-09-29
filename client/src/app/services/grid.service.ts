@@ -17,7 +17,6 @@ export const NB_CASE_CHEVALET = 7;
     providedIn: 'root',
 })
 export class GridService {
-    
     gridContext: CanvasRenderingContext2D;
     handContext: CanvasRenderingContext2D;
     private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
@@ -193,7 +192,7 @@ export class GridService {
     drawOnChevalet(playerhand: PlayerHand) {
         this.handContext.font = 'bold 40px serif';
         this.handContext.fillStyle = '#EBDDE2';
-        for (const it of playerhand.letters){
+        for (const it of playerhand.letters) {
             this.handContext.fillText(
                 it[0].toLocaleUpperCase(),
                 this.tuileSize + this.tuileSizeChevalet * this.indexChevalet + STROKE_RANGE,

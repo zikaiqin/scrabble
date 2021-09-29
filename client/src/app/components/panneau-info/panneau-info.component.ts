@@ -16,7 +16,7 @@ export class PanneauInfoComponent {
     isVisiblePlayer: boolean;
     isVisibleOpponent: boolean;
     isMyTurn: boolean;
-    
+
     constructor(private gameService: GameService) {
         this.gameService.turnState.subscribe({
             next: (turn: boolean) => (this.isMyTurn = turn),

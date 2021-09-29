@@ -36,11 +36,7 @@ export class CommandService {
         ],
     ]);
 
-    constructor( 
-        private textboxService: TextboxService, 
-        private placeLetterService: LetterPlacingService, 
-        private exchange:Exchange 
-        ) {}
+    constructor(private textboxService: TextboxService, private placeLetterService: LetterPlacingService, private exchange: Exchange) {}
 
     parseCommand(message: string): void {
         let command: string;
