@@ -3,6 +3,7 @@ import { GameService } from '@app/services/game.service';
 // import { ValidationService } from './validation.service';
 import { TextboxService } from './textbox.service';
 import { MessageType } from '@app/classes/message';
+import { PlayerHand } from '@app/classes/player-hand';
 
 export const DEFAULT_TURN_COUNT = 0;
 export const MAX_TURN_SKIP_COUNT = 7;
@@ -83,7 +84,16 @@ export class EndGameService {
         return EMPTY;
     }
 
-    showLettersLeft(): void {
+    showLettersLeft(playerHand: PlayerHand, opponentHand: PlayerHand): void {
+        for (const it of playerHand.letters) {
+           this.playerLettersLeft.push(it[0]);
+        }
+        for (const it of opponentHand.letters) {
+        this.opponentLettersLeft.push(it[0]);
+        }
+        this.textboxService.sendMessage(MessageType.System , 'Fin de partie - lettres restantes');
+        this.textboxService.sendMessage(MessageType.System , this.gameService.player + ': ' + this.playerLettersLeft.join('').toString());
+        this.textboxService.sendMessage(MessageType.System , this.gameService.opponent + ': ' + this.opponentLettersLeft.join('').toString());
     }
 
     endGame(): void {

@@ -35,7 +35,6 @@ export class PassTurnComponent {
 
     startTimer(): void {
         let time = TIMER;
-        console.log(time);
         this.timer = setInterval(() => {
             const element = document.getElementById('timer');
             if (element !== null) {
@@ -54,6 +53,5 @@ export class PassTurnComponent {
 
     clearTimer(): void {
         clearInterval(this.timer);
-        console.log('Clear called succesfully');
     }
 }
