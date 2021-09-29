@@ -1,3 +1,4 @@
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -11,11 +12,10 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { ChevaletComponent } from './components/chevalet/chevalet.component';
-import { DragDropModule } from '@angular/cdk/drag-drop';
-import { PanneauInfoComponent } from './components/panneau-info/panneau-info.component';
 import { InputbarComponent } from './components/inputbar/inputbar.component';
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
+import { PanneauInfoComponent } from './components/panneau-info/panneau-info.component';
 import { PassTurnComponent } from './components/pass-turn/pass-turn.component';
 import { TextboxComponent } from './components/textbox/textbox.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';

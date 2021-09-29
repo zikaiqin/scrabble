@@ -14,6 +14,5 @@ export class GamePageComponent implements OnInit {
         if (!this.gameService.isInit) {
             this.router.navigateByUrl('/home');
         }
-        this.gameService.start();
     }
 }
