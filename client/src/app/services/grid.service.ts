@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { tableau } from './tableau.config';
-
+import { PlayerHand } from '@app/classes/player-hand';
 // TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
 export const DEFAULT_WIDTH = 500;
 export const DEFAULT_HEIGHT = 500;
@@ -54,14 +54,10 @@ export class GridService {
             this.tuilePosY += this.tuileSize;
             this.tuilePosX = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         }
-        this.drawWord('A', 5, 1);
-        this.drawWord('B', 10, 12);
+        this.drawWord('B', 10, 11);
+        this.drawWord('O', 10, 12);
+        this.drawWord('B', 10, 13);
         this.drawChevalet();
-
-        this.drawOnChevalet('B');
-        this.drawOnChevalet('B');
-        this.drawEmpty();
-
         this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
     }
@@ -193,15 +189,18 @@ export class GridService {
         }
     }
 
-    drawOnChevalet(lettre: string) {
+    drawOnChevalet(playerhand: PlayerHand) {
         this.handContext.font = 'bold 40px serif';
         this.handContext.fillStyle = '#EBDDE2';
-        this.handContext.fillText(
-            lettre,
-            this.tuileSize + this.tuileSizeChevalet * this.indexChevalet + STROKE_RANGE,
-            DEFAULT_HEIGHT + this.tuileSize * 2 + STROKE_RANGE * 3,
-        );
-        this.indexChevalet++;
+        for (const it of playerhand.letters) {
+            this.handContext.fillText(
+                it[0].toLocaleUpperCase(),
+                this.tuileSize + this.tuileSizeChevalet * this.indexChevalet + STROKE_RANGE,
+                DEFAULT_HEIGHT + this.tuileSize * 2 + STROKE_RANGE * 3,
+            );
+            this.indexChevalet++;
+        }
+        this.indexChevalet = 0;
     }
     drawEmpty(i?: number) {
         this.handContext.fillStyle = '#E42217';
