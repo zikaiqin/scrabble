@@ -55,19 +55,10 @@ export class GridService {
             this.tuilePosY += this.tuileSize;
             this.tuilePosX = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         }
-<<<<<<< HEAD
         this.drawWord('B', 10, 11);
         this.drawWord('O', 10, 12);
         this.drawWord('B', 10, 13);
-=======
-        this.drawWord('A', 5, 1);
-        this.drawWord('B', 10, 12);
         this.drawChevalet();
-
->>>>>>> b1e51ecfdec765604830240553362c76e23b0bb9
-
-        this.drawChevalet();
-        
         this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
     }
@@ -204,7 +195,7 @@ export class GridService {
         this.handContext.fillStyle = '#EBDDE2';
         for (const it of playerhand.letters){
             this.handContext.fillText(
-                it[0],
+                it[0].toLocaleUpperCase(),
                 this.tuileSize + this.tuileSizeChevalet * this.indexChevalet + STROKE_RANGE,
                 DEFAULT_HEIGHT + this.tuileSize * 2 + STROKE_RANGE * 3,
             );

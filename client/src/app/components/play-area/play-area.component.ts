@@ -26,11 +26,8 @@ export enum MouseButton {
 })
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
-<<<<<<< HEAD
-=======
     
 
->>>>>>> b1e51ecfdec765604830240553362c76e23b0bb9
     mousePosition: Vec2 = { x: 0, y: 0 };
     buttonPressed = '';
 
@@ -42,10 +39,10 @@ export class PlayAreaComponent implements AfterViewInit {
     buttonDetect(event: KeyboardEvent) {
         this.buttonPressed = event.key;
     }
-    surrender(){
-        this.router.navigateByUrl('/home');
-
+    redirectTo (uri:string){
+        this.router.navigateByUrl(uri);
     }
+
     maximize(): void {
         this.gridService.clearGrid();
         this.gridService.maxGrid();
@@ -85,10 +82,6 @@ export class PlayAreaComponent implements AfterViewInit {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
         }
     }
-    surrender():void {
-        
-        this.router.navigateByUrl('/home');
 
-    }
 
 }
