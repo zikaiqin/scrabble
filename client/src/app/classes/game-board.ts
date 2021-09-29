@@ -12,12 +12,12 @@ export class GameBoard {
         return this.letters.size;
     }
 
-    hasLetter(coords: string): boolean {
+    hasCoords(coords: string): boolean {
         return this.letters.has(coords);
     }
 
     placeLetter(coords: string, letter: string): void {
-        if (!this.hasLetter(coords)) {
+        if (!this.hasCoords(coords)) {
             this.letters.set(coords, letter);
         }
     }
