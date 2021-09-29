@@ -27,6 +27,13 @@ export class CommandService {
                 return this.placeLetterService.validateCommand(position, word);
             },
         ],
+        [
+            '!echange',
+            (position: string, word: string): boolean => {
+                // eslint-disable-next-line no-invalid-this
+                return this.placeLetterService.validateCommand(position, word);
+            },
+        ],
     ]);
 
     constructor(private textboxService: TextboxService, private placeLetterService: LetterPlacingService) {}
