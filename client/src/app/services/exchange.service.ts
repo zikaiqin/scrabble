@@ -3,7 +3,6 @@ import { PlayerHand } from '@app/classes/player-hand';
 import { Injectable } from '@angular/core';
 import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
-
 const WILDCARD = '*';
 @Injectable({
     providedIn: 'root',
@@ -29,10 +28,12 @@ export class Exchange {
 
         // Doit etre entre 1 et 7
         if(word.length < 0 || word.length >7){
+            this.textboxService.sendMessage(MessageType.System, 'Doit etre entre 1 et 7');
             return false;
         }
         // Verifie si ils sont tous en mimuscule
         if (word != word.toLowerCase()){
+            this.textboxService.sendMessage(MessageType.System, 'Doit etre en miniscule');
             return false;
         }
         // Seulement a mon tour
@@ -52,10 +53,17 @@ export class Exchange {
         return canPlace;
     }
     exchangeLetter():void{
+        this.afficherBox();
         this.removeFromHand();
         for(let i = 0 ; i < this.word.length; i++){
             this.gameService.reserve.drawOne();
         }
+    }
+    
+    //manque le nom de joueur
+    afficherBox():void{
+        this.textboxService.sendMessage(MessageType.User, `La commande: échanger ${this.word} a été lancée `);
+        
     }
     removeFromHand():void{
             Array.from(this.letters.entries()).forEach((entry) => {
@@ -93,7 +101,7 @@ export class Exchange {
 
     isMyTurn(): boolean {
         if (!this.turnState) {
-            this.textboxService.sendMessage(MessageType.System, 'La commande !placer peut seulement être utilisé lors de votre tour');
+            this.textboxService.sendMessage(MessageType.System, 'La commande !échanger peut seulement être utilisé lors de votre tour');
         }
         return this.turnState;
     }

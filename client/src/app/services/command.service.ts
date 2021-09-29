@@ -28,7 +28,7 @@ export class CommandService {
             },
         ],
         [
-            '!echange',
+            '!échanger',
             (word: string): boolean => {
                 // eslint-disable-next-line no-invalid-this
                 return this.exchange.validateCommand(word);
