@@ -30,7 +30,8 @@ export class PanneauInfoComponent {
 
     constructor(private gameService: GameService, private turnService: TurnService, private endGameService: EndGameService) {
         this.subscription = this.turnService.getState().subscribe((turn) => {
-            this.turn = turn;})
+            this.turn = turn;
+        });
         this.gameService.turnState.subscribe({
             next: (turn: boolean) => (this.isMyTurn = turn),
         });
@@ -92,7 +93,7 @@ export class PanneauInfoComponent {
                     element.innerHTML = 'Turn ended';
                     clearInterval(timer);
                     this.endGameService.turnSkipCountReset();
-                    this.endGameService.endGame()
+                    this.endGameService.endGame();
                 }
             }
         }, TIMER_INTERVAL);

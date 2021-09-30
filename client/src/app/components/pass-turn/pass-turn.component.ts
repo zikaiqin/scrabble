@@ -21,7 +21,7 @@ export class PassTurnComponent {
         this.subscription = this.turnService.getState().subscribe((turn) => {
             this.activePlayer = turn;
             this.turn = turn;
-            if(turn){
+            if (turn) {
                 this.startTimer();
             }
         });

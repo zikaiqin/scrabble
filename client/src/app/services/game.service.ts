@@ -4,9 +4,7 @@ import { PlayerHand } from '@app/classes/player-hand';
 import { Reserve } from '@app/classes/reserve';
 import { Subject } from 'rxjs';
 
-const BOT_NAMES: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
-export const DEFAULT_HAND_SIZE = 7;
-export const DEFAULT_SCORE = 0;
+import { DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 
 @Injectable({
     providedIn: 'root',
@@ -21,8 +19,8 @@ export class GameService {
     playerHand: PlayerHand;
     opponentHand: PlayerHand;
 
-    playerScore: number = DEFAULT_SCORE;
-    opponentScore: number = DEFAULT_SCORE;
+    playerScore: number;
+    opponentScore: number;
 
     reserve: Reserve;
 
@@ -31,7 +29,7 @@ export class GameService {
     turnState = new Subject<boolean>();
 
     init(username: string): void {
-        const validBotNames = BOT_NAMES.filter((name) => name !== username);
+        const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== username);
 
         this.player = username;
         this.opponent = validBotNames[Math.floor(Math.random() * validBotNames.length)];
@@ -49,8 +47,10 @@ export class GameService {
 
         this.reserve = new Reserve();
 
-        // TODO: Assign type to bonuses and inject default bonus map
-        this.gameBoard = new GameBoard(new Map<string, string>());
+        this.gameBoard = new GameBoard(DEFAULT_BONUSES);
+
+        this.playerScore = 0;
+        this.opponentScore = 0;
 
         const playerHand = this.reserve.draw(DEFAULT_HAND_SIZE);
         const opponentHand = this.reserve.draw(DEFAULT_HAND_SIZE);
