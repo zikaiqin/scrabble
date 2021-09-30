@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { EndGameService } from '@app/services/end-game.service';
-// import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game.service';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-end-game',
@@ -8,16 +9,26 @@ import { EndGameService } from '@app/services/end-game.service';
     styleUrls: ['./end-game.component.scss'],
 })
 export class EndGameComponent {
-    isVisibleWinner: boolean = false;
+    isVisibleWinner: boolean;
+    isVisibleGiveUp: boolean;
+    isVisibleButton: boolean;
 
-    constructor(private endGameService: EndGameService /* , private gameService: GameService*/) {}
+    constructor(private endGameService: EndGameService, private gameService: GameService, private readonly router: Router) {
+        this.isVisibleWinner = false;
+        this.isVisibleGiveUp = false;
+        this.isVisibleButton = true;
+    }
 
     surrender(): void {
-        this.endGameService.gameHasEnded = true;
-        this.endGameService.endGame();
+        if (!this.endGameService.checkIfGameEnd()) {
+            this.isVisibleButton = false;
+            this.endGameService.gameHasEnded = true;
+            this.endGameService.endGame();
+        }
     }
-    /* getWinner(): string {
-        if (this.endGameService.gameHasEnded) {
+
+    getWinner(): string {
+        if (this.endGameService.checkIfGameEnd()) {
             this.isVisibleWinner = true;
             if (this.gameService.playerScore > this.gameService.opponentScore) {
                 return this.gameService.player;
@@ -27,5 +38,13 @@ export class EndGameComponent {
                 return this.gameService.player + ' et ' + this.gameService.opponent;
         }
         return '';
-    } */
+    }
+
+    redirectTo(uri: string) {
+        this.router.navigateByUrl(uri);
+    }
+
+    checkIfGameEnded(): boolean {
+        return this.endGameService.checkIfGameEnd();
+    }
 }

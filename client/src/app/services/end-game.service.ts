@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { GameService } from '@app/services/game.service';
-// import { ValidationService } from './validation.service';
+import { DEFAULT_POINTS } from '@app/classes/game-config';
 import { TextboxService } from './textbox.service';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
 
-export const DEFAULT_TURN_COUNT = 0;
-export const MAX_TURN_SKIP_COUNT = 7;
+export const START_TURN_COUNT = 0;
+export const MAX_TURN_SKIP_COUNT = 8;
 export const DEFAULT_POINT = 0;
 export const EMPTY = 0;
 export const PLAYER = 1;
@@ -16,7 +16,7 @@ export const OPPONENT = 2;
     providedIn: 'root',
 })
 export class EndGameService {
-    turnSkipCounter: number = DEFAULT_TURN_COUNT;
+    turnSkipCounter: number = START_TURN_COUNT;
     pointDeductedPlayer: number = DEFAULT_POINT;
     pointDeductedOpponent: number = DEFAULT_POINT;
     pointAddedPlayer: number = DEFAULT_POINT;
@@ -24,14 +24,14 @@ export class EndGameService {
     playerLettersLeft: string[] = [];
     opponentLettersLeft: string[] = [];
     gameHasEnded: boolean = false;
-    constructor(private gameService: GameService/*, private validationService: ValidationService*/, private textboxService: TextboxService) {}
+    constructor(private gameService: GameService, private textboxService: TextboxService) {}
 
     turnSkipCount(): void {
         this.turnSkipCounter++;
     }
 
     turnSkipCountReset(): void {
-        this.turnSkipCounter = DEFAULT_TURN_COUNT;
+        this.turnSkipCounter = START_TURN_COUNT;
     }
 
     checkIfGameEnd(): boolean {
@@ -50,29 +50,29 @@ export class EndGameService {
     }
 
     deductPoint(): void {
-        /*for (const i of this.gameService.playerHand.letters) {
-            this.pointDeductedPlayer += this.validationService.points.get(i[0]) as number;
+        for (const i of this.gameService.playerHand.letters) {
+            this.pointDeductedPlayer += DEFAULT_POINTS.get(i[0]) as number;
         }
         this.gameService.playerScore -= this.pointDeductedPlayer;
         for (const i of this.gameService.opponentHand.letters) {
-            this.pointDeductedOpponent += this.validationService.points.get(i[0]) as number;
+            this.pointDeductedOpponent += DEFAULT_POINTS.get(i[0]) as number;
         }
-        this.gameService.opponentScore -= this.pointDeductedOpponent;*/
+        this.gameService.opponentScore -= this.pointDeductedOpponent;
     }
 
     addPoint(player: number): void {
-        /*if (player === PLAYER) {
+        if (player === PLAYER) {
             for (const i of this.gameService.opponentHand.letters) {
-                this.pointAddedPlayer += this.validationService.points.get(i[0]) as number;
+                this.pointAddedPlayer += DEFAULT_POINTS.get(i[0]) as number;
             }
             this.gameService.playerScore += this.pointAddedPlayer;
         }
         if (player === OPPONENT) {
             for (const i of this.gameService.playerHand.letters) {
-                this.pointAddedOpponent += this.validationService.points.get(i[0]) as number;
+                this.pointAddedOpponent += DEFAULT_POINTS.get(i[0]) as number;
             }
             this.gameService.opponentScore += this.pointAddedOpponent;
-        }*/
+        }
     }
 
     checkWhoEmptiedHand(): number {
@@ -86,21 +86,22 @@ export class EndGameService {
 
     showLettersLeft(playerHand: PlayerHand, opponentHand: PlayerHand): void {
         for (const it of playerHand.letters) {
-           this.playerLettersLeft.push(it[0]);
+            this.playerLettersLeft.push(it[0]);
         }
         for (const it of opponentHand.letters) {
-        this.opponentLettersLeft.push(it[0]);
+            this.opponentLettersLeft.push(it[0]);
         }
-        this.textboxService.sendMessage(MessageType.System , 'Fin de partie - lettres restantes');
-        this.textboxService.sendMessage(MessageType.System , this.gameService.player + ': ' + this.playerLettersLeft.join('').toString());
-        this.textboxService.sendMessage(MessageType.System , this.gameService.opponent + ': ' + this.opponentLettersLeft.join('').toString());
+        this.textboxService.sendMessage(MessageType.System, 'Fin de partie - lettres restantes');
+        this.textboxService.sendMessage(MessageType.System, this.gameService.player + ': ' + this.playerLettersLeft.join('').toString());
+        this.textboxService.sendMessage(MessageType.System, this.gameService.opponent + ': ' + this.opponentLettersLeft.join('').toString());
     }
 
     endGame(): void {
         if (this.checkIfGameEnd()) {
             this.textboxService.sendMessage(MessageType.System, 'Game has ended');
-            /*this.deductPoint();
-            this.addPoint(this.checkWhoEmptiedHand());*/
+            this.deductPoint();
+            this.addPoint(this.checkWhoEmptiedHand());
+            this.showLettersLeft(this.gameService.playerHand, this.gameService.opponentHand);
         }
     }
 }

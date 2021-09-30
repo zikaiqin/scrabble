@@ -27,6 +27,6 @@
         <ng-template #startButton>
             <button mat-raised-button (click)="startGame()">Commencer</button>
         </ng-template>
-        <app-end-game></app-end-game>
+        <app-end-game class="end" [style.display]="isVisibleGiveUp ? 'block' : 'none'"></app-end-game>
     </div>
 </div>

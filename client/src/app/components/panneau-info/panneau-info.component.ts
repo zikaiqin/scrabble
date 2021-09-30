@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { DEFAULT_HAND_SIZE, GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game.service';
 import { TurnService } from '@app/services/turn.service';
 import { Subscription } from 'rxjs';
 import { EndGameService } from '@app/services/end-game.service';
+import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 
 enum PlayerType {
     Human,
@@ -26,7 +27,11 @@ export class PanneauInfoComponent {
     isVisibleWinner: boolean;
     isVisiblePlayer: boolean;
     isVisibleOpponent: boolean;
+    isVisibleGiveUp: boolean;
     isMyTurn: boolean;
+
+    // eslint-disable-next-line no-undef
+    timer: NodeJS.Timeout; // Variable for timer
 
     constructor(private gameService: GameService, private turnService: TurnService, private endGameService: EndGameService) {
         this.subscription = this.turnService.getState().subscribe((turn) => {
@@ -38,6 +43,7 @@ export class PanneauInfoComponent {
         this.isVisiblePlayer = true;
         this.isVisibleOpponent = true;
         this.isVisibleWinner = false;
+        this.isVisibleGiveUp = false;
     }
 
     getTurnMessage(): string {
@@ -77,38 +83,32 @@ export class PanneauInfoComponent {
     }
 
     startGame(): void {
+        this.isVisibleGiveUp = true;
         this.gameService.start();
         this.startTimer();
     }
 
     startTimer(): void {
         let time = TIMER;
-        const timer = setInterval(() => {
+        this.timer = setInterval(() => {
             const element = document.getElementById('timer');
             if (element !== null) {
                 element.innerHTML = (time / TIMER_INTERVAL).toString();
                 time -= TIMER_INTERVAL;
                 if (time < 0 || !this.turn) {
                     this.turnService.changeTurn(false);
-                    element.innerHTML = 'Turn ended';
-                    clearInterval(timer);
-                    this.endGameService.turnSkipCountReset();
-                    this.endGameService.endGame();
+                    element.innerHTML = 'Tour fini';
+                    this.clearTimer();
+                    if (!this.endGameService.checkIfGameEnd()) {
+                        this.endGameService.turnSkipCount();
+                        this.endGameService.endGame();
+                    }
                 }
             }
         }, TIMER_INTERVAL);
     }
 
-    /* getWinner(): string {
-        if (this.endGameService.gameHasEnded) {
-            this.isVisibleWinner = true;
-            if (this.gameService.playerScore > this.gameService.opponentScore) {
-                return this.gameService.player;
-            } else if (this.gameService.playerScore < this.gameService.opponentScore) {
-                return this.gameService.opponent;
-            } else if (this.gameService.playerScore === this.gameService.opponentScore)
-                return this.gameService.player + ' et ' + this.gameService.opponent;
-        }
-        return '';
-    }*/
+    clearTimer(): void {
+        clearInterval(this.timer);
+    }
 }

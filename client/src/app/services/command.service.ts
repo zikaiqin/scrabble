@@ -58,6 +58,7 @@ export class CommandService {
         [
             '!passer',
             (): boolean => {
+                // eslint-disable-next-line no-invalid-this
                 this.turnService.changeTurn(false);
                 // eslint-disable-next-line no-invalid-this
                 this.textboxService.sendMessage(MessageType.System, 'Votre tour a été passé');
@@ -72,7 +73,6 @@ export class CommandService {
         private letterExchangeService: LetterExchangeService,
         private turnService: TurnService,
     ) {}
-
 
     parseCommand(message: string): void {
         let command: string;

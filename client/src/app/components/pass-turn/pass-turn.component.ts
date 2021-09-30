@@ -15,6 +15,7 @@ export class PassTurnComponent {
     @Input() activePlayer: boolean;
     subscription: Subscription;
     turn: boolean;
+    // eslint-disable-next-line no-undef
     timer: NodeJS.Timeout; // Variable for timer
 
     constructor(private turnService: TurnService, private endGameService: EndGameService) {
@@ -28,9 +29,11 @@ export class PassTurnComponent {
     }
 
     passTurn(): void {
-        this.endGameService.turnSkipCount();
-        this.endGameService.endGame();
-        this.turnService.changeTurn(!this.activePlayer);
+        if (!this.endGameService.checkIfGameEnd()) {
+            this.endGameService.turnSkipCount();
+            this.endGameService.endGame();
+            this.turnService.changeTurn(!this.activePlayer);
+        }
     }
 
     startTimer(): void {
@@ -42,10 +45,12 @@ export class PassTurnComponent {
                 time -= TIMER_INTERVAL;
                 if (time < 0 || !this.turn) {
                     this.turnService.changeTurn(false);
-                    element.innerHTML = 'Turn ended';
+                    element.innerHTML = 'Tour fini';
                     this.clearTimer();
-                    this.endGameService.turnSkipCount();
-                    this.endGameService.endGame();
+                    if (!this.endGameService.checkIfGameEnd()) {
+                        this.endGameService.turnSkipCount();
+                        this.endGameService.endGame();
+                    }
                 }
             }
         }, TIMER_INTERVAL);

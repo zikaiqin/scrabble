@@ -45,7 +45,6 @@ export class ValidationService {
             let tempWord = '';
             // Adds the word that he placed since a word has a minimum of a length of 2
             for (const i of this.newWord) {
-
                 orientation = this.startCoord.x - Number(i[0].toLowerCase()[0]);
                 tempWord += i[1].toLowerCase();
             }
@@ -91,7 +90,6 @@ export class ValidationService {
         // Scanning through the big indexes
         for (this.index; xIndex + this.index <= ASCII_SMALL_A + BOARD_SIZE; this.index++) {
             if (!this.gameService.gameBoard.hasCoords(String.fromCharCode(xIndex + this.index) + yIndex)) break;
-
         }
         for (let j = 0; j < this.index; j++) {
             tempWord += this.gameService.gameBoard.getLetter(String.fromCharCode(this.startCoord.x + this.index) + yIndex);
@@ -117,7 +115,6 @@ export class ValidationService {
         // Scanning through the big indexes
         for (this.index; yIndex + this.index <= BOARD_SIZE; this.index++) {
             if (!this.gameService.gameBoard.hasCoords(xIndex + String(yIndex + this.index))) break;
-
         }
         for (let j = 0; j < this.index; j++) {
             tempWord += this.gameService.gameBoard.getLetter(xIndex + String(yIndex + this.index));
@@ -172,7 +169,6 @@ export class ValidationService {
                             break;
                         }
                         case Bonuses.W3: {
-
                             tempPoints += DEFAULT_POINTS.get(word[0][letter]) as number;
 
                             w3 = true;
@@ -195,8 +191,6 @@ export class ValidationService {
 
         // IF the player placed all of his hand, gains 50 pts
         if (this.newWord.size === BINGO_WORD) counter += BINGO_BONUS;
-
-
         return counter;
     }
 }
