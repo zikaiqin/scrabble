@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { GameService, DEFAULT_HAND_SIZE } from '@app/services/game.service';
-
 enum PlayerType {
     Human,
     Bot,

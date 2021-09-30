@@ -3,69 +3,76 @@ import { PlayerHand } from '@app/classes/player-hand';
 import { Injectable } from '@angular/core';
 import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
-
 const WILDCARD = '*';
-const HAND_SIZE_MAX = 7;
+const HAND_SIZE = 7;
 @Injectable({
     providedIn: 'root',
 })
-
 export class Exchange {
     private word: string;
     private letters: Map<string, string>;
     private turnState: boolean;
     
     constructor(private textboxService: TextboxService, private gameService: GameService) {
-        
         this.gameService.turnState.subscribe({
             next: (turn: boolean) => (this.turnState = turn),
         });
-
     }
 
-    validateCommand( word :string) : boolean{
+    validateCommand(word: string): boolean {
         this.word = word;
 
-        //conditions d'une commande valide
+        // conditions d'une commande valide
 
         // Doit etre entre 1 et 7
-        if(word.length < 0 || word.length >7){
+        if (word.length < 0 || word.length > HAND_SIZE) {
+            this.textboxService.sendMessage(MessageType.System, 'Doit etre entre 1 et 7');
             return false;
         }
         // Verifie si ils sont tous en mimuscule
-        if (word != word.toLowerCase()){
+        if (word !== word.toLowerCase()) {
+            this.textboxService.sendMessage(MessageType.System, 'Doit etre en miniscule');
             return false;
         }
         // Seulement a mon tour
-        if (!this.isMyTurn()){
+        if (!this.isMyTurn()) {
             return false;
         }
         // contient dans la main
         // au moins 7 lettres dans la reserve
         this.letters = new Map<string, string>();
         const canPlace = this.constainsInHand() && this.capacityReserve();
-        if(canPlace){
+        if (canPlace) {
             this.exchangeLetter();
             this.gameService.turnState.next(!this.turnState);
         }
-        
+
         return canPlace;
     }
-    exchangeLetter():void{
+    exchangeLetter(): void {
+        this.afficherBox();
         this.removeFromHand();
-        for(let i = 0 ; i < this.word.length; i++){
-            this.gameService.reserve.drawOne();
-        }
+        this.word.split('').forEach(() => {
+            const letter = this.gameService.reserve.drawOne();
+            if (letter !== undefined) {
+                this.gameService.playerHand.add(letter);
+            }
+        });
     }
-    removeFromHand():void{
-            Array.from(this.letters.entries()).forEach((entry) => {
-                this.gameService.playerHand.remove(entry[1]);
-                this.gameService.reserve.receiveOne(entry[1]);
-            });
-                //this.gridService.drawEmpty();
+
+    // manque le nom de joueur
+    afficherBox(): void {
+        this.textboxService.sendMessage(MessageType.User, `La commande: échanger ${this.word} a été lancée `);
     }
-    capacityReserve():boolean{
-        if(this.gameService.reserve.getSize() < HAND_SIZE_MAX ) {
+    removeFromHand(): void {
+        Array.from(this.letters.entries()).forEach((entry) => {
+            this.gameService.playerHand.remove(entry[1]);
+            this.gameService.reserve.receiveOne(entry[1]);
+        });
+        // this.gridService.drawEmpty();
+    }
+    capacityReserve(): boolean {
+        if (this.gameService.reserve.getSize() < HAND_SIZE) {
             return false;
         }
         return true;
@@ -93,10 +100,8 @@ export class Exchange {
 
     isMyTurn(): boolean {
         if (!this.turnState) {
-            this.textboxService.sendMessage(MessageType.System, 'La commande !placer peut seulement être utilisé lors de votre tour');
+            this.textboxService.sendMessage(MessageType.System, 'La commande !échanger peut seulement être utilisé lors de votre tour');
         }
         return this.turnState;
     }
-
-
 }

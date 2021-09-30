@@ -26,23 +26,22 @@ export enum MouseButton {
 })
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
-    
 
     mousePosition: Vec2 = { x: 0, y: 0 };
     buttonPressed = '';
 
     private canvasSize = { x: DEFAULT_WIDTH_ALL, y: DEFAULT_HEIGHT_ALL };
 
-    constructor(private readonly gridService: GridService, private readonly router:Router) {}
+    constructor(private readonly gridService: GridService, private readonly router: Router) {}
 
     @HostListener('keydown', ['$event'])
     buttonDetect(event: KeyboardEvent) {
         this.buttonPressed = event.key;
     }
-    surrender(){
-        this.router.navigateByUrl('/home');
-
+    redirectTo(uri: string) {
+        this.router.navigateByUrl(uri);
     }
+
     maximize(): void {
         this.gridService.clearGrid();
         this.gridService.maxGrid();

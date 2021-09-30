@@ -54,11 +54,10 @@ export class GridService {
             this.tuilePosY += this.tuileSize;
             this.tuilePosX = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         }
-        this.drawWord('A', 5, 1);
-        this.drawWord('B', 10, 12);
+        this.drawWord('B', 10, 11);
+        this.drawWord('O', 10, 12);
+        this.drawWord('B', 10, 13);
         this.drawChevalet();
-
-
         this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
     }
@@ -189,21 +188,18 @@ export class GridService {
         }
     }
 
-    drawOnChevalet(playerHand:PlayerHand) {     
+    drawOnChevalet(playerhand: PlayerHand) {
         this.handContext.font = 'bold 40px serif';
         this.handContext.fillStyle = '#EBDDE2';
- 
-        for(const it of playerHand.letters){
+        for (const it of playerhand.letters) {
             this.handContext.fillText(
-            it[0],
-            this.tuileSize + this.tuileSizeChevalet * this.indexChevalet + STROKE_RANGE,
-            DEFAULT_HEIGHT + this.tuileSize * 2 + STROKE_RANGE * 3,
-        );
-        this.indexChevalet++;
-
+                it[0].toLocaleUpperCase(),
+                this.tuileSize + this.tuileSizeChevalet * this.indexChevalet + STROKE_RANGE,
+                DEFAULT_HEIGHT + this.tuileSize * 2 + STROKE_RANGE * 3,
+            );
+            this.indexChevalet++;
         }
-
-
+        this.indexChevalet = 0;
     }
     drawEmpty(i?: number) {
         this.handContext.fillStyle = '#E42217';
