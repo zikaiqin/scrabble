@@ -3,10 +3,8 @@ import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
 import { GameService } from '@app/services/game.service';
 import { TextboxService } from '@app/services/textbox.service';
-<<<<<<< HEAD
-=======
 import { ValidationService } from '@app/services/validation.service';
->>>>>>> develop
+
 
 const BOUNDARY = 15;
 const VALIDATION_TIMEOUT = 3000;
@@ -64,7 +62,7 @@ export class LetterPlacingService {
      * @param position the position parameter entered by the player
      * @param word the word entered by the player
      */
-    
+
     validateCommand(position: string, word: string): boolean {
         this.word = word
             .split('')

@@ -59,12 +59,10 @@ export class ValidationService {
                 }
             } else if (orientation > 0) {
                 for (const i of this.newWord) {
-
                     wordContainer.push(this.horizontalCheck(i[0]));
                 }
             }
         } else {
-
             // IF the player only placed 1 letter on the board
 
             wordContainer.push(this.verticalCheck(String.fromCharCode(this.startCoord.x) + String(this.startCoord.y)));
