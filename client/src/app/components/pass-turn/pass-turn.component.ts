@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { TurnService } from '@app/services/turn.service';
 import { Subscription } from 'rxjs';
 
@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./pass-turn.component.scss'],
 })
 export class PassTurnComponent {
-    activePlayer: boolean;
+    @Input() activePlayer: boolean;
     subscription: Subscription;
 
     constructor(private turnService: TurnService) {

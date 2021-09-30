@@ -29,7 +29,7 @@ export class Reserve {
     }
 
     receiveOne(word: string): void {
-        BASE_RESERVE.push(word);
+        this.letters.push(word);
         this.size++;
     }
 }
