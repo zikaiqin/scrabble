@@ -44,10 +44,8 @@ export class CommandService {
     ) {}
 
     parseCommand(message: string): void {
-        let command: string;
-        let params: string[];
-        // eslint-disable-next-line prefer-const
-        [command, ...params] = message.split(' ');
+        const command: string = message.split(' ')[0];
+        const params: string[] = message.split(' ').slice(1);
 
         const exec: ((...args: string[]) => boolean) | undefined = this.commandLookup.get(command);
         if (!exec) {

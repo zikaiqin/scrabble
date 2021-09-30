@@ -1,42 +1,34 @@
 export class PlayerHand {
-    readonly letters: Map<string, number>;
+    readonly letters: string[];
     size: number;
 
     constructor() {
-        this.letters = new Map<string, number>();
+        this.letters = [];
         this.size = 0;
     }
 
     has(letter: string): boolean {
-        return this.letters.has(letter);
+        return this.letters.includes(letter);
     }
 
-    get(letter: string): number | undefined {
-        return this.letters.get(letter);
+    get(letter: string): number {
+        return this.letters.filter((letterInHand) => letterInHand === letter).length;
     }
 
     add(letter: string): void {
-        const number = this.letters.get(letter);
-        if (!number) {
-            this.letters.set(letter, 1);
-        } else {
-            this.letters.set(letter, number + 1);
-        }
+        this.letters.push(letter);
         this.size++;
     }
 
     addAll(letters: string[]): void {
-        letters.forEach((letter) => this.add(letter));
+        this.letters.push(...letters);
+        this.size += letters.length;
     }
 
     remove(letter: string): void {
-        const number = this.letters.get(letter);
-        if (number) {
-            if (number > 1) {
-                this.letters.set(letter, number - 1);
-            } else {
-                this.letters.delete(letter);
-            }
+        const index = this.letters.indexOf(letter);
+        if (index >= 0) {
+            this.letters.splice(index, 1);
             this.size--;
         }
     }
