@@ -125,7 +125,6 @@ export class GridService {
 
     drawMx3() {
         this.betterBorder();
-
         this.gridContext.fillStyle = 'rgb(220, 73, 77)';
         this.gridContext.fillRect(this.tuilePosX + 2, this.tuilePosY + 2, this.tuileSize - STROKE_RANGE, this.tuileSize - STROKE_RANGE);
 

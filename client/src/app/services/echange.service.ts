@@ -5,6 +5,7 @@ import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
 
 const WILDCARD = '*';
+const HAND_SIZE_MAX = 7;
 @Injectable({
     providedIn: 'root',
 })
@@ -13,7 +14,7 @@ export class Exchange {
     private word: string;
     private letters: Map<string, string>;
     private turnState: boolean;
-
+    
     constructor(private textboxService: TextboxService, private gameService: GameService) {
         
         this.gameService.turnState.subscribe({
@@ -40,7 +41,6 @@ export class Exchange {
             return false;
         }
         // contient dans la main
-
         // au moins 7 lettres dans la reserve
         this.letters = new Map<string, string>();
         const canPlace = this.constainsInHand() && this.capacityReserve();
@@ -65,7 +65,7 @@ export class Exchange {
                 //this.gridService.drawEmpty();
     }
     capacityReserve():boolean{
-        if(this.gameService.reserve.getSize() < 7 ) {
+        if(this.gameService.reserve.getSize() < HAND_SIZE_MAX ) {
             return false;
         }
         return true;
