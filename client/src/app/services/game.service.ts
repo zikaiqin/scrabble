@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { GameBoard } from '@app/classes/game-board';
+import { DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 import { PlayerHand } from '@app/classes/player-hand';
 import { Reserve } from '@app/classes/reserve';
 import { Subject } from 'rxjs';
-
-import { DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 
 @Injectable({
     providedIn: 'root',
