@@ -11,15 +11,14 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { ChevaletComponent } from './components/chevalet/chevalet.component';
-import { InputbarComponent } from './components/inputbar/inputbar.component';
-import { MainMenuComponent } from './components/main-menu/main-menu.component';
-import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
-import { PanneauInfoComponent } from './components/panneau-info/panneau-info.component';
-import { PassTurnComponent } from './components/pass-turn/pass-turn.component';
-import { TextboxComponent } from './components/textbox/textbox.component';
-import { HomePageComponent } from './pages/home-page/home-page.component';
-import { EndGameComponent } from './components/end-game/end-game.component';
+import { ChevaletComponent } from '@app/components/chevalet/chevalet.component';
+import { InputbarComponent } from '@app/components/inputbar/inputbar.component';
+import { MainMenuComponent } from '@app/components/main-menu/main-menu.component';
+import { NewGameMenuComponent } from '@app/components/new-game-menu/new-game-menu.component';
+import { PanneauInfoComponent } from '@app/components/panneau-info/panneau-info.component';
+import { PassTurnComponent } from '@app/components/pass-turn/pass-turn.component';
+import { TextboxComponent } from '@app/components/textbox/textbox.component';
+import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -42,7 +41,6 @@ import { EndGameComponent } from './components/end-game/end-game.component';
         HomePageComponent,
         MainMenuComponent,
         NewGameMenuComponent,
-        EndGameComponent,
     ],
     imports: [
         AppMaterialModule,
