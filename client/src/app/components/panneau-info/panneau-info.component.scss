@@ -72,6 +72,8 @@
     font-size: 30px;
     text-align: center;
     padding: 40px;
+    border-bottom: 5px solid black;
+    border-top: 5px solid black;
 }
 
 #timer {
@@ -86,4 +88,10 @@
 
 .end {
     padding: 40px;
+}
+
+.start {
+    padding: 50px;
+    width: 350px;
+    font-size: 40px;
 }

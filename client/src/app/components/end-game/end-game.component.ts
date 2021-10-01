@@ -19,14 +19,6 @@ export class EndGameComponent {
         this.isVisibleButton = true;
     }
 
-    surrender(): void {
-        if (!this.endGameService.checkIfGameEnd()) {
-            this.isVisibleButton = false;
-            this.endGameService.gameHasEnded = true;
-            this.endGameService.endGame();
-        }
-    }
-
     getWinner(): string {
         if (this.endGameService.checkIfGameEnd()) {
             this.isVisibleWinner = true;

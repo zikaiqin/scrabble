@@ -6,7 +6,7 @@ import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
 
 export const START_TURN_COUNT = 0;
-export const MAX_TURN_SKIP_COUNT = 8;
+export const MAX_TURN_SKIP_COUNT = 9;
 export const DEFAULT_POINT = 0;
 export const EMPTY = 0;
 export const PLAYER = 1;

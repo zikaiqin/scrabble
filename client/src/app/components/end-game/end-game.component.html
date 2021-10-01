@@ -1,3 +1,2 @@
-<button class="surrender" (click)="surrender()">Abandonner</button>
 <div class="winner" [style.display]="isVisibleWinner ? 'block' : 'none'">Félicitation à {{ getWinner() }}!</div>
 <button class="return" [style.display]="checkIfGameEnded() ? 'block' : 'none'" (click)="redirectTo('/home')">Retour à la page d'accueil</button>
