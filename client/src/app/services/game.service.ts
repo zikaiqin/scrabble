@@ -4,6 +4,7 @@ import { DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_HAND_SIZE } from '@app/clas
 import { PlayerHand } from '@app/classes/player-hand';
 import { Reserve } from '@app/classes/reserve';
 import { Subject } from 'rxjs';
+import { GridService } from './grid.service';
 
 @Injectable({
     providedIn: 'root',
@@ -27,6 +28,8 @@ export class GameService {
 
     turnState = new Subject<boolean>();
 
+    constructor(private gridService: GridService) {}
+
     init(username: string): void {
         const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== username);
 
@@ -41,9 +44,6 @@ export class GameService {
     }
 
     start(): void {
-        const turnState = Boolean(Math.floor(Math.random() * 2));
-        this.turnState.next(turnState);
-
         this.reserve = new Reserve();
 
         this.gameBoard = new GameBoard(DEFAULT_BONUSES);
@@ -58,5 +58,16 @@ export class GameService {
             this.playerHand.addAll(playerHand);
             this.opponentHand.addAll(opponentHand);
         }
+
+        const turnState = Boolean(Math.floor(Math.random() * 2));
+        this.turnState.next(turnState);
+    }
+    updateHand(playhand: PlayerHand): void {
+        this.gridService.drawPlayerHand();
+        this.gridService.drawPlayerHandLetters(playhand.letters);
+    }
+    updateGame(positions: Map<string, string>) {
+        this.gridService.clearGrid();
+        this.gridService.drawGridLetters(positions);
     }
 }
