@@ -28,29 +28,29 @@ describe('GridService', () => {
         expect(service.width).toEqual(CANVAS_HEIGHT);
     });
 
-    it(' drawWord should call fillText on the canvas', () => {
+    it(' drawLetter should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        service.drawWord('test');
+        service.drawLetter('test');
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
-    it(' drawWord should not call fillText if word is empty', () => {
+    it(' drawLetter should not call fillText if word is empty', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        service.drawWord('');
+        service.drawLetter('');
         expect(fillTextSpy).toHaveBeenCalledTimes(0);
     });
 
-    it(' drawWord should call fillText as many times as letters in a word', () => {
+    it(' drawLetter should call fillText as many times as letters in a word', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
         const word = 'test';
-        service.drawWord(word);
+        service.drawLetter(word);
         expect(fillTextSpy).toHaveBeenCalledTimes(word.length);
     });
 
-    it(' drawWord should color pixels on the canvas', () => {
+    it(' drawLetter should color pixels on the canvas', () => {
         let imageData = service.gridContext.getImageData(0, 0, service.width, service.height).data;
         const beforeSize = imageData.filter((x) => x !== 0).length;
-        service.drawWord('test');
+        service.drawLetter('test');
         imageData = service.gridContext.getImageData(0, 0, service.width, service.height).data;
         const afterSize = imageData.filter((x) => x !== 0).length;
         expect(afterSize).toBeGreaterThan(beforeSize);
