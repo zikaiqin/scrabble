@@ -1,16 +1,16 @@
-import { GameService } from '@app/services/game.service';
-import { PlayerHand } from '@app/classes/player-hand';
 import { Injectable } from '@angular/core';
+import { GameService } from '@app/services/game.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
-const WILDCARD = '*';
+import { PlayerHand } from '@app/classes/player-hand';
+
 const HAND_SIZE = 7;
+
 @Injectable({
     providedIn: 'root',
 })
-export class Exchange {
-    private word: string;
-    private letters: Map<string, string>;
+export class LetterExchangeService {
+    private letters: string;
     private turnState: boolean;
 
     constructor(private textboxService: TextboxService, private gameService: GameService) {
@@ -19,18 +19,18 @@ export class Exchange {
         });
     }
 
-    validateCommand(word: string): boolean {
-        this.word = word;
+    validateCommand(letters: string): boolean {
+        this.letters = letters;
 
         // conditions d'une commande valide
 
         // Doit etre entre 1 et 7
-        if (word.length < 0 || word.length > HAND_SIZE) {
+        if (letters.length < 1 || letters.length > HAND_SIZE) {
             this.textboxService.sendMessage(MessageType.System, 'Doit etre entre 1 et 7');
             return false;
         }
         // Verifie si ils sont tous en mimuscule
-        if (word !== word.toLowerCase()) {
+        if (letters !== letters.toLowerCase()) {
             this.textboxService.sendMessage(MessageType.System, 'Doit etre en miniscule');
             return false;
         }
@@ -41,19 +41,18 @@ export class Exchange {
         // contient dans la main
 
         // au moins 7 lettres dans la reserve
-        this.letters = new Map<string, string>();
-        const canPlace = this.constainsInHand() && this.capacityReserve();
-        if (canPlace) {
+        const canExchange = this.isInHand() && this.capacityReserve();
+        if (canExchange) {
             this.exchangeLetter();
             this.gameService.turnState.next(!this.turnState);
         }
 
-        return canPlace;
+        return canExchange;
     }
+
     exchangeLetter(): void {
-        this.afficherBox();
         this.removeFromHand();
-        this.word.split('').forEach(() => {
+        this.letters.split('').forEach(() => {
             const letter = this.gameService.reserve.drawOne();
             if (letter !== undefined) {
                 this.gameService.playerHand.add(letter);
@@ -61,31 +60,23 @@ export class Exchange {
         });
     }
 
-    // manque le nom de joueur
-    afficherBox(): void {
-        this.textboxService.sendMessage(MessageType.User, `La commande: échanger ${this.word} a été lancée `);
-    }
     removeFromHand(): void {
-        Array.from(this.letters.entries()).forEach((entry) => {
-            this.gameService.playerHand.remove(entry[1]);
-            this.gameService.reserve.receiveOne(entry[1]);
+        this.letters.split('').forEach((letter) => {
+            this.gameService.playerHand.remove(letter);
+            this.gameService.reserve.receiveOne(letter);
         });
-        // this.gridService.drawEmpty();
     }
+
     capacityReserve(): boolean {
-        if (this.gameService.reserve.getSize() < HAND_SIZE) {
-            return false;
-        }
-        return true;
+        return this.gameService.reserve.getSize() >= HAND_SIZE;
     }
-    constainsInHand(): boolean {
-        const wildCard = /[A-Z]/;
-        const letters = Array.from(this.letters.values());
+
+    isInHand(): boolean {
         const testHand: PlayerHand = new PlayerHand();
-        letters.forEach((letter) => testHand.add(wildCard.test(letter) ? WILDCARD : letter));
+        this.letters.split('').forEach((letter) => testHand.add(letter));
 
         // using unique set of letters in word as key, compare to amount of letters in hand
-        const isInHand: boolean = [...new Set<string>(letters)].every((letter) => {
+        const isInHand: boolean = [...new Set<string>(this.letters)].every((letter) => {
             const amountRequired = testHand.get(letter);
             const amountInHand = this.gameService.playerHand.get(letter);
             return amountRequired !== undefined && amountInHand !== undefined ? amountRequired <= amountInHand : false;
