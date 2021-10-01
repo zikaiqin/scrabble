@@ -79,7 +79,7 @@ export class LetterExchangeService {
         const isInHand: boolean = [...new Set<string>(this.letters)].every((letter) => {
             const amountRequired = testHand.get(letter);
             const amountInHand = this.gameService.playerHand.get(letter);
-            return amountRequired !== undefined && amountInHand !== undefined ? amountRequired <= amountInHand : false;
+            return amountRequired <= amountInHand;
         });
         if (!isInHand) {
             this.textboxService.sendMessage(
