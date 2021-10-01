@@ -5,7 +5,6 @@ import { GameService } from '@app/services/game.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { ValidationService } from '@app/services/validation.service';
 
-
 const BOUNDARY = 15;
 const VALIDATION_TIMEOUT = 3000;
 const CENTER_TILE = 'h8';
