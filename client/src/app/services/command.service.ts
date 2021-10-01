@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { MessageType } from '@app/classes/message';
-import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { LetterExchangeService } from '@app/services/letter-exchange.service';
+import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
-import { TurnService } from './turn.service';
-import { EndGameService } from './end-game.service';
 import { Subscription } from 'rxjs';
+import { EndGameService } from './end-game.service';
+import { TurnService } from './turn.service';
 
 @Injectable({
     providedIn: 'root',
