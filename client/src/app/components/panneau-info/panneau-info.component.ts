@@ -1,11 +1,17 @@
 import { Component } from '@angular/core';
 import { GameService } from '@app/services/game.service';
+import { TurnService } from '@app/services/turn.service';
+import { Subscription } from 'rxjs';
+import { EndGameService } from '@app/services/end-game.service';
 import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 
 enum PlayerType {
     Human,
     Bot,
 }
+
+const TIMER = 60000; // temporary value just here for demo
+const TIMER_INTERVAL = 1000;
 
 @Component({
     selector: 'app-panneau-info',
@@ -15,16 +21,29 @@ enum PlayerType {
 export class PanneauInfoComponent {
     readonly playerType = PlayerType;
 
+    subscription: Subscription;
+    turn: boolean;
+
+    isVisibleWinner: boolean;
     isVisiblePlayer: boolean;
     isVisibleOpponent: boolean;
+    isVisibleGiveUp: boolean;
     isMyTurn: boolean;
 
-    constructor(private gameService: GameService) {
+    // eslint-disable-next-line no-undef
+    timer: NodeJS.Timeout; // Variable for timer
+
+    constructor(private gameService: GameService, private turnService: TurnService, private endGameService: EndGameService) {
+        this.subscription = this.turnService.getState().subscribe((turn) => {
+            this.turn = turn;
+        });
         this.gameService.turnState.subscribe({
             next: (turn: boolean) => (this.isMyTurn = turn),
         });
         this.isVisiblePlayer = true;
         this.isVisibleOpponent = true;
+        this.isVisibleWinner = false;
+        this.isVisibleGiveUp = false;
     }
 
     getTurnMessage(): string {
@@ -64,6 +83,32 @@ export class PanneauInfoComponent {
     }
 
     startGame(): void {
+        this.isVisibleGiveUp = true;
         this.gameService.start();
+        this.startTimer();
+    }
+
+    startTimer(): void {
+        let time = TIMER;
+        this.timer = setInterval(() => {
+            const element = document.getElementById('timer');
+            if (element !== null) {
+                element.innerHTML = (time / TIMER_INTERVAL).toString();
+                time -= TIMER_INTERVAL;
+                if (time < 0 || !this.turn) {
+                    this.turnService.changeTurn(false);
+                    element.innerHTML = 'Tour fini';
+                    this.clearTimer();
+                    if (!this.endGameService.checkIfGameEnd()) {
+                        this.endGameService.turnSkipCount();
+                        this.endGameService.endGame();
+                    }
+                }
+            }
+        }, TIMER_INTERVAL);
+    }
+
+    clearTimer(): void {
+        clearInterval(this.timer);
     }
 }
