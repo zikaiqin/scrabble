@@ -61,6 +61,7 @@ export class LetterPlacingService {
      * @param position the position parameter entered by the player
      * @param word the word entered by the player
      */
+
     validateCommand(position: string, word: string): boolean {
         this.word = word
             .split('')
@@ -239,7 +240,7 @@ export class LetterPlacingService {
         const isInHand: boolean = [...new Set<string>(letters)].every((letter) => {
             const amountRequired = testHand.get(letter);
             const amountInHand = this.gameService.playerHand.get(letter);
-            return amountRequired !== undefined && amountInHand !== undefined ? amountRequired <= amountInHand : false;
+            return amountRequired <= amountInHand;
         });
         if (!isInHand) {
             this.textboxService.sendMessage(

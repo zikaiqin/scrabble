@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { GameBoard } from '@app/classes/game-board';
+import { DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 import { PlayerHand } from '@app/classes/player-hand';
 import { Reserve } from '@app/classes/reserve';
 import { Subject } from 'rxjs';
-import { DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 import { GridService } from './grid.service';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -44,7 +45,6 @@ export class GameService {
 
     start(): void {
         const turnState = Boolean(Math.floor(Math.random() * 2));
-        this.turnState.next(turnState);
 
         this.reserve = new Reserve();
 
@@ -60,6 +60,7 @@ export class GameService {
             this.playerHand.addAll(playerHand);
             this.opponentHand.addAll(opponentHand);
         }
+        this.turnState.next(turnState);
     }
     updateHand(playhand: PlayerHand): void {
         this.gridService.drawPlayerHand();

@@ -6,7 +6,7 @@
     border-radius: 15px;
     border: 5px solid black;
     width: 350px;
-    height: 800px;
+    height: 900px;
     background-color: rgb(170, 231, 228);
 }
 .joueur-container {
@@ -72,6 +72,8 @@
     font-size: 30px;
     text-align: center;
     padding: 40px;
+    border-bottom: 5px solid black;
+    border-top: 5px solid black;
 }
 
 #timer {
@@ -82,4 +84,14 @@
 
 #passer {
     padding: 40px;
+}
+
+.end {
+    padding: 40px;
+}
+
+.start {
+    padding: 50px;
+    width: 350px;
+    font-size: 40px;
 }

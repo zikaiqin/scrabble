@@ -1,11 +1,10 @@
 .passer {
-    background-color: white;
-    color: black;
-}
-
-.passer:active {
-    background-color: black;
-    color: white;
+    background-color: green;
+    border: 3px solid black;
+    padding: 5px;
+    font-size: 15px;
+    border-radius: 10px;
+    width: 270px;
 }
 
 .passer:disabled {
