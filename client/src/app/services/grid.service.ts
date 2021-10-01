@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { tableau } from './tableau.config';
-import { PlayerHand } from '@app/classes/player-hand';
 
 const CHARCODE_SMALL_A = 97;
 
@@ -54,10 +53,8 @@ export class GridService {
             this.tuilePosY += this.tuileSize;
             this.tuilePosX = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         }
-
         this.drawPlayerHand();
-        this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
-        this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
+        
     }
 
     drawGridCol() {
@@ -227,9 +224,24 @@ export class GridService {
         }
     }
 
-    // TODO: implement function to erase letter from board
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    eraseLetter() {}
+
+    // This function convert les strings map de zi kai to real coordonnees
+    // so with postions X,Y to call drawLetter 
+    // it[0]= coord
+    // it[1] =lettre
+    drawGridLetters(positions: Map<string, string>) {
+
+        var postionX :string;
+        var letter;
+        for (const it of positions) {
+            letter = it[0].charAt(0);
+            var positionY =  letter.charCodeAt(0) - 97;
+            postionX = it[0].replace(/[^0-9]/g,'');
+            var positionX = parseInt(postionX,10);
+            this.drawLetter(it[1],positionX -1, positionY);
+        }
+
+    }
 
     drawPlayerHand() {
         this.handContext.shadowColor = '#566D7E';
@@ -249,10 +261,9 @@ export class GridService {
         this.handContext.shadowBlur = 0;
     }
 
-    drawPlayerHandSlots(i?: number) {
+    drawPlayerHandSlots(i: number) {
         this.handContext.fillStyle = '#E42217';
         // pour draw 7 cases
-        if (i) {
             i--;
             this.handContext.fillRect(
                 this.tuileSize + this.tuileSizeChevalet * i,
@@ -260,30 +271,20 @@ export class GridService {
                 this.tuileSizeChevalet,
                 this.tuileSizeChevalet,
             );
-        }
-        // pour empty le dernier case
-        else {
-            this.indexChevalet--;
-            this.handContext.fillRect(
-                this.tuileSize + this.tuileSizeChevalet * this.indexChevalet,
-                DEFAULT_HEIGHT + this.tuileSize + STROKE_RANGE,
-                this.tuileSizeChevalet,
-                this.tuileSizeChevalet,
-            );
-        }
+
     }
 
-    drawPlayerHandLetters(playerHand: PlayerHand) {
+    drawPlayerHandLetters(letters: string[]) {
         this.handContext.font = 'bold 40px serif';
         this.handContext.fillStyle = '#EBDDE2';
-        for (const it of playerHand.letters) {
+        letters.forEach((letter) => {
             this.handContext.fillText(
-                it[0].toLocaleUpperCase(),
+                letter.toLocaleUpperCase(),
                 this.tuileSize + this.tuileSizeChevalet * this.indexChevalet + STROKE_RANGE,
                 DEFAULT_HEIGHT + this.tuileSize * 2 + STROKE_RANGE * 3,
             );
             this.indexChevalet++;
-        }
+        });
         this.indexChevalet = 0;
     }
 
@@ -296,7 +297,7 @@ export class GridService {
             this.gridContext.scale(1 + this.scale, 1 + this.scale);
             this.scaleCounter++;
         }
-        this.indexChevalet--; // pour garder la meme place vu que drawGrid reappele index++
+        this.indexChevalet--; 
         this.drawGrid();
     }
 
@@ -305,7 +306,7 @@ export class GridService {
             this.gridContext.scale(1 - this.scale, 1 - this.scale);
             this.scaleCounter--;
         }
-        this.indexChevalet--; // pour garder la meme place vu que drawGrid reappele index++
+        this.indexChevalet--;
         this.drawGrid();
     }
 
