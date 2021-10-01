@@ -45,7 +45,9 @@ export class ValidationService {
             for (const i of this.newWord) {
                 orientation = this.startCoord.x - i[0].toLowerCase()[0].charCodeAt(0);
             }
+
             // Checks if the word is oriented horizontally or vertically
+
             if (orientation === 0) {
                 wordContainer.push(this.horizontalCheck(this.newWord.keys().next().value));
                 for (const i of this.newWord) {
@@ -59,6 +61,7 @@ export class ValidationService {
             }
         } else {
             // IF the player only placed 1 letter on the board
+
             wordContainer.push(this.verticalCheck(String.fromCharCode(this.startCoord.x) + String(this.startCoord.y)));
             wordContainer.push(this.horizontalCheck(String.fromCharCode(this.startCoord.x) + String(this.startCoord.y)));
         }
@@ -73,7 +76,9 @@ export class ValidationService {
         const xIndex = coord.toLowerCase()[0].charCodeAt(0);
         const yIndex = coord.slice(1, coord.length);
         let tempWord = '';
+
         const stringIndexes: number[] = [];
+
         // Scanning through the small indexes
         for (this.index; xIndex - this.index >= ASCII_SMALL_A; this.index++) {
             if (!this.gameService.gameBoard.hasCoords(String.fromCharCode(xIndex - this.index) + yIndex)) break;
@@ -99,7 +104,9 @@ export class ValidationService {
         const xIndex = coord[0];
         const yIndex = Number(coord.slice(1, coord.length));
         let tempWord = '';
+
         const stringIndexes: number[] = [];
+
         // Scanning through the small indexes
         for (this.index; yIndex - this.index >= 0; this.index++) {
             if (!this.gameService.gameBoard.hasCoords(xIndex + String(yIndex - this.index))) break;
@@ -179,6 +186,7 @@ export class ValidationService {
                 } else tempPoints += DEFAULT_POINTS.get(word[0][letter]) as number;
             }
             counter += tempPoints;
+
             if (w2) {
                 counter *= 2;
                 w2 = false;
@@ -188,9 +196,9 @@ export class ValidationService {
                 w3 = false;
             }
         }
+
         // IF the player placed all of his hand, gains 50 pts
         if (this.newWord.size === BINGO_WORD) counter += BINGO_BONUS;
-
         return counter;
     }
 }
