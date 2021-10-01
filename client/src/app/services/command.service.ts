@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
+import { LetterExchangeService } from '@app/services/letter-exchange.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
 
@@ -24,12 +25,23 @@ export class CommandService {
             '!placer',
             (position: string, word: string): boolean => {
                 // eslint-disable-next-line no-invalid-this
-                return this.placeLetterService.validateCommand(position, word);
+                return this.letterPlacingService.validateCommand(position, word);
+            },
+        ],
+        [
+            '!échanger',
+            (letters: string): boolean => {
+                // eslint-disable-next-line no-invalid-this
+                return this.letterExchangeService.validateCommand(letters);
             },
         ],
     ]);
 
-    constructor(private textboxService: TextboxService, private placeLetterService: LetterPlacingService) {}
+    constructor(
+        private textboxService: TextboxService,
+        private letterPlacingService: LetterPlacingService,
+        private letterExchangeService: LetterExchangeService,
+    ) {}
 
     parseCommand(message: string): void {
         let command: string;

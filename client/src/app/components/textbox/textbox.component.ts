@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { TextboxService } from '@app/services/textbox.service';
 import { Message, MessageType } from '@app/classes/message';
+import { TextboxService } from '@app/services/textbox.service';
+import { Subscription } from 'rxjs';
 
 const MESSAGE_REFRESH_DELAY = 100;
 

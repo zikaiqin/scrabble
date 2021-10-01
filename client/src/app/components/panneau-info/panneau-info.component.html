@@ -2,7 +2,7 @@
     <div class="panneau">
         <div class="joueur-container">
             <div class="joueur">Joueur</div>
-            <div class="nom-joueur">{{ getName(playerType.Human) }} </div>
+            <div class="nom-joueur">{{ getName(playerType.Human) }}</div>
             <div class="score-container">
                 <span>Score</span>
                 <div>{{ getScore(playerType.Human) }} point(s)</div>
@@ -22,13 +22,10 @@
         <div class="tour" [style.backgroundColor]="getTurnColor()">{{ getTurnMessage() }}</div>
         <ng-template [ngIf]="isMyTurn !== undefined" [ngIfElse]="startButton">
             <p id="timer">----</p>
-            <app-pass-turn id="passer"></app-pass-turn>
+            <app-pass-turn id="passer" [activePlayer]="isMyTurn"></app-pass-turn>
         </ng-template>
         <ng-template #startButton>
-            <button mat-raised-button (click)="startGame()">
-                Commencer
-            </button>
+            <button mat-raised-button (click)="startGame()">Commencer</button>
         </ng-template>
     </div>
 </div>
-

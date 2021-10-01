@@ -1,6 +1,8 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
+import { Router } from '@angular/router';
+
 // import { GridChevalet } from '@app/services/chevalet.service';
 // TODO : Avoir un fichier séparé pour les constantes!
 export const DEFAULT_WIDTH_ALL = 650; // 525
@@ -25,20 +27,21 @@ export enum MouseButton {
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
 
-    // @ViewChild('canvasChevalet', { static: false }) private gridChevalet_lol : ElementRef<HTMLCanvasElement>;
-
-    // private ChevaletSize = {ChevaletX:HAND_WIDTH,ChevaletY:HAND_HEIGHT };
     mousePosition: Vec2 = { x: 0, y: 0 };
     buttonPressed = '';
 
     private canvasSize = { x: DEFAULT_WIDTH_ALL, y: DEFAULT_HEIGHT_ALL };
 
-    constructor(private readonly gridService: GridService) {}
+    constructor(private readonly gridService: GridService, private readonly router: Router) {}
 
     @HostListener('keydown', ['$event'])
     buttonDetect(event: KeyboardEvent) {
         this.buttonPressed = event.key;
     }
+    redirectTo(uri: string) {
+        this.router.navigateByUrl(uri);
+    }
+
     maximize(): void {
         this.gridService.clearGrid();
         this.gridService.maxGrid();
@@ -54,7 +57,6 @@ export class PlayAreaComponent implements AfterViewInit {
 
         this.gridService.drawGrid();
         this.gridCanvas.nativeElement.focus();
-
         // this.gridServiceChevalet.gridHand = this.gridChevalet_lol.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         // this.gridServiceChevalet.drawSomethign();
     }

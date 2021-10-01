@@ -1,11 +1,10 @@
 export class GameBoard {
-    // TODO: assign a type to bonuses
     readonly letters: Map<string, string>;
-    readonly bonuses: Map<string, unknown>;
+    readonly bonuses: Map<string, string>;
 
-    constructor(bonuses: Map<string, unknown>) {
+    constructor(bonuses: Map<string, string>) {
         this.letters = new Map<string, string>();
-        this.bonuses = new Map<string, unknown>(bonuses);
+        this.bonuses = new Map<string, string>(bonuses);
     }
 
     size(): number {
@@ -26,8 +25,13 @@ export class GameBoard {
         return this.letters.get(coords);
     }
 
-    // TODO: assign a type to bonuses
-    getBonus(coords: string): unknown | undefined {
+    getBonus(coords: string): string | undefined {
         return this.bonuses.get(coords);
+    }
+
+    removeAt(coords: string): void {
+        if (this.hasCoords(coords)) {
+            this.letters.delete(coords);
+        }
     }
 }
