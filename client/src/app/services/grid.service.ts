@@ -54,6 +54,9 @@ export class GridService {
             this.tuilePosX = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         }
         this.drawPlayerHand();
+        this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
+        this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
+
     }
 
     drawGridCol() {

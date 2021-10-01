@@ -5,10 +5,18 @@ import { GridService } from '@app/services/grid.service';
 describe('GridService', () => {
     let service: GridService;
     let ctxStub: CanvasRenderingContext2D;
+    const CHARCODE_SMALL_A = 97;
 
     const CANVAS_WIDTH = 500;
     const CANVAS_HEIGHT = 500;
+    const DEFAULT_SCALE = 0.04;
 
+    const DEFAULT_NB_CASES = 16;
+    const STROKE_RANGE = 4;
+    const DEFAULT_WIDTH_CHEVALET = 385;
+    const DEFAULT_HEIGHT_CHEVALET = 55;
+    const NB_CASE_CHEVALET = 7;
+    
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(GridService);
@@ -72,5 +80,10 @@ describe('GridService', () => {
         imageData = service.gridContext.getImageData(0, 0, service.width, service.height).data;
         const afterSize = imageData.filter((x) => x !== 0).length;
         expect(afterSize).toBeGreaterThan(beforeSize);
+    });
+    
+    it('should decrease indexChevalet when maxGrid', () => {
+        service.maxGrid();
+        expect(service['indexChevalet']).toEqual(CANVAS_HEIGHT);
     });
 });
