@@ -54,7 +54,6 @@ export class GridService {
             this.tuilePosX = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         }
         this.drawPlayerHand();
-        
     }
 
     drawGridCol() {
@@ -224,23 +223,20 @@ export class GridService {
         }
     }
 
-
     // This function convert les strings map de zi kai to real coordonnees
-    // so with postions X,Y to call drawLetter 
+    // so with postions X,Y to call drawLetter
     // it[0]= coord
     // it[1] =lettre
     drawGridLetters(positions: Map<string, string>) {
-
-        var postionX :string;
-        var letter;
+        let postionX: string;
+        let letter;
         for (const it of positions) {
             letter = it[0].charAt(0);
-            var positionY =  letter.charCodeAt(0) - 97;
-            postionX = it[0].replace(/[^0-9]/g,'');
-            var positionX = parseInt(postionX,10);
-            this.drawLetter(it[1],positionX -1, positionY);
+            const positionY = letter.charCodeAt(0) - CHARCODE_SMALL_A;
+            postionX = it[0].replace(/[^0-9]/g, '');
+            const positionX = parseInt(postionX, 10);
+            this.drawLetter(it[1], positionX - 1, positionY);
         }
-
     }
 
     drawPlayerHand() {
@@ -264,14 +260,13 @@ export class GridService {
     drawPlayerHandSlots(i: number) {
         this.handContext.fillStyle = '#E42217';
         // pour draw 7 cases
-            i--;
-            this.handContext.fillRect(
-                this.tuileSize + this.tuileSizeChevalet * i,
-                DEFAULT_HEIGHT + this.tuileSize + STROKE_RANGE,
-                this.tuileSizeChevalet,
-                this.tuileSizeChevalet,
-            );
-
+        i--;
+        this.handContext.fillRect(
+            this.tuileSize + this.tuileSizeChevalet * i,
+            DEFAULT_HEIGHT + this.tuileSize + STROKE_RANGE,
+            this.tuileSizeChevalet,
+            this.tuileSizeChevalet,
+        );
     }
 
     drawPlayerHandLetters(letters: string[]) {
@@ -297,7 +292,7 @@ export class GridService {
             this.gridContext.scale(1 + this.scale, 1 + this.scale);
             this.scaleCounter++;
         }
-        this.indexChevalet--; 
+        this.indexChevalet--;
         this.drawGrid();
     }
 

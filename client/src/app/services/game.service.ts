@@ -27,7 +27,7 @@ export class GameService {
 
     turnState = new Subject<boolean>();
 
-    constructor(private gridService:GridService){}
+    constructor(private gridService: GridService) {}
 
     init(username: string): void {
         const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== username);
@@ -61,13 +61,12 @@ export class GameService {
             this.opponentHand.addAll(opponentHand);
         }
     }
-    updateHand(playhand:PlayerHand):void{
+    updateHand(playhand: PlayerHand): void {
         this.gridService.drawPlayerHand();
         this.gridService.drawPlayerHandLetters(playhand.letters);
     }
-    updateGame(positions: Map<string, string>){
+    updateGame(positions: Map<string, string>) {
         this.gridService.clearGrid();
         this.gridService.drawGridLetters(positions);
     }
-
 }
