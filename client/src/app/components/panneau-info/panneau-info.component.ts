@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
+import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
+import { EndGameService } from '@app/services/end-game.service';
 import { GameService } from '@app/services/game.service';
 import { TurnService } from '@app/services/turn.service';
 import { Subscription } from 'rxjs';
-import { EndGameService } from '@app/services/end-game.service';
-import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 
 enum PlayerType {
     Human,

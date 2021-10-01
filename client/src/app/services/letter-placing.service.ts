@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
+import { GameBoard } from '@app/classes/game-board';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
 import { GameService } from '@app/services/game.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { ValidationService } from '@app/services/validation.service';
-import { GameBoard } from '@app/classes/game-board';
 
 const BOUNDARY = 15;
 const VALIDATION_TIMEOUT = 3000;

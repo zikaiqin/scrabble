@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { GameService } from '@app/services/game.service';
 import { DEFAULT_POINTS } from '@app/classes/game-config';
-import { TextboxService } from './textbox.service';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
+import { GameService } from '@app/services/game.service';
+import { TextboxService } from './textbox.service';
 
 export const START_TURN_COUNT = 0;
 export const MAX_TURN_SKIP_COUNT = 9;
