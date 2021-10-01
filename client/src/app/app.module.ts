@@ -13,6 +13,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { ChevaletComponent } from './components/chevalet/chevalet.component';
 import { EndGameComponent } from './components/end-game/end-game.component';
 import { InputbarComponent } from './components/inputbar/inputbar.component';
+import { JoueurVirtuelleComponent } from './components/joueur-virtuelle/joueur-virtuelle.component';
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
 import { PanneauInfoComponent } from './components/panneau-info/panneau-info.component';
@@ -30,6 +31,7 @@ import { HomePageComponent } from './pages/home-page/home-page.component';
     declarations: [
         AppComponent,
         GamePageComponent,
+        JoueurVirtuelleComponent,
         PlayAreaComponent,
         SidebarComponent,
         ChevaletComponent,
