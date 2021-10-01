@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
-import { Router } from '@angular/router';
 
 // import { GridChevalet } from '@app/services/chevalet.service';
 // TODO : Avoir un fichier séparé pour les constantes!
@@ -32,14 +31,14 @@ export class PlayAreaComponent implements AfterViewInit {
 
     private canvasSize = { x: DEFAULT_WIDTH_ALL, y: DEFAULT_HEIGHT_ALL };
 
-    constructor(private readonly gridService: GridService, private readonly router: Router) {}
+    constructor(private readonly gridService: GridService) {}
 
     @HostListener('keydown', ['$event'])
     buttonDetect(event: KeyboardEvent) {
         this.buttonPressed = event.key;
     }
-    redirectTo(uri: string) {
-        this.router.navigateByUrl(uri);
+    redirectTo() {
+        window.location.reload();
     }
 
     maximize(): void {

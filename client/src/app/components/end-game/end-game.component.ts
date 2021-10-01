@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { EndGameService } from '@app/services/end-game.service';
 import { GameService } from '@app/services/game.service';
-import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-end-game',
@@ -13,7 +12,7 @@ export class EndGameComponent {
     isVisibleGiveUp: boolean;
     isVisibleButton: boolean;
 
-    constructor(private endGameService: EndGameService, private gameService: GameService, private readonly router: Router) {
+    constructor(private endGameService: EndGameService, private gameService: GameService) {
         this.isVisibleWinner = false;
         this.isVisibleGiveUp = false;
         this.isVisibleButton = true;
@@ -32,8 +31,8 @@ export class EndGameComponent {
         return '';
     }
 
-    redirectTo(uri: string) {
-        this.router.navigateByUrl(uri);
+    redirectTo() {
+        window.location.reload();
     }
 
     checkIfGameEnded(): boolean {

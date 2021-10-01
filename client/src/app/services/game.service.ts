@@ -42,7 +42,6 @@ export class GameService {
 
     start(): void {
         const turnState = Boolean(Math.floor(Math.random() * 2));
-        this.turnState.next(turnState);
 
         this.reserve = new Reserve();
 
@@ -58,5 +57,6 @@ export class GameService {
             this.playerHand.addAll(playerHand);
             this.opponentHand.addAll(opponentHand);
         }
+        this.turnState.next(turnState);
     }
 }
