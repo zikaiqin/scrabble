@@ -25,8 +25,7 @@
             <app-pass-turn id="passer" [activePlayer]="isMyTurn"></app-pass-turn>
         </ng-template>
         <ng-template #startButton>
-            <button mat-raised-button class="start" (click)="startGame()">Commencer</button>
+            <button mat-raised-button (click)="startGame()">Commencer</button>
         </ng-template>
-        <app-end-game class="end" [style.display]="isVisibleGiveUp ? 'block' : 'none'"></app-end-game>
     </div>
 </div>
