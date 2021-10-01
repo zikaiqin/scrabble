@@ -1,12 +1,42 @@
 import { Injectable } from '@angular/core';
-import { TextboxService } from '@app/services/textbox.service';
-import { GameService } from '@app/services/game.service';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
+import { GameService } from '@app/services/game.service';
+import { TextboxService } from '@app/services/textbox.service';
+import { ValidationService } from '@app/services/validation.service';
 
 const BOUNDARY = 15;
+const VALIDATION_TIMEOUT = 3000;
 const CENTER_TILE = 'h8';
 const WILDCARD = '*';
+const SPECIAL_CHARS = new Map<string, string>([
+    ['à', 'a'],
+    ['è', 'e'],
+    ['ù', 'u'],
+    ['é', 'e'],
+    ['â', 'a'],
+    ['ê', 'e'],
+    ['î', 'i'],
+    ['ô', 'o'],
+    ['û', 'u'],
+    ['ë', 'e'],
+    ['ï', 'i'],
+    ['ü', 'u'],
+    ['ç', 'c'],
+    ['À', 'A'],
+    ['È', 'E'],
+    ['Ù', 'U'],
+    ['É', 'E'],
+    ['Â', 'A'],
+    ['Ê', 'E'],
+    ['Î', 'I'],
+    ['Ô', 'O'],
+    ['Û', 'U'],
+    ['Ë', 'E'],
+    ['Ï', 'I'],
+    ['Ü', 'U'],
+    ['Ç', 'C'],
+]);
 
 @Injectable({
     providedIn: 'root',
@@ -20,14 +50,22 @@ export class LetterPlacingService {
     private word: string;
     private letters: Map<string, string>;
 
-    constructor(private textboxService: TextboxService, private gameService: GameService) {
+    constructor(private textboxService: TextboxService, private gameService: GameService, private validationService: ValidationService) {
         this.gameService.turnState.subscribe({
             next: (turn: boolean) => (this.turnState = turn),
         });
     }
 
+    /**
+     * @description Wrapper function that calls all validation functions
+     * @param position the position parameter entered by the player
+     * @param word the word entered by the player
+     */
     validateCommand(position: string, word: string): boolean {
-        this.word = word;
+        this.word = word
+            .split('')
+            .map((letter) => this.mapSpecialChars(letter))
+            .join('');
 
         if (!(this.isMyTurn() && this.isValidParam(position) && this.isInBounds())) {
             return false;
@@ -38,13 +76,16 @@ export class LetterPlacingService {
         const canPlace = this.isAdjacent() && this.isInHand();
         if (canPlace) {
             this.placeLetters();
-            this.updateScore();
-            this.gameService.turnState.next(!this.turnState);
+            this.validationService.init(this.startCoords, this.letters);
+            this.isInDict();
         }
         return canPlace;
     }
 
-    generateLetters() {
+    /**
+     * @description Generate a map of coords/letter pairs from startCoords and direction
+     */
+    generateLetters(): void {
         const letters = this.word.split('');
 
         if (this.direction === 'h') {
@@ -58,11 +99,31 @@ export class LetterPlacingService {
         }
     }
 
+    /**
+     * @description Place the letters onto the board
+     */
     placeLetters(): void {
         Array.from(this.letters.entries()).forEach((entry) => {
             this.gameService.gameBoard.placeLetter(entry[0], entry[1]);
             this.gameService.playerHand.remove(entry[1]);
+        });
+    }
 
+    /**
+     * @description Remove the placed letters from the board and return them to the hand
+     */
+    returnLetters(): void {
+        Array.from(this.letters.entries()).forEach((entry) => {
+            this.gameService.gameBoard.removeAt(entry[0]);
+            this.gameService.playerHand.add(entry[1]);
+        });
+    }
+
+    /**
+     * @description Draw as many letters as possible from the reserve and place them into the hand
+     */
+    replenishHand(): void {
+        Array.from(this.letters.keys()).forEach(() => {
             const letter = this.gameService.reserve.drawOne();
             if (letter !== undefined) {
                 this.gameService.playerHand.add(letter);
@@ -70,9 +131,10 @@ export class LetterPlacingService {
         });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    updateScore(): void {}
-
+    /**
+     * @description Assert that the position parameter entered in textbox is valid
+     * @param position the position parameter entered by the player
+     */
     isValidParam(position: string): boolean {
         const validPosition = /[a-o](?:1[0-5]|[1-9])[vh]/;
         const validWord = /[a-zA-Z]+/;
@@ -87,6 +149,9 @@ export class LetterPlacingService {
         return isValid;
     }
 
+    /**
+     * @description Assert that it is the player's turn
+     */
     isMyTurn(): boolean {
         if (!this.turnState) {
             this.textboxService.sendMessage(MessageType.System, 'La commande !placer peut seulement être utilisé lors de votre tour');
@@ -94,6 +159,9 @@ export class LetterPlacingService {
         return this.turnState;
     }
 
+    /**
+     * @description Assert that no letters are being placed out of bounds
+     */
     isInBounds(): boolean {
         if (this.direction === 'h') {
             this.endCoords = this.startCoords.charAt(0) + String(Number(this.startCoords.slice(1)) + this.word.length - 1);
@@ -107,6 +175,11 @@ export class LetterPlacingService {
         return inBounds;
     }
 
+    /**
+     * @description Assert that the letters are adjacent to at least one existing letter
+     * @description Assert that overlapping letters match the ones on the board
+     * @description Remove overlapping letters from letters to be placed
+     */
     isAdjacent(): boolean {
         let isAdjacent: boolean;
         if (this.gameService.gameBoard.size() === 0) {
@@ -153,6 +226,9 @@ export class LetterPlacingService {
         return isAdjacent;
     }
 
+    /**
+     * @description Assert that the player has the required letters in hand
+     */
     isInHand(): boolean {
         const wildCard = /[A-Z]/;
         const letters = Array.from(this.letters.values());
@@ -172,5 +248,28 @@ export class LetterPlacingService {
             );
         }
         return isInHand;
+    }
+
+    /**
+     * @description Assert that the newly placed word is included in the dictionary
+     */
+    isInDict(): boolean {
+        const isInDict = this.validationService.findWord(this.validationService.fetchWords());
+        setTimeout(() => {
+            if (isInDict) {
+                this.gameService.playerScore += this.validationService.calcPoints();
+                this.replenishHand();
+            } else {
+                this.textboxService.sendMessage(MessageType.System, 'Le mot ne figure pas dans le dictionnaire de jeu');
+                this.returnLetters();
+            }
+            this.gameService.turnState.next(!this.turnState);
+        }, VALIDATION_TIMEOUT);
+        return isInDict;
+    }
+
+    mapSpecialChars(letter: string): string | undefined {
+        const specialChars = /[àèùéâêîôûëïüç]/i;
+        return specialChars.test(letter) ? SPECIAL_CHARS.get(letter) : letter;
     }
 }
