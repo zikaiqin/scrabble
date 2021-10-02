@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
+import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
+import { EndGameService } from '@app/services/end-game.service';
 import { GameService } from '@app/services/game.service';
 import { TurnService } from '@app/services/turn.service';
 import { Subscription } from 'rxjs';
-import { EndGameService } from '@app/services/end-game.service';
-import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 
 enum PlayerType {
     Human,
     Bot,
 }
 
-const TIMER = 10000; // temporary value just here for demo
+const TIMER = 60000; // temporary value just here for demo
 const TIMER_INTERVAL = 1000;
 
 @Component({

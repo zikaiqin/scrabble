@@ -4,7 +4,7 @@ import { Vec2 } from '@app/classes/vec2';
 import * as data from 'src/assets/dictionnary.json';
 import { GameService } from './game.service';
 
-const ASCII_SMALL_A = 97;
+export const ASCII_SMALL_A = 97;
 const BINGO_BONUS = 50;
 const BINGO_WORD = 7;
 const BOARD_SIZE = 14;
@@ -135,7 +135,7 @@ export class ValidationService {
                 for (const val of this.dictionnary.words) {
                     if (itr === val) temp = true;
                 }
-                if (temp === false) return false;
+                if (!temp) return false;
             }
         }
         return temp;

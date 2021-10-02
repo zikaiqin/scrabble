@@ -10,16 +10,16 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { ChevaletComponent } from './components/chevalet/chevalet.component';
+import { EndGameComponent } from './components/end-game/end-game.component';
 import { InputbarComponent } from './components/inputbar/inputbar.component';
+import { JoueurVirtuelleComponent } from './components/joueur-virtuelle/joueur-virtuelle.component';
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
 import { PanneauInfoComponent } from './components/panneau-info/panneau-info.component';
 import { PassTurnComponent } from './components/pass-turn/pass-turn.component';
 import { TextboxComponent } from './components/textbox/textbox.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
-import { EndGameComponent } from './components/end-game/end-game.component';
 
 /**
  * Main module that is used in main.ts.
@@ -31,7 +31,7 @@ import { EndGameComponent } from './components/end-game/end-game.component';
     declarations: [
         AppComponent,
         GamePageComponent,
-        MaterialPageComponent,
+        JoueurVirtuelleComponent,
         PlayAreaComponent,
         SidebarComponent,
         ChevaletComponent,

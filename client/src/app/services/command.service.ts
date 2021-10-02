@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { MessageType } from '@app/classes/message';
-import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { LetterExchangeService } from '@app/services/letter-exchange.service';
+import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
+import { Subscription } from 'rxjs';
+import { EndGameService } from './end-game.service';
 import { TurnService } from './turn.service';
 
 @Injectable({
@@ -10,6 +12,8 @@ import { TurnService } from './turn.service';
 })
 export class CommandService {
     debugActive: boolean = false;
+    subscription: Subscription;
+    turn: boolean;
     readonly commandLookup = new Map<string, (...params: string[]) => boolean>([
         [
             '!aide',
@@ -55,16 +59,24 @@ export class CommandService {
                 return true;
             },
         ],
+        /* eslint-disable no-invalid-this */
         [
             '!passer',
             (): boolean => {
-                // eslint-disable-next-line no-invalid-this
-                this.turnService.changeTurn(false);
-                // eslint-disable-next-line no-invalid-this
-                this.textboxService.sendMessage(MessageType.System, 'Votre tour a été passé');
+                if (this.turn) {
+                    this.turnService.changeTurn(false);
+                    if (!this.endGameService.checkIfGameEnd()) {
+                        this.endGameService.turnSkipCount();
+                        this.endGameService.endGame();
+                    }
+                    this.textboxService.sendMessage(MessageType.System, 'Votre tour a été passé');
+                    return true;
+                }
+                this.textboxService.sendMessage(MessageType.System, "Ce n'est pas votre tour");
                 return true;
             },
         ],
+        /* eslint-enable no-invalid-this */
     ]);
 
     constructor(
@@ -72,7 +84,12 @@ export class CommandService {
         private letterPlacingService: LetterPlacingService,
         private letterExchangeService: LetterExchangeService,
         private turnService: TurnService,
-    ) {}
+        private endGameService: EndGameService,
+    ) {
+        this.subscription = this.turnService.getState().subscribe((turn) => {
+            this.turn = turn;
+        });
+    }
 
     parseCommand(message: string): void {
         const command: string = message.split(' ')[0];

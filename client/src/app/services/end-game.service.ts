@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { GameService } from '@app/services/game.service';
 import { DEFAULT_POINTS } from '@app/classes/game-config';
-import { TextboxService } from './textbox.service';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
+import { GameService } from '@app/services/game.service';
+import { TextboxService } from './textbox.service';
 
 export const START_TURN_COUNT = 0;
 export const MAX_TURN_SKIP_COUNT = 9;
@@ -23,7 +23,6 @@ export class EndGameService {
     pointAddedOpponent: number = DEFAULT_POINT;
     playerLettersLeft: string[] = [];
     opponentLettersLeft: string[] = [];
-    gameHasEnded: boolean = false;
     constructor(private gameService: GameService, private textboxService: TextboxService) {}
 
     turnSkipCount(): void {
@@ -43,9 +42,6 @@ export class EndGameService {
         if (this.turnSkipCounter === MAX_TURN_SKIP_COUNT) {
             return true;
         }
-        if (this.gameHasEnded) {
-            return true;
-        }
         return false;
     }
 
@@ -54,6 +50,7 @@ export class EndGameService {
             this.pointDeductedPlayer += DEFAULT_POINTS.get(i[0]) as number;
         }
         this.gameService.playerScore -= this.pointDeductedPlayer;
+
         for (const i of this.gameService.opponentHand.letters) {
             this.pointDeductedOpponent += DEFAULT_POINTS.get(i[0]) as number;
         }
@@ -98,7 +95,6 @@ export class EndGameService {
 
     endGame(): void {
         if (this.checkIfGameEnd()) {
-            this.textboxService.sendMessage(MessageType.System, 'Game has ended');
             this.deductPoint();
             this.addPoint(this.checkWhoEmptiedHand());
             this.showLettersLeft(this.gameService.playerHand, this.gameService.opponentHand);

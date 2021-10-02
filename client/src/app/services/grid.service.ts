@@ -171,6 +171,9 @@ export class GridService {
     }
 
     drawBonus(x: number, y: number) {
+        if (x < 0 || x >= DEFAULT_NB_CASES || y < 0 || y >= DEFAULT_NB_CASES) {
+            return;
+        }
         // CASE MOT X 3
         if (tableau[x][y] === 'Wx3') {
             this.drawMx3();
