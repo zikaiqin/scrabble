@@ -4,7 +4,7 @@ import { TextboxService } from '@app/services/textbox.service';
 import { LetterPlacingService } from './letter-placing.service';
 import { LetterExchangeService } from './letter-exchange.service';
 
-fdescribe('CommandService', () => {
+describe('CommandService', () => {
     let service: CommandService;
     let textboxServiceSpy: jasmine.SpyObj<TextboxService>;
     let letterPlacingServiceSpy: jasmine.SpyObj<LetterPlacingService>;
