@@ -5,23 +5,21 @@ import { GridService } from '@app/services/grid.service';
 describe('GridService', () => {
     let service: GridService;
     let ctxStub: CanvasRenderingContext2D;
-    // const CHARCODE_SMALL_A = 97;
-
+    const pointOnMap: Map<string, string> = new Map();
     const CANVAS_WIDTH = 500;
     const CANVAS_HEIGHT = 500;
-    // const DEFAULT_SCALE = 0.04;
-
-    // const DEFAULT_NB_CASES = 16;
-    // const STROKE_RANGE = 4;
-    // const DEFAULT_WIDTH_CHEVALET = 385;
-    // const DEFAULT_HEIGHT_CHEVALET = 55;
-    // const NB_CASE_CHEVALET = 7;
-
+    const DEFAULT_NB_CASES = 16;
+    const NEGATIVE_NB = -1;
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(GridService);
         ctxStub = CanvasTestHelper.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         service.gridContext = ctxStub;
+        service.handContext = ctxStub;
+        pointOnMap.set('o11', 'a');
+        pointOnMap.set('b11', 'b');
+        pointOnMap.set('a2', 'c');
+        pointOnMap.set('e1', 'e');
     });
 
     it('should be created', () => {
@@ -38,39 +36,49 @@ describe('GridService', () => {
 
     it(' drawLetter should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        service.drawLetter('test');
+
+        service.drawLetter('a', 1, 1);
+
         expect(fillTextSpy).toHaveBeenCalled();
     });
+    it(' drawLetter should not call fillText on the canvas', () => {
+        service.drawLetter('a', DEFAULT_NB_CASES, DEFAULT_NB_CASES);
 
-    it(' drawLetter should not call fillText if word is empty', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        service.drawLetter('');
+
         expect(fillTextSpy).toHaveBeenCalledTimes(0);
     });
+    it(' drawBonus should drawNONE', () => {
+        service.drawBonus(1, DEFAULT_NB_CASES);
+        const drawNONESpy = spyOn(service, 'drawNONE').and.callThrough();
 
-    it(' drawLetter should call fillText as many times as letters in a word', () => {
-        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        const word = 'test';
-        service.drawLetter(word);
-        expect(fillTextSpy).toHaveBeenCalledTimes(word.length);
+        expect(drawNONESpy).toHaveBeenCalledTimes(0);
     });
+    it(' drawGridLetters should call drawGridLetters', () => {
+        const drawGridLettersSpy = spyOn(service, 'drawGridLetters').and.callThrough();
 
-    it(' drawLetter should color pixels on the canvas', () => {
-        let imageData = service.gridContext.getImageData(0, 0, service.width, service.height).data;
-        const beforeSize = imageData.filter((x) => x !== 0).length;
-        service.drawLetter('test');
-        imageData = service.gridContext.getImageData(0, 0, service.width, service.height).data;
-        const afterSize = imageData.filter((x) => x !== 0).length;
-        expect(afterSize).toBeGreaterThan(beforeSize);
+        service.drawGridLetters(pointOnMap);
+
+        expect(drawGridLettersSpy).toHaveBeenCalled();
     });
+    it(' drawPlayerHandLetters should call fillText on the canvas', () => {
+        const stringTester: string[] = ['a', 'b', 'c'];
+        const fillTextSpy = spyOn(service.handContext, 'fillText').and.callThrough();
 
-    it(' drawGrid should call moveTo and lineTo 4 times', () => {
-        const expectedCallTimes = 4;
-        const moveToSpy = spyOn(service.gridContext, 'moveTo').and.callThrough();
-        const lineToSpy = spyOn(service.gridContext, 'lineTo').and.callThrough();
+        service.drawPlayerHandLetters(stringTester);
+
+        expect(fillTextSpy).toHaveBeenCalled();
+    });
+    it(' clearGrid should call clearRect ', () => {
+        const clearRectSpy = spyOn(service.gridContext, 'clearRect').and.callThrough();
+        service.clearGrid();
+        expect(clearRectSpy).toHaveBeenCalled();
+    });
+    it(' drawGrid should reset the positions', () => {
+        const expectedPostions = CANVAS_WIDTH / DEFAULT_NB_CASES;
         service.drawGrid();
-        expect(moveToSpy).toHaveBeenCalledTimes(expectedCallTimes);
-        expect(lineToSpy).toHaveBeenCalledTimes(expectedCallTimes);
+        expect(service.tuilePosX).toBe(expectedPostions);
+        expect(service.tuilePosY).toBe(expectedPostions);
     });
 
     it(' drawGrid should color pixels on the canvas', () => {
@@ -82,8 +90,26 @@ describe('GridService', () => {
         expect(afterSize).toBeGreaterThan(beforeSize);
     });
 
-    it('should decrease indexChevalet when maxGrid', () => {
+    it(' drawGrid should increment tuilePosY and tuilePosX', () => {
+        service.drawGrid();
+    });
+    it('should increment scaleCounter when maxGrid', () => {
         service.maxGrid();
-        expect(service.indexChevalet).toEqual(CANVAS_HEIGHT);
+        expect(service.scaleCounter).toBe(1);
+    });
+    it('should not increment scaleCounter when maxGrid', () => {
+        service.scaleCounter = 6;
+
+        service.maxGrid();
+        expect(service.scaleCounter).toBe(6);
+    });
+    it('should decrement scaleCounter when minGrid', () => {
+        service.minGrid();
+        expect(service.scaleCounter).toBe(NEGATIVE_NB);
+    });
+    it('should not decrement scaleCounter when minGrid', () => {
+        service.scaleCounter = NEGATIVE_NB;
+        service.minGrid();
+        expect(service.scaleCounter).toBe(NEGATIVE_NB);
     });
 });

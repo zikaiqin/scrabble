@@ -10,8 +10,8 @@ const HAND_SIZE = 7;
     providedIn: 'root',
 })
 export class LetterExchangeService {
-    private letters: string;
-    private turnState: boolean;
+    letters: string;
+    turnState: boolean;
 
     constructor(private textboxService: TextboxService, private gameService: GameService) {
         this.gameService.turnState.subscribe({
@@ -41,12 +41,11 @@ export class LetterExchangeService {
         // contient dans la main
 
         // au moins 7 lettres dans la reserve
-        const canExchange = this.isInHand() && this.capacityReserve();
+        const canExchange = this.isInHand(this.letters, this.gameService.playerHand) && this.capacityReserve();
         if (canExchange) {
             this.exchangeLetter();
             this.gameService.turnState.next(!this.turnState);
         }
-
         return canExchange;
     }
 
@@ -71,14 +70,14 @@ export class LetterExchangeService {
         return this.gameService.reserve.getSize() >= HAND_SIZE;
     }
 
-    isInHand(): boolean {
+    isInHand(expectedHand: string, actualHand: PlayerHand): boolean {
         const testHand: PlayerHand = new PlayerHand();
-        this.letters.split('').forEach((letter) => testHand.add(letter));
+        expectedHand.split('').forEach((letter) => testHand.add(letter));
 
         // using unique set of letters in word as key, compare to amount of letters in hand
-        const isInHand: boolean = [...new Set<string>(this.letters)].every((letter) => {
+        const isInHand: boolean = [...new Set<string>(expectedHand)].every((letter) => {
             const amountRequired = testHand.get(letter);
-            const amountInHand = this.gameService.playerHand.get(letter);
+            const amountInHand = actualHand.get(letter);
             return amountRequired <= amountInHand;
         });
         if (!isInHand) {
