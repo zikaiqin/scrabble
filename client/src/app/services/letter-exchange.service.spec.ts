@@ -4,7 +4,7 @@ import { GameService } from '@app/services/game.service';
 import { LetterExchangeService } from './letter-exchange.service';
 import { PlayerHand } from '@app/classes/player-hand';
 //const HAND_SIZE = 7;
-fdescribe('LetterExchangeService', () => {
+describe('LetterExchangeService', () => {
     let service: LetterExchangeService;
     beforeEach(() => {
 

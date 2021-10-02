@@ -7,7 +7,7 @@ import { ValidationService } from '@app/services/validation.service';
 import { GameBoard } from '@app/classes/game-board';
 import { PlayerHand } from '@app/classes/player-hand';
 
-fdescribe('LetterPlacingService', () => {
+describe('LetterPlacingService', () => {
     let service: LetterPlacingService;
 
     beforeEach(() => {

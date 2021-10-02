@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { GridService } from '@app/services/grid.service';
 
-describe('GridService', () => {
+fdescribe('GridService', () => {
     let service: GridService;
     let ctxStub: CanvasRenderingContext2D;
     const pointOnMap: Map<string, string> = new Map();
@@ -42,15 +42,15 @@ describe('GridService', () => {
         expect(fillTextSpy).toHaveBeenCalled();
     });
     it(' drawLetter should not call fillText on the canvas', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
         service.drawLetter('a', DEFAULT_NB_CASES, DEFAULT_NB_CASES);
 
-        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
 
         expect(fillTextSpy).toHaveBeenCalledTimes(0);
     });
     it(' drawBonus should drawNONE', () => {
-        service.drawBonus(1, DEFAULT_NB_CASES);
         const drawNONESpy = spyOn(service, 'drawNONE').and.callThrough();
+        service.drawBonus(1, DEFAULT_NB_CASES);
 
         expect(drawNONESpy).toHaveBeenCalledTimes(0);
     });
