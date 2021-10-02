@@ -10,7 +10,7 @@ export const TEST_INCREMENT = 1;
 export const PLAYER = 1;
 export const OPPONENT = 2;
 
-fdescribe('GameService', () => {
+describe('GameService', () => {
     let service: EndGameService;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let textboxServiceSpy: jasmine.SpyObj<TextboxService>;
