@@ -7,7 +7,6 @@ describe('GameService', () => {
     let service: GameService;
     let username: string;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
-    let positions: Map<string, string>;
 
     beforeEach(() => {
         gridServiceSpy = jasmine.createSpyObj('GridService', ['drawPlayerHand', 'drawPlayerHandLetters', 'clearGrid', 'drawGridLetters']);
@@ -18,7 +17,6 @@ describe('GameService', () => {
         username = 'testName';
         service.playerHand = new PlayerHand();
         service.opponentHand = new PlayerHand();
-        positions = new Map();
     });
 
     it('should be created', () => {
@@ -39,17 +37,10 @@ describe('GameService', () => {
         expect(service.opponentScore).toEqual(0);
     });
 
-    // it('updateHand should call the right functions', () => {
-    //     service.init(username);
-    //     service.updateHand(service.playerHand);
-    //     expect(gridServiceSpy.drawPlayerHand).toHaveBeenCalled();
-    //     expect(gridServiceSpy.drawPlayerHandLetters).toHaveBeenCalled();
-    // });
-
     it('updateGame should call the right functions', () => {
         service.init(username);
         service.start();
-        service.updateGame(positions);
+        service.updateGame();
         expect(gridServiceSpy.clearGrid).toHaveBeenCalled();
         expect(gridServiceSpy.drawGridLetters).toHaveBeenCalled();
     });
