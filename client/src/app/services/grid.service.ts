@@ -190,7 +190,6 @@ export class GridService {
         else if (tableau[x][y] === 'Lx3') {
             this.drawLx3();
         }
-
         // case NONE
         else if (tableau[x][y] === 'VIDE') {
             this.drawNONE();
