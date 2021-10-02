@@ -62,10 +62,10 @@ export class GameService {
         const turnState = Boolean(Math.floor(Math.random() * 2));
         this.turnState.next(turnState);
     }
-    updateHand(playhand: PlayerHand): void {
+    /* updateHand(playhand: PlayerHand): void {
         this.gridService.drawPlayerHand();
         this.gridService.drawPlayerHandLetters(playhand.letters);
-    }
+    }*/
     updateGame(positions: Map<string, string>) {
         this.gridService.clearGrid();
         this.gridService.drawGridLetters(positions);

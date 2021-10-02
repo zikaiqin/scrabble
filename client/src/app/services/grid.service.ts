@@ -10,8 +10,8 @@ const DEFAULT_SCALE = 0.04;
 
 const DEFAULT_NB_CASES = 16;
 const STROKE_RANGE = 4;
-const DEFAULT_WIDTH_CHEVALET = 385;
-const DEFAULT_HEIGHT_CHEVALET = 55;
+// const DEFAULT_WIDTH_CHEVALET = 385;
+// const DEFAULT_HEIGHT_CHEVALET = 55;
 const NB_CASE_CHEVALET = 7;
 
 @Injectable({
@@ -20,16 +20,16 @@ const NB_CASE_CHEVALET = 7;
 export class GridService {
     gridContext: CanvasRenderingContext2D;
     handContext: CanvasRenderingContext2D;
-    tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
-    tuileSizeChevalet: number = DEFAULT_HEIGHT_CHEVALET;
-    indexChevalet: number = 0;
-    canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
-    startNumberPos: number = DEFAULT_WIDTH / DEFAULT_NB_CASES;
-    startLetterPos: number = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
-    tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
-    tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
-    scale: number = DEFAULT_SCALE;
-    scaleCounter: number = 0;
+    private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
+    // private tuileSizeChevalet: number = DEFAULT_HEIGHT_CHEVALET;
+    // private indexChevalet: number = 0;
+    private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
+    private startNumberPos: number = DEFAULT_WIDTH / DEFAULT_NB_CASES;
+    private startLetterPos: number = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
+    private tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
+    private tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
+    private scale: number = DEFAULT_SCALE;
+    private scaleCounter: number = 0;
 
     drawGrid() {
         this.gridContext.lineWidth = 1;
@@ -53,7 +53,7 @@ export class GridService {
             this.tuilePosY += this.tuileSize;
             this.tuilePosX = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         }
-        this.drawPlayerHand();
+        // this.drawPlayerHand();
         this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
     }
@@ -240,7 +240,7 @@ export class GridService {
         }
     }
 
-    drawPlayerHand() {
+    /* drawPlayerHand() {
         this.handContext.shadowColor = '#566D7E';
         this.handContext.shadowBlur = 20;
         this.handContext.lineJoin = 'bevel';
@@ -282,7 +282,7 @@ export class GridService {
             this.indexChevalet++;
         });
         this.indexChevalet = 0;
-    }
+    }*/
 
     clearGrid() {
         this.gridContext.clearRect(0, 0, DEFAULT_WIDTH * 2, DEFAULT_HEIGHT * 2);
@@ -293,6 +293,7 @@ export class GridService {
             this.gridContext.scale(1 + this.scale, 1 + this.scale);
             this.scaleCounter++;
         }
+        // this.indexChevalet--;
         this.drawGrid();
     }
 
@@ -301,6 +302,7 @@ export class GridService {
             this.gridContext.scale(1 - this.scale, 1 - this.scale);
             this.scaleCounter--;
         }
+        // this.indexChevalet--;
         this.drawGrid();
     }
 
