@@ -10,6 +10,7 @@ describe('GridService', () => {
     const CANVAS_HEIGHT = 500;
     const DEFAULT_NB_CASES = 16;
     const NEGATIVE_NB = -1;
+    const size = 6;
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(GridService);
@@ -44,7 +45,6 @@ describe('GridService', () => {
     it(' drawLetter should not call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
         service.drawLetter('a', DEFAULT_NB_CASES, DEFAULT_NB_CASES);
-
 
         expect(fillTextSpy).toHaveBeenCalledTimes(0);
     });
@@ -98,10 +98,10 @@ describe('GridService', () => {
         expect(service.scaleCounter).toBe(1);
     });
     it('should not increment scaleCounter when maxGrid', () => {
-        service.scaleCounter = 6;
+        service.scaleCounter = size;
 
         service.maxGrid();
-        expect(service.scaleCounter).toBe(6);
+        expect(service.scaleCounter).toBe(size);
     });
     it('should decrement scaleCounter when minGrid', () => {
         service.minGrid();

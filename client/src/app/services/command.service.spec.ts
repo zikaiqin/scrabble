@@ -11,20 +11,18 @@ fdescribe('CommandService', () => {
     let letterExchangeServiceSpy: jasmine.SpyObj<LetterExchangeService>;
 
     beforeEach(() => {
-        textboxServiceSpy = jasmine.createSpyObj('TextBoxService',['sendMessage']);
-        letterPlacingServiceSpy = jasmine.createSpyObj('letterPlacingService',['validateCommand']);
-        letterExchangeServiceSpy = jasmine.createSpyObj('letterExchangeServiceSpy',['validateCommand']);
+        textboxServiceSpy = jasmine.createSpyObj('TextBoxService', ['sendMessage']);
+        letterPlacingServiceSpy = jasmine.createSpyObj('letterPlacingService', ['validateCommand']);
+        letterExchangeServiceSpy = jasmine.createSpyObj('letterExchangeServiceSpy', ['validateCommand']);
 
         TestBed.configureTestingModule({
             providers: [
-                { provide : TextboxService, useValue: textboxServiceSpy},
-                { provide : LetterPlacingService, useValue: letterPlacingServiceSpy},
-                { provide : LetterExchangeService, useValue: letterExchangeServiceSpy},
-
+                { provide: TextboxService, useValue: textboxServiceSpy },
+                { provide: LetterPlacingService, useValue: letterPlacingServiceSpy },
+                { provide: LetterExchangeService, useValue: letterExchangeServiceSpy },
             ],
         });
         service = TestBed.inject(CommandService);
-        
     });
 
     it('should be created', () => {
@@ -32,7 +30,6 @@ fdescribe('CommandService', () => {
     });
 
     it('should allow the command', () => {
-
         service.parseCommand('!aide');
 
         expect(textboxServiceSpy.sendMessage).toHaveBeenCalled();
@@ -46,16 +43,15 @@ fdescribe('CommandService', () => {
         service.debugActive = true;
         service.parseCommand('!debug');
         expect(textboxServiceSpy.sendMessage).toHaveBeenCalled();
-        
+
         service.parseCommand('!placer o15 s');
         expect(letterPlacingServiceSpy.validateCommand).toHaveBeenCalled();
-        
+
+        service.turn = false;
         service.parseCommand('!passer');
         expect(textboxServiceSpy.sendMessage).toHaveBeenCalled();
-
     });
     it('should allow not the command', () => {
-
         service.parseCommand('!ass');
         expect(textboxServiceSpy.sendMessage).toHaveBeenCalled();
     });

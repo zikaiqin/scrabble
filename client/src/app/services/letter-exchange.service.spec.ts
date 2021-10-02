@@ -3,22 +3,20 @@ import { GridService } from '@app/services/grid.service';
 import { GameService } from '@app/services/game.service';
 import { LetterExchangeService } from './letter-exchange.service';
 import { PlayerHand } from '@app/classes/player-hand';
-//const HAND_SIZE = 7;
+// const HAND_SIZE = 7;
 describe('LetterExchangeService', () => {
     let service: LetterExchangeService;
     beforeEach(() => {
-
         TestBed.configureTestingModule({
-            providers: [
-            ],
+            providers: [],
         });
-        service = TestBed.inject(LetterExchangeService);   
+        service = TestBed.inject(LetterExchangeService);
     });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
-    
+
     it('should not allow exchanging of letters not in hand', () => {
         const gameService = new GameService(new GridService());
         const fakeHand = {
@@ -27,14 +25,13 @@ describe('LetterExchangeService', () => {
 
         gameService.turnState.next(true);
 
-        let expectedHand :string = 'asd';
+        let expectedHand = 'asd';
         expect(service.isInHand(expectedHand, fakeHand as PlayerHand)).toBeFalse();
 
         expect(service.isInHand('ééasd^à', fakeHand as PlayerHand)).toBeFalse();
-        expectedHand =  't';
+        expectedHand = 't';
         expect(service.isInHand(expectedHand, fakeHand as PlayerHand)).toBeTrue();
-     });
-
+    });
 
     it('should display message if not my turn', () => {
         service.turnState = false;
@@ -43,20 +40,21 @@ describe('LetterExchangeService', () => {
         service.turnState = true;
         expect(service.isMyTurn()).toBeTrue();
     });
-    it(' should exchangeLetter'), () => {
+
+    it('should exchangeLetter', () => {
         service.letters = 'asd';
         const removeFromHandspy = spyOn(service, 'removeFromHand');
         service.exchangeLetter();
         expect(removeFromHandspy).toHaveBeenCalled();
-    }
-    it(' should not be validateCommand'),() => {
+    });
+
+    it('should not be validateCommand', () => {
         expect(service.validateCommand('asdasfasf')).toBeFalse();
         expect(service.validateCommand('asSDQaASasf')).toBeFalse();
         service.validateCommand('àèùéâêîôûëïüç');
         expect(service.validateCommand('asSDQaASasf')).toBeFalse();
-    }
-    it(' should be validateCommand'),() => {
+    });
+    it('should be validateCommand', () => {
         expect(service.validateCommand('asd')).toBeTrue();
-
-    }
+    });
 });
