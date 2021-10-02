@@ -23,7 +23,6 @@ export class EndGameService {
     pointAddedOpponent: number = DEFAULT_POINT;
     playerLettersLeft: string[] = [];
     opponentLettersLeft: string[] = [];
-    gameHasEnded: boolean = false;
     constructor(private gameService: GameService, private textboxService: TextboxService) {}
 
     turnSkipCount(): void {
@@ -43,7 +42,7 @@ export class EndGameService {
         if (this.turnSkipCounter === MAX_TURN_SKIP_COUNT) {
             return true;
         }
-        return this.gameHasEnded;
+        return false;
     }
 
     deductPoint(): void {
@@ -51,6 +50,7 @@ export class EndGameService {
             this.pointDeductedPlayer += DEFAULT_POINTS.get(i[0]) as number;
         }
         this.gameService.playerScore -= this.pointDeductedPlayer;
+
         for (const i of this.gameService.opponentHand.letters) {
             this.pointDeductedOpponent += DEFAULT_POINTS.get(i[0]) as number;
         }
