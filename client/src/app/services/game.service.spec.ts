@@ -39,12 +39,12 @@ describe('GameService', () => {
         expect(service.opponentScore).toEqual(0);
     });
 
-    it('updateHand should call the right functions', () => {
-        service.init(username);
-        service.updateHand(service.playerHand);
-        expect(gridServiceSpy.drawPlayerHand).toHaveBeenCalled();
-        expect(gridServiceSpy.drawPlayerHandLetters).toHaveBeenCalled();
-    });
+    // it('updateHand should call the right functions', () => {
+    //     service.init(username);
+    //     service.updateHand(service.playerHand);
+    //     expect(gridServiceSpy.drawPlayerHand).toHaveBeenCalled();
+    //     expect(gridServiceSpy.drawPlayerHandLetters).toHaveBeenCalled();
+    // });
 
     it('updateGame should call the right functions', () => {
         service.init(username);
