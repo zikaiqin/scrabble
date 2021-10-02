@@ -15,6 +15,7 @@ export class PassTurnComponent {
     @Input() activePlayer: boolean;
     subscription: Subscription;
     turn: boolean;
+    timerStarted: number = 0;
     // eslint-disable-next-line no-undef
     timer: NodeJS.Timeout; // Variable for timer
 
@@ -22,7 +23,7 @@ export class PassTurnComponent {
         this.subscription = this.turnService.getState().subscribe((turn) => {
             this.activePlayer = turn;
             this.turn = turn;
-            if (turn) {
+            if (turn && this.timerStarted === 0) {
                 this.startTimer();
             }
         });
@@ -37,6 +38,7 @@ export class PassTurnComponent {
     }
 
     startTimer(): void {
+        this.timerStarted++;
         let time = TIMER;
         this.timer = setInterval(() => {
             const element = document.getElementById('timer');
@@ -57,6 +59,7 @@ export class PassTurnComponent {
     }
 
     clearTimer(): void {
+        this.timerStarted = 0;
         clearInterval(this.timer);
     }
 }

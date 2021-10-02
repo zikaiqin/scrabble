@@ -4,7 +4,7 @@ import { Vec2 } from '@app/classes/vec2';
 import * as data from 'src/assets/dictionnary.json';
 import { GameService } from './game.service';
 
-const ASCII_SMALL_A = 97;
+export const ASCII_SMALL_A = 97;
 const BINGO_BONUS = 50;
 const BINGO_WORD = 7;
 const BOARD_SIZE = 14;
