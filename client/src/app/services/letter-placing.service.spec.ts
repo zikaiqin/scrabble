@@ -199,4 +199,31 @@ describe('LetterPlacingService', () => {
         ]);
         expect(service.isAdjacent(board, toPlace, Array.from(toPlace.keys())[0], Array.from(toPlace.keys())[3])).toBeFalse();
     });
+
+    it('should place letters from the hand onto the board', () => {
+        const actualHand = ['s', 't', 'u', 'b', 'm', 'l', 'e'];
+        const expectedHand = ['m', 'l', 'e'];
+        const actualBoard = new Map<string, string>();
+        const expectedBoard = new Map<string, string>([
+            ['a1', 's'],
+            ['a2', 't'],
+            ['a3', 'u'],
+            ['a4', 'b'],
+        ]);
+        const fakeHand = {
+            remove: (letter: string) => {
+                const index = actualHand.indexOf(letter);
+                actualHand.splice(index, 1);
+            },
+        };
+        const fakeBoard = {
+            placeLetter: (coords: string, letter: string) => {
+                actualBoard.set(coords, letter);
+            },
+        };
+        service.placeLetters(expectedBoard, fakeBoard as GameBoard, fakeHand as PlayerHand);
+
+        expect(actualHand).toEqual(expectedHand);
+        expect(actualBoard).toEqual(expectedBoard);
+    });
 });
