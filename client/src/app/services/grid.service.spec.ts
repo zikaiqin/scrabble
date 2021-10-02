@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { GridService } from '@app/services/grid.service';
 
-fdescribe('GridService', () => {
+describe('GridService', () => {
     let service: GridService;
     let ctxStub: CanvasRenderingContext2D;
     const pointOnMap: Map<string, string> = new Map();
