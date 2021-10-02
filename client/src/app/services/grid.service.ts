@@ -20,16 +20,16 @@ const NB_CASE_CHEVALET = 7;
 export class GridService {
     gridContext: CanvasRenderingContext2D;
     handContext: CanvasRenderingContext2D;
-    private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
-    private tuileSizeChevalet: number = DEFAULT_HEIGHT_CHEVALET;
-    private indexChevalet: number = 0;
-    private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
-    private startNumberPos: number = DEFAULT_WIDTH / DEFAULT_NB_CASES;
-    private startLetterPos: number = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
-    private tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
-    private tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
-    private scale: number = DEFAULT_SCALE;
-    private scaleCounter: number = 0;
+    tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
+    tuileSizeChevalet: number = DEFAULT_HEIGHT_CHEVALET;
+    indexChevalet: number = 0;
+    canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
+    startNumberPos: number = DEFAULT_WIDTH / DEFAULT_NB_CASES;
+    startLetterPos: number = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
+    tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
+    tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
+    scale: number = DEFAULT_SCALE;
+    scaleCounter: number = 0;
 
     drawGrid() {
         this.gridContext.lineWidth = 1;
@@ -190,7 +190,6 @@ export class GridService {
         else if (tableau[x][y] === 'Lx3') {
             this.drawLx3();
         }
-
         // case NONE
         else if (tableau[x][y] === 'VIDE') {
             this.drawNONE();
@@ -294,7 +293,6 @@ export class GridService {
             this.gridContext.scale(1 + this.scale, 1 + this.scale);
             this.scaleCounter++;
         }
-        this.indexChevalet--;
         this.drawGrid();
     }
 
@@ -303,7 +301,6 @@ export class GridService {
             this.gridContext.scale(1 - this.scale, 1 - this.scale);
             this.scaleCounter--;
         }
-        this.indexChevalet--;
         this.drawGrid();
     }
 
