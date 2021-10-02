@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GameBoard } from '@app/classes/game-board';
+import { Reserve } from '@app/classes/reserve';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
 import { GameService } from '@app/services/game.service';
@@ -74,7 +75,7 @@ export class LetterPlacingService {
             this.isAdjacent(this.gameService.gameBoard, this.letters, this.startCoords, this.endCoords) &&
             this.isInHand(this.letters, this.gameService.playerHand);
         if (canPlace) {
-            this.placeLetters();
+            this.placeLetters(this.letters, this.gameService.gameBoard, this.gameService.playerHand);
             this.validationService.init(this.startCoords, this.letters);
             this.isInDict();
         }
@@ -101,31 +102,31 @@ export class LetterPlacingService {
     /**
      * @description Place the letters onto the board
      */
-    placeLetters(): void {
-        Array.from(this.letters.entries()).forEach((entry) => {
-            this.gameService.gameBoard.placeLetter(entry[0], entry[1]);
-            this.gameService.playerHand.remove(entry[1]);
+    placeLetters(letters: Map<string, string>, gameBoard: GameBoard, playerHand: PlayerHand): void {
+        Array.from(letters.entries()).forEach((entry) => {
+            gameBoard.placeLetter(entry[0], entry[1]);
+            playerHand.remove(entry[1]);
         });
     }
 
     /**
      * @description Remove the placed letters from the board and return them to the hand
      */
-    returnLetters(): void {
-        Array.from(this.letters.entries()).forEach((entry) => {
-            this.gameService.gameBoard.removeAt(entry[0]);
-            this.gameService.playerHand.add(entry[1]);
+    returnLetters(letters: Map<string, string>, gameBoard: GameBoard, playerHand: PlayerHand): void {
+        Array.from(letters.entries()).forEach((entry) => {
+            gameBoard.removeAt(entry[0]);
+            playerHand.add(entry[1]);
         });
     }
 
     /**
      * @description Draw as many letters as possible from the reserve and place them into the hand
      */
-    replenishHand(): void {
-        Array.from(this.letters.keys()).forEach(() => {
-            const letter = this.gameService.reserve.drawOne();
+    replenishHand(letters: Map<string, string>, reserve: Reserve, playerHand: PlayerHand): void {
+        Array.from(letters.keys()).forEach(() => {
+            const letter = reserve.drawOne();
             if (letter !== undefined) {
-                this.gameService.playerHand.add(letter);
+                playerHand.add(letter);
             }
         });
     }
@@ -267,10 +268,10 @@ export class LetterPlacingService {
         setTimeout(() => {
             if (isInDict) {
                 this.gameService.playerScore += this.validationService.calcPoints();
-                this.replenishHand();
+                this.replenishHand(this.letters, this.gameService.reserve, this.gameService.playerHand);
             } else {
                 this.textboxService.sendMessage(MessageType.System, 'Le mot ne figure pas dans le dictionnaire de jeu');
-                this.returnLetters();
+                this.returnLetters(this.letters, this.gameService.gameBoard, this.gameService.playerHand);
             }
             this.gameService.turnState.next(false);
         }, VALIDATION_TIMEOUT);
