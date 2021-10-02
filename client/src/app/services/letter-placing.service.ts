@@ -103,20 +103,22 @@ export class LetterPlacingService {
      * @description Place the letters onto the board
      */
     placeLetters(letters: Map<string, string>, gameBoard: GameBoard, playerHand: PlayerHand): void {
-        Array.from(letters.entries()).forEach((entry) => {
-            gameBoard.placeLetter(entry[0], entry[1]);
-            playerHand.remove(entry[1]);
+        letters.forEach((letter, coords) => {
+            gameBoard.placeLetter(coords, letter);
+            playerHand.remove(letter);
         });
+        this.gameService.updateGame();
     }
 
     /**
      * @description Remove the placed letters from the board and return them to the hand
      */
     returnLetters(letters: Map<string, string>, gameBoard: GameBoard, playerHand: PlayerHand): void {
-        Array.from(letters.entries()).forEach((entry) => {
-            gameBoard.removeAt(entry[0]);
-            playerHand.add(entry[1]);
+        letters.forEach((letter, coords) => {
+            gameBoard.removeAt(coords);
+            playerHand.add(letter);
         });
+        this.gameService.updateGame();
     }
 
     /**
