@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { WebsocketService } from '@app/services/websocket.service';
 
 export enum GameMode {
     None,
@@ -19,6 +20,10 @@ export enum GameType {
 export class HomePageComponent implements OnInit {
     gameMode: number;
     gameType: number;
+
+    // FIXME: for test purposes only, to be removed
+    // @ts-ignore
+    constructor(private webSocketService: WebsocketService) {}
 
     ngOnInit(): void {
         this.gameMode = GameMode.None;
