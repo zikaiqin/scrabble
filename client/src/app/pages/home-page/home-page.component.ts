@@ -47,4 +47,8 @@ export class HomePageComponent implements OnInit {
             this.gameType = GameType[menu];
         }
     }
+
+    joinRoom(room: string): void {
+        this.webSocketService.joinRoom(room);
+    }
 }

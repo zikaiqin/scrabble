@@ -6,4 +6,5 @@
     <ng-template #newGame>
         <app-new-game-menu [gameMode]="gameMode" [gameType]="gameType" (goBack)="navigateTo($event)"> </app-new-game-menu>
     </ng-template>
+    <button type="button" (click)="joinRoom('room1')">Join room1</button>
 </div>

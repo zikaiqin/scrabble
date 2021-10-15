@@ -17,4 +17,16 @@ export class WebsocketService {
             console.log(`connection to server on socket: ${this.socket.id}`);
         });
     }
+
+    createRoom(room: string): void {
+        this.socket.emit('createRoom', room);
+    }
+
+    joinRoom(room: string): string {
+        this.socket.emit('joinRoom', room);
+        this.socket.on('roomFull', (message: string) => {
+            return message;
+        });
+        return '';
+    }
 }
