@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { PlayerHand } from '@app/classes/player-hand';
+import { Subject } from 'rxjs';
 import { GameService } from './game.service';
 import { GridService } from './grid.service';
 
@@ -15,8 +16,10 @@ describe('GameService', () => {
         service = TestBed.inject(GameService);
 
         username = 'testName';
-        service.playerHand = new PlayerHand();
-        service.opponentHand = new PlayerHand();
+        service.playerHand = new Subject<PlayerHand>();
+        service.opponentHand = new Subject<PlayerHand>();
+        service.playerScore = new Subject<number>();
+        service.opponentScore = new Subject<number>();
     });
 
     it('should be created', () => {
@@ -32,16 +35,10 @@ describe('GameService', () => {
     });
 
     it('start should affect values correctly', () => {
+        const spyNextPlayer = spyOn(service.playerScore, 'next').and.callThrough();
+        const spyNextOpponent = spyOn(service.opponentScore, 'next').and.callThrough();
         service.start();
-        expect(service.playerScore).toEqual(0);
-        expect(service.opponentScore).toEqual(0);
-    });
-
-    it('updateGame should call the right functions', () => {
-        service.init(username);
-        service.start();
-        service.updateGame();
-        expect(gridServiceSpy.clearGrid).toHaveBeenCalled();
-        expect(gridServiceSpy.drawGridLetters).toHaveBeenCalled();
+        expect(spyNextPlayer).toHaveBeenCalledWith(0);
+        expect(spyNextOpponent).toHaveBeenCalledWith(0);
     });
 });

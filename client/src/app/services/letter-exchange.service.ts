@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { GameService } from '@app/services/game.service';
-import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
+import { GameService } from '@app/services/game.service';
+import { TextboxService } from '@app/services/textbox.service';
 
 const HAND_SIZE = 7;
 
@@ -12,10 +12,14 @@ const HAND_SIZE = 7;
 export class LetterExchangeService {
     letters: string;
     turnState: boolean;
+    playerHand: PlayerHand;
 
     constructor(private textboxService: TextboxService, private gameService: GameService) {
         this.gameService.turnState.subscribe({
             next: (turn: boolean) => (this.turnState = turn),
+        });
+        this.gameService.playerHand.asObservable().subscribe((playerHand) => {
+            this.playerHand = playerHand;
         });
     }
 
@@ -41,7 +45,7 @@ export class LetterExchangeService {
         // contient dans la main
 
         // au moins 7 lettres dans la reserve
-        const canExchange = this.isInHand(this.letters, this.gameService.playerHand) && this.capacityReserve();
+        const canExchange = this.isInHand(this.letters, this.playerHand) && this.capacityReserve();
         if (canExchange) {
             this.exchangeLetter();
             this.gameService.turnState.next(!this.turnState);
@@ -54,14 +58,16 @@ export class LetterExchangeService {
         this.letters.split('').forEach(() => {
             const letter = this.gameService.reserve.drawOne();
             if (letter !== undefined) {
-                this.gameService.playerHand.add(letter);
+                this.playerHand.add(letter);
+                this.gameService.playerHand.next(this.playerHand);
             }
         });
     }
 
     removeFromHand(): void {
         this.letters.split('').forEach((letter) => {
-            this.gameService.playerHand.remove(letter);
+            this.playerHand.remove(letter);
+            this.gameService.playerHand.next(this.playerHand);
             this.gameService.reserve.receiveOne(letter);
         });
     }

@@ -1,13 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { GameBoard } from '@app/classes/game-board';
 import { DEFAULT_BONUSES } from '@app/classes/game-config';
-import { GameService } from './game.service';
 import { ASCII_SMALL_A, ValidationService } from './validation.service';
 
 const INDEX_TEST_VALUE = 10;
 
 describe('ValidationService', () => {
-    let gameServiceSpy: jasmine.SpyObj<GameService>;
     let service: ValidationService;
     let coords: string;
     let startCoord: string;
@@ -20,11 +18,7 @@ describe('ValidationService', () => {
     let invalidDictSearch: string[];
 
     beforeEach(() => {
-        gameServiceSpy = jasmine.createSpyObj('GameService', ['']);
-
-        TestBed.configureTestingModule({
-            providers: [{ provide: GameService, useValue: gameServiceSpy }],
-        });
+        TestBed.configureTestingModule({});
         service = TestBed.inject(ValidationService);
 
         coords = 'a2';
@@ -45,7 +39,7 @@ describe('ValidationService', () => {
         validDictSearch = ['abaca', 'aas', 'abacule'];
         invalidDictSearch = ['aaa', 'aasss', 'xfdjk'];
 
-        gameServiceSpy.gameBoard = new GameBoard(DEFAULT_BONUSES);
+        service.gameBoard = new GameBoard(DEFAULT_BONUSES);
     });
 
     it('should be created', () => {
@@ -77,7 +71,7 @@ describe('ValidationService', () => {
     });
 
     it('fetchWord horizontal', () => {
-        for (const i of hNewWordValues) gameServiceSpy.gameBoard.placeLetter(i[0], i[1]);
+        for (const i of hNewWordValues) service.gameBoard.placeLetter(i[0], i[1]);
         const spyHCheck = spyOn(service, 'horizontalCheck').and.callThrough();
         service.init(startCoord, hNewWordValues);
         const returnValue = service.fetchWords();
@@ -89,7 +83,7 @@ describe('ValidationService', () => {
 
     it('fetchWord vertical', () => {
         startCoord = 'b1';
-        for (const i of vNewWordValues) gameServiceSpy.gameBoard.placeLetter(i[0], i[1]);
+        for (const i of vNewWordValues) service.gameBoard.placeLetter(i[0], i[1]);
         const spyVCheck = spyOn(service, 'verticalCheck').and.callThrough();
         service.init(startCoord, vNewWordValues);
         const returnValue = service.fetchWords();
@@ -118,7 +112,7 @@ describe('ValidationService', () => {
             ['h9', 'a'],
             ['h10', 's'],
         ]);
-        for (const i of word) gameServiceSpy.gameBoard.placeLetter(i[0], i[1]);
+        for (const i of word) service.gameBoard.placeLetter(i[0], i[1]);
         service.init(startCoord, word);
         service.fetchWords();
         const returnValue = service.calcPoints();
@@ -134,7 +128,7 @@ describe('ValidationService', () => {
             ['a2', 'a'],
             ['a3', 's'],
         ]);
-        for (const i of word) gameServiceSpy.gameBoard.placeLetter(i[0], i[1]);
+        for (const i of word) service.gameBoard.placeLetter(i[0], i[1]);
         service.init(startCoord, word);
         service.fetchWords();
         const returnValue = service.calcPoints();
@@ -150,7 +144,7 @@ describe('ValidationService', () => {
             ['d2', 'u'],
             ['d3', 'e'],
         ]);
-        for (const i of word) gameServiceSpy.gameBoard.placeLetter(i[0], i[1]);
+        for (const i of word) service.gameBoard.placeLetter(i[0], i[1]);
         service.init(startCoord, word);
         service.fetchWords();
         const returnValue = service.calcPoints();
@@ -166,7 +160,7 @@ describe('ValidationService', () => {
             ['g2', 'u'],
             ['h2', 'e'],
         ]);
-        for (const i of word) gameServiceSpy.gameBoard.placeLetter(i[0], i[1]);
+        for (const i of word) service.gameBoard.placeLetter(i[0], i[1]);
         service.init(startCoord, word);
         service.fetchWords();
         const returnValue = service.calcPoints();

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { GameBoard } from '@app/classes/game-board';
 import { DEFAULT_POINTS } from '@app/classes/game-config';
 import { Vec2 } from '@app/classes/vec2';
 import * as data from 'src/assets/dictionnary.json';
@@ -24,10 +25,15 @@ export class ValidationService {
     index = 1;
     coordContainer: Map<string, number[]>; // Contains the formed words associated with an index where the letter is placed
     newWord: Map<string, string>;
+    gameBoard: GameBoard;
 
     private dictionnary = JSON.parse(JSON.stringify(data));
 
-    constructor(private gameService: GameService) {}
+    constructor(private gameService: GameService) {
+        this.gameService.gameBoard.asObservable().subscribe((gameBoard) => {
+            this.gameBoard = gameBoard;
+        });
+    }
 
     init(startCoords: string, word: Map<string, string>) {
         this.startCoord = {
@@ -81,18 +87,18 @@ export class ValidationService {
 
         // Scanning through the small indexes
         for (this.index; xIndex - this.index >= ASCII_SMALL_A; this.index++) {
-            if (!this.gameService.gameBoard.hasCoords(String.fromCharCode(xIndex - this.index) + yIndex)) break;
+            if (!this.gameBoard.hasCoords(String.fromCharCode(xIndex - this.index) + yIndex)) break;
         }
         for (this.index -= 1; this.index > 0; this.index--) {
-            tempWord += this.gameService.gameBoard.getLetter(String.fromCharCode(xIndex - this.index) + yIndex);
+            tempWord += this.gameBoard.getLetter(String.fromCharCode(xIndex - this.index) + yIndex);
         }
         // Scanning through the big indexes
         for (this.index; xIndex + this.index <= ASCII_SMALL_A + BOARD_SIZE; this.index++) {
-            if (!this.gameService.gameBoard.hasCoords(String.fromCharCode(xIndex + this.index) + yIndex)) break;
+            if (!this.gameBoard.hasCoords(String.fromCharCode(xIndex + this.index) + yIndex)) break;
         }
         for (let j = 0; j < this.index; j++) {
             if (this.newWord.has(String.fromCharCode(this.startCoord.x + j) + yIndex)) stringIndexes.push(tempWord.length);
-            tempWord += this.gameService.gameBoard.getLetter(String.fromCharCode(this.startCoord.x + j) + yIndex);
+            tempWord += this.gameBoard.getLetter(String.fromCharCode(this.startCoord.x + j) + yIndex);
         }
         this.variableReset();
         if (tempWord.length <= 1) tempWord = '';
@@ -109,18 +115,18 @@ export class ValidationService {
 
         // Scanning through the small indexes
         for (this.index; yIndex - this.index >= 0; this.index++) {
-            if (!this.gameService.gameBoard.hasCoords(xIndex + String(yIndex - this.index))) break;
+            if (!this.gameBoard.hasCoords(xIndex + String(yIndex - this.index))) break;
         }
         for (this.index -= 1; this.index > 0; this.index--) {
-            tempWord += this.gameService.gameBoard.getLetter(xIndex + String(yIndex - this.index));
+            tempWord += this.gameBoard.getLetter(xIndex + String(yIndex - this.index));
         }
         // Scanning through the big indexes
         for (this.index; yIndex + this.index <= BOARD_SIZE; this.index++) {
-            if (!this.gameService.gameBoard.hasCoords(xIndex + String(yIndex + this.index))) break;
+            if (!this.gameBoard.hasCoords(xIndex + String(yIndex + this.index))) break;
         }
         for (let j = 0; j < this.index; j++) {
             if (this.newWord.has(xIndex + String(yIndex + j))) stringIndexes.push(tempWord.length);
-            tempWord += this.gameService.gameBoard.getLetter(xIndex + String(yIndex + j));
+            tempWord += this.gameBoard.getLetter(xIndex + String(yIndex + j));
         }
         this.variableReset();
         if (tempWord.length <= 1) tempWord = '';
@@ -133,7 +139,10 @@ export class ValidationService {
         for (const itr of words) {
             if (itr.length >= 2 && !(itr.includes('-') || itr.includes("'"))) {
                 for (const val of this.dictionnary.words) {
-                    if (itr === val) temp = true;
+                    if (itr === val) {
+                        temp = true;
+                        break;
+                    } else temp = false;
                 }
                 if (!temp) return false;
             }
@@ -149,8 +158,8 @@ export class ValidationService {
 
         // Associating which letter amongst the placed letters has bonus attached to it in tempMap
         for (const letter of this.newWord) {
-            if (this.gameService.gameBoard.bonuses.has(letter[0])) {
-                tempMap.set(letter[1], this.gameService.gameBoard.getBonus(letter[0]));
+            if (this.gameBoard.bonuses.has(letter[0])) {
+                tempMap.set(letter[1], this.gameBoard.getBonus(letter[0]));
             }
         }
         for (const word of this.coordContainer) {

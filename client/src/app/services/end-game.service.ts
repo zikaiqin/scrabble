@@ -23,7 +23,25 @@ export class EndGameService {
     pointAddedOpponent: number = DEFAULT_POINT;
     playerLettersLeft: string[] = [];
     opponentLettersLeft: string[] = [];
-    constructor(private gameService: GameService, private textboxService: TextboxService) {}
+    playerHand: PlayerHand = new PlayerHand();
+    opponentHand: PlayerHand = new PlayerHand();
+    playerScore = 0;
+    opponentScore = 0;
+
+    constructor(private gameService: GameService, private textboxService: TextboxService) {
+        this.gameService.playerHand.asObservable().subscribe((playerHand) => {
+            this.playerHand = playerHand;
+        });
+        this.gameService.opponentHand.asObservable().subscribe((opponentHand) => {
+            this.opponentHand = opponentHand;
+        });
+        this.gameService.playerScore.asObservable().subscribe((playerScore) => {
+            this.playerScore = playerScore;
+        });
+        this.gameService.opponentScore.asObservable().subscribe((opponentScore) => {
+            this.opponentScore = opponentScore;
+        });
+    }
 
     turnSkipCount(): void {
         this.turnSkipCounter++;
@@ -35,7 +53,7 @@ export class EndGameService {
 
     checkIfGameEnd(): boolean {
         if (this.gameService.reserve.size === EMPTY) {
-            if (this.gameService.playerHand.size === EMPTY || this.gameService.opponentHand.size === EMPTY) {
+            if (this.playerHand.size === EMPTY || this.opponentHand.size === EMPTY) {
                 return true;
             }
         }
@@ -46,36 +64,40 @@ export class EndGameService {
     }
 
     deductPoint(): void {
-        for (const i of this.gameService.playerHand.letters) {
+        for (const i of this.playerHand.letters) {
             this.pointDeductedPlayer += DEFAULT_POINTS.get(i[0]) as number;
         }
-        this.gameService.playerScore -= this.pointDeductedPlayer;
 
-        for (const i of this.gameService.opponentHand.letters) {
+        this.playerScore -= this.pointDeductedPlayer;
+        this.gameService.playerScore.next(this.playerScore);
+        for (const i of this.opponentHand.letters) {
             this.pointDeductedOpponent += DEFAULT_POINTS.get(i[0]) as number;
         }
-        this.gameService.opponentScore -= this.pointDeductedOpponent;
+        this.opponentScore -= this.pointDeductedOpponent;
+        this.gameService.opponentScore.next(this.opponentScore);
     }
 
     addPoint(player: number): void {
         if (player === PLAYER) {
-            for (const i of this.gameService.opponentHand.letters) {
+            for (const i of this.opponentHand.letters) {
                 this.pointAddedPlayer += DEFAULT_POINTS.get(i[0]) as number;
             }
-            this.gameService.playerScore += this.pointAddedPlayer;
+            this.playerScore += this.pointAddedPlayer;
+            this.gameService.playerScore.next(this.playerScore);
         }
         if (player === OPPONENT) {
-            for (const i of this.gameService.playerHand.letters) {
+            for (const i of this.playerHand.letters) {
                 this.pointAddedOpponent += DEFAULT_POINTS.get(i[0]) as number;
             }
-            this.gameService.opponentScore += this.pointAddedOpponent;
+            this.opponentScore += this.pointAddedOpponent;
+            this.gameService.opponentScore.next(this.opponentScore);
         }
     }
 
     checkWhoEmptiedHand(): number {
-        if (this.gameService.playerHand.size === EMPTY) {
+        if (this.playerHand.size === EMPTY) {
             return PLAYER;
-        } else if (this.gameService.opponentHand.size === EMPTY) {
+        } else if (this.opponentHand.size === EMPTY) {
             return OPPONENT;
         }
         return EMPTY;
@@ -97,7 +119,7 @@ export class EndGameService {
         if (this.checkIfGameEnd()) {
             this.deductPoint();
             this.addPoint(this.checkWhoEmptiedHand());
-            this.showLettersLeft(this.gameService.playerHand, this.gameService.opponentHand);
+            this.showLettersLeft(this.playerHand, this.opponentHand);
         }
     }
 }
