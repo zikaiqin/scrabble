@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { PlayerHand } from '@app/classes/player-hand';
 import { Reserve } from '@app/classes/reserve';
+import { Subject } from 'rxjs';
 import { EndGameService } from './end-game.service';
 import { GameService } from './game.service';
 import { TextboxService } from './textbox.service';
@@ -17,10 +18,12 @@ describe('GameService', () => {
 
     beforeEach(() => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['']);
+        gameServiceSpy.playerHand = new Subject<PlayerHand>();
+        gameServiceSpy.playerScore = new Subject<number>();
+        gameServiceSpy.opponentHand = new Subject<PlayerHand>();
+        gameServiceSpy.opponentScore = new Subject<number>();
         textboxServiceSpy = jasmine.createSpyObj('TextboxService', ['sendMessage']);
-        gameServiceSpy.opponentHand = new PlayerHand();
-        gameServiceSpy.playerHand = new PlayerHand();
-        gameServiceSpy.reserve = new Reserve();
+
         TestBed.configureTestingModule({
             providers: [
                 { provide: GameService, useValue: gameServiceSpy },
@@ -28,9 +31,10 @@ describe('GameService', () => {
             ],
         });
         service = TestBed.inject(EndGameService);
+        gameServiceSpy.reserve = new Reserve();
         service.turnSkipCounter = EMPTY;
-        gameServiceSpy.playerScore = EMPTY;
-        gameServiceSpy.opponentScore = EMPTY;
+        service.playerScore = EMPTY;
+        service.opponentScore = EMPTY;
     });
 
     it('should be created', () => {
@@ -49,10 +53,10 @@ describe('GameService', () => {
     });
 
     it(' checkIfGameEnd should return true if reserve is empty and one of the hand is empty', () => {
-        gameServiceSpy.opponentHand.add('a');
+        service.opponentHand.add('a');
         gameServiceSpy.reserve.letters.splice(0, gameServiceSpy.reserve.letters.length);
         gameServiceSpy.reserve.size = EMPTY;
-        expect(gameServiceSpy.opponentHand.letters).toEqual(['a']);
+        expect(service.opponentHand.letters).toEqual(['a']);
         expect(service.checkIfGameEnd()).toBe(true);
     });
 
@@ -62,54 +66,55 @@ describe('GameService', () => {
     });
 
     it(' checkIfGameEnd should return false if none of the above is true ', () => {
-        gameServiceSpy.opponentHand.add('a');
-        gameServiceSpy.playerHand.add('a');
+        service.opponentHand.add('a');
+        service.playerHand.add('a');
         gameServiceSpy.reserve.size = EMPTY;
-        expect(service.checkIfGameEnd()).toBe(false);
+        const result = service.checkIfGameEnd();
+        expect(result).toBeFalse();
     });
 
     it(' deductPoint should deduct point from both player if they have letters left by the value of the letters ', () => {
         const expectedValue1 = -4;
         const expectedValue2 = -10;
-        gameServiceSpy.opponentHand.add('a');
-        gameServiceSpy.opponentHand.add('b');
-        gameServiceSpy.playerHand.add('z');
-        expect(gameServiceSpy.opponentHand.letters).toEqual(['a', 'b']);
+        service.opponentHand.add('a');
+        service.opponentHand.add('b');
+        service.playerHand.add('z');
+        expect(service.opponentHand.letters).toEqual(['a', 'b']);
         service.deductPoint();
-        expect(gameServiceSpy.opponentScore).toEqual(expectedValue1);
-        expect(gameServiceSpy.playerScore).toEqual(expectedValue2);
+        expect(service.opponentScore).toEqual(expectedValue1);
+        expect(service.playerScore).toEqual(expectedValue2);
     });
 
     it(' checkWhoEmptiedHand should return the player constant if player emptied his hand ', () => {
-        gameServiceSpy.opponentHand.add('a');
+        service.opponentHand.add('a');
         expect(service.checkWhoEmptiedHand()).toEqual(PLAYER);
     });
 
     it(' checkWhoEmptiedHand should return the none constant if both players still have letters ', () => {
-        gameServiceSpy.playerHand.add('a');
-        gameServiceSpy.opponentHand.add('a');
+        service.playerHand.add('a');
+        service.opponentHand.add('a');
         expect(service.checkWhoEmptiedHand()).toEqual(EMPTY);
     });
 
     it(' addPoint should add points to the score of the player if he emptied his hand by the value of the letters of his opponent ', () => {
         const expectedValue1 = 1;
-        gameServiceSpy.playerHand.add('a');
-        gameServiceSpy.opponentScore = EMPTY;
+        service.playerHand.add('a');
+        service.opponentScore = EMPTY;
         service.addPoint(service.checkWhoEmptiedHand());
-        expect(gameServiceSpy.opponentScore).toEqual(expectedValue1);
+        expect(service.opponentScore).toEqual(expectedValue1);
     });
 
     it(' addPoint should add points to the score of the opponent if he emptied his hand by the value of the letters of the player ', () => {
         const expectedValue1 = 10;
-        gameServiceSpy.opponentHand.add('z');
+        service.opponentHand.add('z');
         service.addPoint(service.checkWhoEmptiedHand());
-        expect(gameServiceSpy.playerScore).toEqual(expectedValue1);
+        expect(service.playerScore).toEqual(expectedValue1);
     });
 
     it(' showLetterLeft should display the letters left of the player and opponent in the textbox ', () => {
-        gameServiceSpy.playerHand.add('a');
-        gameServiceSpy.opponentHand.add('c');
-        service.showLettersLeft(gameServiceSpy.playerHand, gameServiceSpy.opponentHand);
+        service.playerHand.add('a');
+        service.opponentHand.add('c');
+        service.showLettersLeft(service.playerHand, service.opponentHand);
         expect(textboxServiceSpy.sendMessage).toHaveBeenCalled();
     });
 
@@ -117,7 +122,7 @@ describe('GameService', () => {
         const expectedValue1 = -1;
         const expectedValue2 = 1;
         service.turnSkipCounter = TEST_NUMBER;
-        gameServiceSpy.playerHand.add('a');
+        service.playerHand.add('a');
         const spy1 = spyOn(service, 'deductPoint').and.callThrough();
         const spy2 = spyOn(service, 'addPoint').and.callThrough();
         const spy3 = spyOn(service, 'showLettersLeft').and.callThrough();
@@ -126,14 +131,14 @@ describe('GameService', () => {
         expect(spy2).toHaveBeenCalled();
         expect(spy3).toHaveBeenCalled();
         expect(service.checkIfGameEnd()).toBeTrue();
-        expect(gameServiceSpy.playerScore).toEqual(expectedValue1);
-        expect(gameServiceSpy.opponentScore).toEqual(expectedValue2);
+        expect(service.playerScore).toEqual(expectedValue1);
+        expect(service.opponentScore).toEqual(expectedValue2);
     });
 
     it(' endGame should do nothing is checkIfGameEnd returns false ', () => {
         service.turnSkipCounter = TEST_NUMBER;
         service.endGame();
-        expect(gameServiceSpy.opponentScore).toEqual(EMPTY);
-        expect(gameServiceSpy.playerScore).toEqual(EMPTY);
+        expect(service.opponentScore).toEqual(EMPTY);
+        expect(service.playerScore).toEqual(EMPTY);
     });
 });

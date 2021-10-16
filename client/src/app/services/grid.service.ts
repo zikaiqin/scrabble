@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
+import { GameBoard } from '@app/classes/game-board';
+import { DEFAULT_BONUSES } from '@app/classes/game-config';
 import { Vec2 } from '@app/classes/vec2';
+import { GameService } from './game.service';
 import { tableau } from './tableau.config';
 
 const CHARCODE_SMALL_A = 97;
@@ -20,6 +23,7 @@ const NB_CASE_CHEVALET = 7;
 export class GridService {
     gridContext: CanvasRenderingContext2D;
     handContext: CanvasRenderingContext2D;
+    gameBoard: GameBoard = new GameBoard(DEFAULT_BONUSES);
     private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     // private tuileSizeChevalet: number = DEFAULT_HEIGHT_CHEVALET;
     // private indexChevalet: number = 0;
@@ -31,7 +35,15 @@ export class GridService {
     private scale: number = DEFAULT_SCALE;
     private scaleCounter: number = 0;
 
+    constructor(private gameService: GameService) {
+        this.gameService.gameBoard.asObservable().subscribe((gameBoard) => {
+            this.gameBoard = gameBoard;
+            this.drawGridLetters(this.gameBoard.letters);
+        });
+    }
+
     drawGrid() {
+        this.clearGrid();
         this.gridContext.lineWidth = 1;
         this.gridContext.fillStyle = 'black';
         this.gridContext.strokeStyle = 'black';
@@ -56,6 +68,8 @@ export class GridService {
         // this.drawPlayerHand();
         this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
+
+        this.drawGridLetters(this.gameBoard.letters);
     }
 
     drawGridCol() {
