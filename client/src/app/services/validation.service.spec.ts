@@ -66,13 +66,13 @@ describe('ValidationService', () => {
     it('variableReset should affect correct value', () => {
         service.index = INDEX_TEST_VALUE;
         expect(service.index).toEqual(INDEX_TEST_VALUE);
-        service.variableReset();
+        service.resetVariable();
         expect(service.index).toEqual(1);
     });
 
     it('fetchWord horizontal', () => {
         for (const i of hNewWordValues) service.gameBoard.placeLetter(i[0], i[1]);
-        const spyHCheck = spyOn(service, 'horizontalCheck').and.callThrough();
+        const spyHCheck = spyOn(service, 'checkHorizontal').and.callThrough();
         service.init(startCoord, hNewWordValues);
         const returnValue = service.fetchWords();
         const expectedString: string = hNewWordValues.keys().next().value;
@@ -84,7 +84,7 @@ describe('ValidationService', () => {
     it('fetchWord vertical', () => {
         startCoord = 'b1';
         for (const i of vNewWordValues) service.gameBoard.placeLetter(i[0], i[1]);
-        const spyVCheck = spyOn(service, 'verticalCheck').and.callThrough();
+        const spyVCheck = spyOn(service, 'checkVertival').and.callThrough();
         service.init(startCoord, vNewWordValues);
         const returnValue = service.fetchWords();
         const expectedString: string = vNewWordValues.keys().next().value;
@@ -94,8 +94,8 @@ describe('ValidationService', () => {
     });
 
     it('fetchWord single letter placed', () => {
-        const spyVCheck = spyOn(service, 'verticalCheck').and.callThrough();
-        const spyHCheck = spyOn(service, 'horizontalCheck').and.callThrough();
+        const spyVCheck = spyOn(service, 'checkVertival').and.callThrough();
+        const spyHCheck = spyOn(service, 'checkHorizontal').and.callThrough();
         service.init(startCoord, singleNewWordValues);
         service.fetchWords();
         const expectedString: string = singleNewWordValues.keys().next().value;

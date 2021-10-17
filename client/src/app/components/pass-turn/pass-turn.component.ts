@@ -16,7 +16,7 @@ export class PassTurnComponent {
     subscription: Subscription;
     turn: boolean;
     timerStarted: number = 0;
-    // eslint-disable-next-line no-undef
+    // eslint-disable-next-line no-undef --- timer is defined when the game starts
     timer: NodeJS.Timeout; // Variable for timer
 
     constructor(private turnService: TurnService, private endGameService: EndGameService) {

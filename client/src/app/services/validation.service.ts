@@ -34,7 +34,11 @@ export class ValidationService {
             this.gameBoard = gameBoard;
         });
     }
-
+    /**
+     * @description Startup to initialize the attributes
+     * @param startCoords the starting coordinates of the placed word/letter
+     * @param word the word/letter that has been placed on the gameBoard
+     */
     init(startCoords: string, word: Map<string, string>) {
         this.startCoord = {
             x: startCoords.charCodeAt(0),
@@ -43,7 +47,10 @@ export class ValidationService {
         this.newWord = word;
         this.coordContainer = new Map<string, number[]>();
     }
-
+    /**
+     * @description Function to go get the formed words from the gameBoard
+     * @returns an array of all the formed words
+     */
     fetchWords(): string[] {
         const wordContainer: string[] = [];
         let orientation = 0;
@@ -55,30 +62,36 @@ export class ValidationService {
             // Checks if the word is oriented horizontally or vertically
 
             if (orientation === 0) {
-                wordContainer.push(this.horizontalCheck(this.newWord.keys().next().value));
+                wordContainer.push(this.checkHorizontal(this.newWord.keys().next().value));
                 for (const i of this.newWord) {
-                    wordContainer.push(this.verticalCheck(i[0]));
+                    wordContainer.push(this.checkVertival(i[0]));
                 }
             } else {
-                wordContainer.push(this.verticalCheck(this.newWord.keys().next().value));
+                wordContainer.push(this.checkVertival(this.newWord.keys().next().value));
                 for (const i of this.newWord) {
-                    wordContainer.push(this.horizontalCheck(i[0]));
+                    wordContainer.push(this.checkHorizontal(i[0]));
                 }
             }
         } else {
             // IF the player only placed 1 letter on the board
 
-            wordContainer.push(this.verticalCheck(String.fromCharCode(this.startCoord.x) + String(this.startCoord.y)));
-            wordContainer.push(this.horizontalCheck(String.fromCharCode(this.startCoord.x) + String(this.startCoord.y)));
+            wordContainer.push(this.checkVertival(String.fromCharCode(this.startCoord.x) + String(this.startCoord.y)));
+            wordContainer.push(this.checkHorizontal(String.fromCharCode(this.startCoord.x) + String(this.startCoord.y)));
         }
         return wordContainer;
     }
-
-    variableReset(): void {
+    /**
+     * @description Resets the variable used throughout the code
+     */
+    resetVariable(): void {
         this.index = 1;
     }
-
-    verticalCheck(coord: string): string {
+    /**
+     * @description Function to get the vertically formed word at a precise position on the gameBoard
+     * @param coord the position where this function will go check
+     * @returns the word formed / '' if nothing is formed
+     */
+    checkVertival(coord: string): string {
         const xIndex = coord.toLowerCase()[0].charCodeAt(0);
         const yIndex = coord.slice(1, coord.length);
         let tempWord = '';
@@ -100,13 +113,17 @@ export class ValidationService {
             if (this.newWord.has(String.fromCharCode(this.startCoord.x + j) + yIndex)) stringIndexes.push(tempWord.length);
             tempWord += this.gameBoard.getLetter(String.fromCharCode(this.startCoord.x + j) + yIndex);
         }
-        this.variableReset();
+        this.resetVariable();
         if (tempWord.length <= 1) tempWord = '';
         this.coordContainer.set(tempWord, stringIndexes);
         return tempWord;
     }
-
-    horizontalCheck(coord: string): string {
+    /**
+     * @description Function to get the horizontally formed word at a precise position on the gameBoard
+     * @param coord the position where this function will go check
+     * @returns the word formed / '' if nothing is formed
+     */
+    checkHorizontal(coord: string): string {
         const xIndex = coord[0];
         const yIndex = Number(coord.slice(1, coord.length));
         let tempWord = '';
@@ -128,12 +145,16 @@ export class ValidationService {
             if (this.newWord.has(xIndex + String(yIndex + j))) stringIndexes.push(tempWord.length);
             tempWord += this.gameBoard.getLetter(xIndex + String(yIndex + j));
         }
-        this.variableReset();
+        this.resetVariable();
         if (tempWord.length <= 1) tempWord = '';
         this.coordContainer.set(tempWord, stringIndexes);
         return tempWord;
     }
-
+    /**
+     * @description Function that verifies the validity of a word with the dictionnary
+     * @param words the words that needs to be verified
+     * @returns true if all words are valid / false if any 1 word isn't valid
+     */
     findWord(words: string[]): boolean {
         let temp = false;
         for (const itr of words) {
@@ -149,7 +170,10 @@ export class ValidationService {
         }
         return temp;
     }
-
+    /**
+     * @description Wrapper function that calculates all the points with all the formed words
+     * @returns the total points gained
+     */
     calcPoints(): number {
         let counter = 0;
         let w2 = false;

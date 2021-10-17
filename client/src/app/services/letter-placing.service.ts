@@ -44,17 +44,16 @@ const SPECIAL_CHARS = new Map<string, string>([
     providedIn: 'root',
 })
 export class LetterPlacingService {
-    turnState: boolean;
-    gameBoard: GameBoard;
-    playerHand: PlayerHand = new PlayerHand();
-
     startCoords: string;
     endCoords: string;
     direction: string;
     word: string;
     letters: Map<string, string>;
-    playerScore: number = 0;
-    opponentScore: number = 0;
+
+    private playerScore: number = 0;
+    private turnState: boolean;
+    private gameBoard: GameBoard;
+    private playerHand: PlayerHand = new PlayerHand();
 
     constructor(private textboxService: TextboxService, private gameService: GameService, private validationService: ValidationService) {
         this.gameService.turnState.asObservable().subscribe((turn) => {
@@ -68,9 +67,6 @@ export class LetterPlacingService {
         });
         this.gameService.playerScore.asObservable().subscribe((playerScore) => {
             this.playerScore = playerScore;
-        });
-        this.gameService.opponentScore.asObservable().subscribe((opponentScore) => {
-            this.opponentScore = opponentScore;
         });
     }
 
