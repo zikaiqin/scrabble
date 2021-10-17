@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
+// For the value of each letter sometimes they value 10 or 8
+/* eslint-disable @typescript-eslint/no-magic-numbers*/
 export const DEFAULT_POINTS: Map<string, number> = new Map([
     ['a', 1],
     ['b', 3],
@@ -27,7 +28,7 @@ export const DEFAULT_POINTS: Map<string, number> = new Map([
     ['y', 10],
     ['z', 10],
 ]);
-/* eslint-enable @typescript-eslint/no-magic-numbers */
+
 export const DEFAULT_BONUSES: Map<string, string> = new Map([
     ['a1', 'Wx3'],
     ['a4', 'Lx2'],

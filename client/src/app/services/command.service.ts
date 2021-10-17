@@ -1,3 +1,4 @@
+/* eslint-disable no-invalid-this --- because we have a variable that uses a service but it is declared before the constructor */
 import { Injectable } from '@angular/core';
 import { MessageType } from '@app/classes/message';
 import { LetterExchangeService } from '@app/services/letter-exchange.service';
@@ -18,10 +19,8 @@ export class CommandService {
         [
             '!aide',
             (): boolean => {
-                // eslint-disable-next-line no-invalid-this
                 this.textboxService.sendMessage(
                     MessageType.System,
-                    // eslint-disable-next-line no-invalid-this
                     `Voici une liste des commandes : ${Array.from(this.commandLookup.keys()).join(', ')}`,
                 );
                 return true;
@@ -30,36 +29,28 @@ export class CommandService {
         [
             '!placer',
             (position: string, word: string): boolean => {
-                // eslint-disable-next-line no-invalid-this
                 return this.letterPlacingService.validateCommand(position, word);
             },
         ],
         [
             '!échanger',
             (letters: string): boolean => {
-                // eslint-disable-next-line no-invalid-this
                 return this.letterExchangeService.validateCommand(letters);
             },
         ],
         [
             '!debug',
             (): boolean => {
-                // eslint-disable-next-line no-invalid-this
                 if (!this.debugActive) {
-                    // eslint-disable-next-line no-invalid-this
                     this.textboxService.sendMessage(MessageType.System, 'Affichages de déboguage activés');
-                    // eslint-disable-next-line no-invalid-this
                     this.debugActive = true;
                 } else {
-                    // eslint-disable-next-line no-invalid-this
                     this.textboxService.sendMessage(MessageType.System, 'Affichages de déboguage désactivés');
-                    // eslint-disable-next-line no-invalid-this
                     this.debugActive = false;
                 }
                 return true;
             },
         ],
-        /* eslint-disable no-invalid-this */
         [
             '!passer',
             (): boolean => {

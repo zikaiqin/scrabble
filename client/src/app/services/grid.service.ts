@@ -41,7 +41,9 @@ export class GridService {
             this.drawGridLetters(this.gameBoard.letters);
         });
     }
-
+    /**
+     * @description Wrapper function to draw the entirety of the board
+     */
     drawGrid() {
         this.clearGrid();
         this.gridContext.lineWidth = 1;
@@ -71,7 +73,9 @@ export class GridService {
 
         this.drawGridLetters(this.gameBoard.letters);
     }
-
+    /**
+     * @description Function to draw the columns for the board
+     */
     drawGridCol() {
         const START_GRID_POS = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         for (let i = 1; i < DEFAULT_NB_CASES + 1; i++) {
@@ -83,7 +87,9 @@ export class GridService {
             this.gridContext.stroke();
         }
     }
-
+    /**
+     * @description Function to draw the lines for the board
+     */
     drawGridLine() {
         for (let i = 1; i < DEFAULT_NB_CASES + 1; i++) {
             const START_GRID_POS = DEFAULT_WIDTH / DEFAULT_NB_CASES;
@@ -95,7 +101,9 @@ export class GridService {
             this.gridContext.stroke();
         }
     }
-
+    /**
+     * @description Function to draw the borders of the board
+     */
     drawBorder() {
         this.gridContext.beginPath();
         this.gridContext.moveTo(this.startNumberPos, this.startLetterPos);
@@ -106,12 +114,16 @@ export class GridService {
         this.gridContext.lineTo(DEFAULT_HEIGHT, this.startLetterPos);
         this.gridContext.stroke();
     }
-
+    /**
+     * @description Function to make the borders more visible
+     */
     betterBorder() {
         this.gridContext.fillStyle = 'black';
         this.gridContext.fillRect(this.tuilePosX, this.tuilePosY, this.tuileSize, this.tuileSize);
     }
-
+    /**
+     * @description Function that draw the coordinates listed on the side
+     */
     drawCoords() {
         for (let i = 1; i < DEFAULT_NB_CASES; i++) {
             this.gridContext.font = '17px serif';
@@ -135,7 +147,9 @@ export class GridService {
         this.startLetterPos = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         this.startNumberPos = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     }
-
+    /**
+     * @description Function to draw the bonus Motx3 on the board
+     */
     drawMx3() {
         this.betterBorder();
 
@@ -146,7 +160,9 @@ export class GridService {
         this.gridContext.font = '7px serif';
         this.gridContext.fillText('MOT X3', this.tuilePosX + 2, this.tuilePosY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2);
     }
-
+    /**
+     * @description Function to draw the bonus Motx2 on the board
+     */
     drawMx2() {
         this.betterBorder();
 
@@ -157,7 +173,9 @@ export class GridService {
         this.gridContext.font = '9px sans-serif';
         this.gridContext.fillText('Motx2', this.tuilePosX + 2, this.tuilePosY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2);
     }
-
+    /**
+     * @description Function to draw the bonus Lettrex2 on the board
+     */
     drawLx2() {
         this.betterBorder();
 
@@ -168,7 +186,9 @@ export class GridService {
         this.gridContext.font = '9px sans-serif';
         this.gridContext.fillText('Let X2', this.tuilePosX + 3, this.tuilePosY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2);
     }
-
+    /**
+     * @description Function to draw the bonus Lettrex3 on the board
+     */
     drawLx3() {
         this.betterBorder();
 
@@ -178,12 +198,19 @@ export class GridService {
         this.gridContext.font = '9px serif';
         this.gridContext.fillText('Let  X3', this.tuilePosX + 2, this.tuilePosY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2);
     }
-
+    /**
+     * @description Function that fills the slots that doesn't contain a bonus
+     */
     drawNONE() {
         this.gridContext.fillStyle = 'rgb(255, 221, 189)';
         this.gridContext.fillRect(this.tuilePosX + 2, this.tuilePosY + 2, this.tuileSize - STROKE_RANGE, this.tuileSize - STROKE_RANGE);
     }
-
+    /**
+     * @description Wrapper function to fill the slots of the board
+     * @param x index [x] in the container tableau.config.ts
+     * @param y index [y] in the container tableau.config.ts
+     * @returns nothing just in case the indexes are out of bound
+     */
     drawBonus(x: number, y: number) {
         if (x < 0 || x >= DEFAULT_NB_CASES || y < 0 || y >= DEFAULT_NB_CASES) {
             return;
@@ -209,7 +236,12 @@ export class GridService {
             this.drawNONE();
         }
     }
-
+    /**
+     * @description Function to draw a letter on the board
+     * @param letter the letter to be draw (i.e.: 'b','a')
+     * @param posX the X position in the gameBoard container
+     * @param posY the Y position in the gameBoard container
+     */
     drawLetter(letter: string, posX: number, posY: number) {
         letter = letter.toUpperCase();
 
@@ -237,11 +269,10 @@ export class GridService {
             this.gridContext.fillText(letter, tuileX + STROKE_RANGE, tuileY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2 + STROKE_RANGE);
         }
     }
-
-    // This function convert les strings map de zi kai to real coordonnees
-    // so with postions X,Y to call drawLetter
-    // it[0]= coord
-    // it[1] =lettre
+    /**
+     * @description Function the converts the string map to coordinates
+     * @param positions map that contains the data to be converted
+     */
     drawGridLetters(positions: Map<string, string>) {
         let postionX: string;
         let letter;
@@ -253,55 +284,15 @@ export class GridService {
             this.drawLetter(it[1], positionX - 1, positionY);
         }
     }
-
-    /* drawPlayerHand() {
-        this.handContext.shadowColor = '#566D7E';
-        this.handContext.shadowBlur = 20;
-        this.handContext.lineJoin = 'bevel';
-        this.handContext.lineWidth = 10;
-        this.handContext.strokeStyle = '#2B3856';
-        this.handContext.strokeRect(
-            this.tuileSize,
-            DEFAULT_HEIGHT + this.tuileSize + STROKE_RANGE, // 500+tuile+petit changement
-            DEFAULT_WIDTH_CHEVALET,
-            DEFAULT_HEIGHT_CHEVALET,
-        );
-        for (let i = 0; i < NB_CASE_CHEVALET; i++) {
-            this.drawPlayerHandSlots(i + 1);
-        }
-        this.handContext.shadowBlur = 0;
-    }
-
-    drawPlayerHandSlots(i: number) {
-        this.handContext.fillStyle = '#E42217';
-        // pour draw 7 cases
-        i--;
-        this.handContext.fillRect(
-            this.tuileSize + this.tuileSizeChevalet * i,
-            DEFAULT_HEIGHT + this.tuileSize + STROKE_RANGE,
-            this.tuileSizeChevalet,
-            this.tuileSizeChevalet,
-        );
-    }
-
-    drawPlayerHandLetters(letters: string[]) {
-        this.handContext.font = 'bold 40px serif';
-        this.handContext.fillStyle = '#EBDDE2';
-        letters.forEach((letter) => {
-            this.handContext.fillText(
-                letter.toLocaleUpperCase(),
-                this.tuileSize + this.tuileSizeChevalet * this.indexChevalet + STROKE_RANGE,
-                DEFAULT_HEIGHT + this.tuileSize * 2 + STROKE_RANGE * 3,
-            );
-            this.indexChevalet++;
-        });
-        this.indexChevalet = 0;
-    }*/
-
+    /**
+     * @description Function to wipe the board (nothing is left behind)
+     */
     clearGrid() {
         this.gridContext.clearRect(0, 0, DEFAULT_WIDTH * 2, DEFAULT_HEIGHT * 2);
     }
-
+    /**
+     * @description Function that makes the grid bigger
+     */
     maxGrid() {
         if (this.scaleCounter < NB_CASE_CHEVALET - 1) {
             this.gridContext.scale(1 + this.scale, 1 + this.scale);
@@ -310,7 +301,9 @@ export class GridService {
         // this.indexChevalet--;
         this.drawGrid();
     }
-
+    /**
+     * @description Function that makes the grid smaller
+     */
     minGrid() {
         if (this.scaleCounter >= 0) {
             this.gridContext.scale(1 - this.scale, 1 - this.scale);

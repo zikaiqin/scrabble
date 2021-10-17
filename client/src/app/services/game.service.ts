@@ -27,6 +27,10 @@ export class GameService {
 
     turnState = new Subject<boolean>();
 
+    /**
+     * @description Function that initializes the variables
+     * @param username the name chosen by the user/player
+     */
     init(username: string): void {
         const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== username);
 
@@ -37,6 +41,9 @@ export class GameService {
         this.isStarted = false;
     }
 
+    /**
+     * @description Function that declares the start of the game (assignation of turns, filling up the player's hand, etc)
+     */
     start(): void {
         this.reserve = new Reserve();
 

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MenuButton } from '@app/classes/menu-button';
 import { GameMode } from '@app/pages/home-page/home-page.component';
 
@@ -25,19 +25,11 @@ export class MainMenuComponent {
     ];
 
     getTitle(): string {
-        if (!this.gameMode) {
-            return 'Scrabble';
-        } else {
-            return this.gameMode === GameMode.Classical ? 'Mode Classique' : 'Mode LOG2990';
-        }
+        return this.gameMode ? (this.gameMode === GameMode.Classical ? 'Mode Classique' : 'Mode LOG2990') : 'Scrabble';
     }
 
     getButtons(): MenuButton[] {
-        if (!this.gameMode) {
-            return this.mainMenu;
-        } else {
-            return this.secondMenu;
-        }
+        return this.gameMode ? this.secondMenu : this.mainMenu;
     }
 
     buttonClick(name: string) {
