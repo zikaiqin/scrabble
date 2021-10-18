@@ -20,6 +20,10 @@ import { PanneauInfoComponent } from './components/panneau-info/panneau-info.com
 import { PassTurnComponent } from './components/pass-turn/pass-turn.component';
 import { TextboxComponent } from './components/textbox/textbox.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
+import { GameBrowserComponent } from './components/game-browser/game-browser.component';
+import { GameBrowserDialogComponent } from '@app/components/game-browser-dialog/game-browser-dialog.component';
+import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
+import { WaitingRoomDialogComponent } from './components/waiting-room-dialog/waiting-room-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -43,6 +47,10 @@ import { HomePageComponent } from './pages/home-page/home-page.component';
         MainMenuComponent,
         NewGameMenuComponent,
         EndGameComponent,
+        GameBrowserComponent,
+        GameBrowserDialogComponent,
+        WaitingRoomComponent,
+        WaitingRoomDialogComponent,
     ],
     imports: [
         AppMaterialModule,

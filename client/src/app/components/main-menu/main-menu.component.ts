@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MenuButton } from '@app/classes/menu-button';
-import { GameMode } from '@app/pages/home-page/home-page.component';
+import { GameMode } from '@app/classes/game-info';
 
 @Component({
     selector: 'app-main-menu',
@@ -10,7 +10,7 @@ import { GameMode } from '@app/pages/home-page/home-page.component';
 export class MainMenuComponent {
     @Input() gameMode: number;
     @Input() gameType: number;
-    @Output() readonly navigationEvent = new EventEmitter<string>();
+    @Output() readonly buttonClick = new EventEmitter<string>();
 
     readonly mainMenu: MenuButton[] = [
         { name: 'Classical', text: 'Scrabble Classique' },
@@ -20,7 +20,7 @@ export class MainMenuComponent {
     readonly secondMenu: MenuButton[] = [
         { name: 'Single', text: 'Jouer Solo' },
         { name: 'Multi', text: 'Jouer Ensemble' },
-        { name: 'BrowseGames', text: 'Joindre une partie' },
+        { name: 'Browse', text: 'Joindre une partie' },
         { name: 'Back' },
     ];
 
@@ -30,9 +30,5 @@ export class MainMenuComponent {
 
     getButtons(): MenuButton[] {
         return this.gameMode ? this.secondMenu : this.mainMenu;
-    }
-
-    buttonClick(name: string) {
-        this.navigationEvent.emit(name);
     }
 }

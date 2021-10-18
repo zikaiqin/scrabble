@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HomePageComponent } from './home-page.component';
+import { RouterTestingModule } from '@angular/router/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 describe('HomePageComponent', () => {
     let component: HomePageComponent;
@@ -8,6 +10,7 @@ describe('HomePageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
+            imports: [RouterTestingModule, MatSnackBarModule],
             declarations: [HomePageComponent],
         }).compileComponents();
     });
