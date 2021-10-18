@@ -1,0 +1,22 @@
+<div mat-dialog-content class="dialog center">
+    <div class="title-container center">
+        <h1 class="title">Nouvelle partie contre</h1>
+        <h2 class="subtitle">{{ data.username }}</h2>
+    </div>
+    <form [formGroup]="form">
+        <mat-form-field appearance="standard">
+            <mat-label>Entrez votre nom</mat-label>
+            <input matInput formControlName="username">
+            <mat-hint>
+                {{ nameHint }}
+            </mat-hint>
+            <mat-error *ngIf="username.invalid">
+                {{ nameError }}
+            </mat-error>
+        </mat-form-field>
+    </form>
+    <div class="button-container">
+        <button mat-button (click)="dialogRef.close()">Annuler</button>
+        <button mat-raised-button color="primary" [disabled]="username.invalid" (click)="dialogRef.close(username.value)">Joindre</button>
+    </div>
+</div>

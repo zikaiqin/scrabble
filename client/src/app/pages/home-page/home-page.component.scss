@@ -6,6 +6,17 @@ button {
     width: 100%;
 }
 
+mat-label {
+    font-size: 15pt;
+    font-weight: lighter;
+}
+
+mat-form-field.mat-form-field {
+    font-size: 15pt;
+    margin-bottom: 20px;
+    padding-top: 0;
+}
+
 .title {
     font-size: 36pt;
 }
@@ -44,4 +55,11 @@ button {
 .justify {
     display: flex;
     justify-content: center;
+}
+
+.button-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }

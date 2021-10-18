@@ -1,9 +1,9 @@
 <div class="container center justify">
-    <ng-template [ngIf]="!gameMode || !gameType" [ngIfElse]="newGame">
-        <app-main-menu [gameMode]="gameMode" [gameType]="gameType" (navigationEvent)="navigateTo($event)"> </app-main-menu>
-    </ng-template>
+    <app-main-menu *ngIf="showPage() === 'Main'" [gameMode]="gameMode" [gameType]="gameType" (buttonClick)="handleClick($event)"></app-main-menu>
 
-    <ng-template #newGame>
-        <app-new-game-menu [gameMode]="gameMode" [gameType]="gameType" (goBack)="navigateTo($event)"> </app-new-game-menu>
-    </ng-template>
+    <app-new-game-menu *ngIf="showPage() === 'NewGame'" [gameMode]="gameMode" [gameType]="gameType" (buttonClick)="handleClick($event)" (newGame)="createGame($event)"></app-new-game-menu>
+
+    <app-game-browser *ngIf="showPage() === 'Browser'" [gameList]="gameListSubject.asObservable()" (buttonClick)="handleClick($event)" (joinRoom)="joinGame($event)"></app-game-browser>
+
+    <app-waiting-room *ngIf="showPage() === 'WaitingRoom'" [configs]="gameConfigs" (buttonClick)="handleClick($event)" (newGame)="createGame($event)" (leaveRoom)="leaveGame()"></app-waiting-room>
 </div>

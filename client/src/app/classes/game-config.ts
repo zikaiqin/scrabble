@@ -94,3 +94,4 @@ export const DEFAULT_BONUSES: Map<string, string> = new Map([
 ]);
 export const DEFAULT_BOT_NAMES: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
 export const DEFAULT_HAND_SIZE = 7;
+export const DEFAULT_TURN_LENGTH = 60;
