@@ -34,11 +34,12 @@ export class GridService {
     private tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
     private scale: number = DEFAULT_SCALE;
     private scaleCounter: number = 0;
+    private counter: number = 0;
 
     constructor(private gameService: GameService) {
         this.gameService.gameBoard.asObservable().subscribe((gameBoard) => {
             this.gameBoard = gameBoard;
-            this.drawGridLetters(this.gameBoard.letters);
+            if (this.counter > 0) this.drawGrid();
         });
     }
     /**
@@ -72,6 +73,7 @@ export class GridService {
         this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
 
         this.drawGridLetters(this.gameBoard.letters);
+        this.counter++;
     }
     /**
      * @description Function to draw the columns for the board

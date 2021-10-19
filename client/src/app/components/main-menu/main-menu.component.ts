@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MenuButton } from '@app/classes/menu-button';
 import { GameMode } from '@app/classes/game-info';
+import { MenuButton } from '@app/classes/menu-button';
 
 @Component({
     selector: 'app-main-menu',
