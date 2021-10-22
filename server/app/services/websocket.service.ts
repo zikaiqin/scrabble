@@ -28,7 +28,7 @@ export class WebSocketService {
                 this.rooms.set(roomName, 1);
                 socket.join(roomName);
             });
-    
+
             socket.on('joinRoom', (roomName: string) => {
                 let clients = this.rooms.get(roomName);
                 if (clients) {
@@ -44,7 +44,5 @@ export class WebSocketService {
                 }
             });
         });
-
-        
     }
 }

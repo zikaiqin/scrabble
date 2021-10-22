@@ -11,7 +11,7 @@
     <form [formGroup]="form" class="stretch-column">
         <mat-form-field appearance="standard">
             <mat-label>Nom du joueur</mat-label>
-            <input matInput formControlName="username">
+            <input matInput formControlName="username" />
             <mat-hint>
                 {{ getNameHint() }}
             </mat-hint>
@@ -29,17 +29,14 @@
         </mat-form-field>
     </form>
 
-    <div class="stretch-column" [ngStyle]="{ 'margin-top' : gameType === gameTypes.Single ? '0px' : '20px' }">
+    <div class="stretch-column" [ngStyle]="{ 'margin-top': gameType === gameTypes.Single ? '0px' : '20px' }">
         <div class="flex-row">
-            <mat-label>
-                Temps de tour :
-            </mat-label>
+            <mat-label> Temps de tour : </mat-label>
             <mat-label>
                 {{ getTurnLabel() }}
             </mat-label>
         </div>
-        <mat-slider step="30" min="30" max="300" [value]="turnLength" (input)="setTurnLength($event.value)">
-        </mat-slider>
+        <mat-slider step="30" min="30" max="300" [value]="turnLength" (input)="setTurnLength($event.value)"> </mat-slider>
 
         <div class="toggle-switch flex-row">
             <mat-label>Bonus aléatoire</mat-label>

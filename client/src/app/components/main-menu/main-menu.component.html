@@ -7,7 +7,12 @@
 
     <div class="stretch-column">
         <ng-template ngFor let-button [ngForOf]="getButtons()">
-            <button mat-raised-button *ngIf="button.name !== 'Back'; else backButton" [disabled]="button.name === 'Log2990' || button.name === 'Scoreboard'" (click)="buttonClick.emit(button.name)">
+            <button
+                mat-raised-button
+                *ngIf="button.name !== 'Back'; else backButton"
+                [disabled]="button.name === 'Log2990' || button.name === 'Scoreboard'"
+                (click)="buttonClick.emit(button.name)"
+            >
                 {{ button.text }}
             </button>
 

@@ -7,7 +7,6 @@ import { GameInfo, GameMode, GameType } from '@app/classes/game-info';
 import { WaitingRoomComponent } from '@app/components/waiting-room/waiting-room.component';
 import { WebsocketService } from '@app/services/websocket.service';
 
-
 @Component({
     selector: 'app-home-page',
     templateUrl: './home-page.component.html',
