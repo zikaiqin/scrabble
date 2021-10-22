@@ -1,4 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { PlayerHand } from '@app/classes/player-hand';
+import { Subject } from 'rxjs';
+import { GameService } from './game.service';
 // import { GridService } from '@app/services/grid.service';
 // import { GameService } from '@app/services/game.service';
 import { LetterExchangeService } from './letter-exchange.service';
@@ -6,9 +9,14 @@ import { LetterExchangeService } from './letter-exchange.service';
 // const HAND_SIZE = 7;
 describe('LetterExchangeService', () => {
     let service: LetterExchangeService;
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
+
     beforeEach(() => {
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['']);
+        gameServiceSpy.playerHand = new Subject<PlayerHand>();
+        gameServiceSpy.turnState = new Subject<boolean>();
         TestBed.configureTestingModule({
-            providers: [],
+            providers: [{ provide: GameService, useValue: gameServiceSpy }],
         });
         service = TestBed.inject(LetterExchangeService);
     });
@@ -16,38 +24,6 @@ describe('LetterExchangeService', () => {
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
-
-    /* it('should not allow exchanging of letters not in hand', () => {
-        const gameService = new GameService(new GridService());
-        const fakeHand = {
-            get: (letter: string): number => ['s', 't', 'u', 'b', 'l', 'e', '*'].filter((actualLetter) => actualLetter === letter).length,
-        };
-
-        gameService.turnState.next(true);
-
-        let expectedHand = 'asd';
-        expect(service.isInHand(expectedHand, fakeHand as PlayerHand)).toBeFalse();
-
-        expect(service.isInHand('ééasd^à', fakeHand as PlayerHand)).toBeFalse();
-        expectedHand = 't';
-        expect(service.isInHand(expectedHand, fakeHand as PlayerHand)).toBeTrue();
-    });
-
-    it('should display message if not my turn', () => {
-        service.turnState = false;
-        expect(service.isMyTurn()).toBeFalse();
-
-        service.turnState = true;
-        expect(service.isMyTurn()).toBeTrue();
-    });*/
-
-    /* it('should exchangeLetter', () => {
-        service.letters = 'asd';
-        const removeFromHandspy = spyOn(service, 'removeFromHand');
-        service.exchangeLetter();
-        expect(removeFromHandspy).toHaveBeenCalled();
-    });
-    */
     it('should not be validateCommand', () => {
         expect(service.validateCommand('asdasfasf')).toBeFalse();
         expect(service.validateCommand('asSDQaASasf')).toBeFalse();

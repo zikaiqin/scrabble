@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { GameBoard } from '@app/classes/game-board';
-import { Reserve } from '@app/classes/reserve';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
+import { Reserve } from '@app/classes/reserve';
 import { GameService } from '@app/services/game.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { ValidationService } from '@app/services/validation.service';
@@ -44,17 +44,29 @@ const SPECIAL_CHARS = new Map<string, string>([
     providedIn: 'root',
 })
 export class LetterPlacingService {
-    turnState: boolean;
-
     startCoords: string;
     endCoords: string;
     direction: string;
     word: string;
     letters: Map<string, string>;
 
+    private playerScore: number = 0;
+    private turnState: boolean;
+    private gameBoard: GameBoard;
+    private playerHand: PlayerHand = new PlayerHand();
+
     constructor(private textboxService: TextboxService, private gameService: GameService, private validationService: ValidationService) {
-        this.gameService.turnState.subscribe({
-            next: (turn: boolean) => (this.turnState = turn),
+        this.gameService.turnState.asObservable().subscribe((turn) => {
+            this.turnState = turn;
+        });
+        this.gameService.gameBoard.asObservable().subscribe((gameBoard) => {
+            this.gameBoard = gameBoard;
+        });
+        this.gameService.playerHand.asObservable().subscribe((playerHand) => {
+            this.playerHand = playerHand;
+        });
+        this.gameService.playerScore.asObservable().subscribe((playerScore) => {
+            this.playerScore = playerScore;
         });
     }
 
@@ -72,10 +84,9 @@ export class LetterPlacingService {
         this.generateLetters();
 
         const canPlace =
-            this.isAdjacent(this.gameService.gameBoard, this.letters, this.startCoords, this.endCoords) &&
-            this.isInHand(this.letters, this.gameService.playerHand);
+            this.isAdjacent(this.gameBoard, this.letters, this.startCoords, this.endCoords) && this.isInHand(this.letters, this.playerHand);
         if (canPlace) {
-            this.placeLetters(this.letters, this.gameService.gameBoard, this.gameService.playerHand);
+            this.placeLetters(this.letters, this.gameBoard, this.playerHand);
             this.validationService.init(this.startCoords, this.letters);
             this.isInDict();
         }
@@ -103,22 +114,24 @@ export class LetterPlacingService {
      * @description Place the letters onto the board
      */
     placeLetters(letters: Map<string, string>, gameBoard: GameBoard, playerHand: PlayerHand): void {
-        letters.forEach((letter, coords) => {
-            gameBoard.placeLetter(coords, letter);
-            playerHand.remove(letter);
+        Array.from(letters.entries()).forEach((entry) => {
+            gameBoard.placeLetter(entry[0], entry[1]);
+            playerHand.remove(entry[1]);
         });
-        this.gameService.updateGame();
+        this.gameService.gameBoard.next(this.gameBoard);
+        this.gameService.playerHand.next(this.playerHand);
     }
 
     /**
      * @description Remove the placed letters from the board and return them to the hand
      */
     returnLetters(letters: Map<string, string>, gameBoard: GameBoard, playerHand: PlayerHand): void {
-        letters.forEach((letter, coords) => {
-            gameBoard.removeAt(coords);
-            playerHand.add(letter);
+        Array.from(letters.entries()).forEach((entry) => {
+            gameBoard.removeAt(entry[0]);
+            playerHand.add(entry[1]);
         });
-        this.gameService.updateGame();
+        this.gameService.gameBoard.next(this.gameBoard);
+        this.gameService.playerHand.next(this.playerHand);
     }
 
     /**
@@ -131,6 +144,7 @@ export class LetterPlacingService {
                 playerHand.add(letter);
             }
         });
+        this.gameService.playerHand.next(this.playerHand);
     }
 
     /**
@@ -269,11 +283,12 @@ export class LetterPlacingService {
         const isInDict = this.validationService.findWord(this.validationService.fetchWords());
         setTimeout(() => {
             if (isInDict) {
-                this.gameService.playerScore += this.validationService.calcPoints();
-                this.replenishHand(this.letters, this.gameService.reserve, this.gameService.playerHand);
+                this.playerScore = this.playerScore + this.validationService.calcPoints();
+                this.gameService.playerScore.next(this.playerScore);
+                this.replenishHand(this.letters, this.gameService.reserve, this.playerHand);
             } else {
                 this.textboxService.sendMessage(MessageType.System, 'Le mot ne figure pas dans le dictionnaire de jeu');
-                this.returnLetters(this.letters, this.gameService.gameBoard, this.gameService.playerHand);
+                this.returnLetters(this.letters, this.gameBoard, this.playerHand);
             }
             this.gameService.turnState.next(false);
         }, VALIDATION_TIMEOUT);

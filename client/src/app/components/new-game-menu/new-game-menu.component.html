@@ -8,34 +8,46 @@
         </h2>
     </div>
 
-    <form class="stretch-column">
+    <form [formGroup]="form" class="stretch-column">
         <mat-form-field appearance="standard">
             <mat-label>Nom du joueur</mat-label>
-            <input matInput [formControl]="nameControl" [(ngModel)]="username" />
+            <input matInput formControlName="username">
             <mat-hint>
                 {{ getNameHint() }}
             </mat-hint>
-            <mat-error *ngIf="nameControl.invalid">
+            <mat-error *ngIf="username.invalid">
                 {{ getNameError() }}
             </mat-error>
         </mat-form-field>
 
-        <mat-label>
-            {{ getTurnLabel() }}
-        </mat-label>
-        <mat-slider disabled step="30" min="30" max="300" [value]="turnLength" [displayWith]="timeFormat" (input)="setTurnLength($event.value)">
+        <mat-form-field *ngIf="gameType === gameTypes.Single">
+            <mat-label>Profil de l'adversaire</mat-label>
+            <mat-select formControlName="difficulty">
+                <mat-option [value]="difficulties.Easy">Novice</mat-option>
+                <mat-option disabled [value]="difficulties.Hard">Expert</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
+
+    <div class="stretch-column" [ngStyle]="{ 'margin-top' : gameType === gameTypes.Single ? '0px' : '20px' }">
+        <div class="flex-row">
+            <mat-label>
+                Temps de tour :
+            </mat-label>
+            <mat-label>
+                {{ getTurnLabel() }}
+            </mat-label>
+        </div>
+        <mat-slider step="30" min="30" max="300" [value]="turnLength" (input)="setTurnLength($event.value)">
         </mat-slider>
 
-        <ng-template [ngIf]="gameType === gameTypes.Single">
-            <mat-label id="toggle-button">Profil de l'adversaire</mat-label>
-            <mat-button-toggle-group disabled name="difficulty" value="easy">
-                <mat-button-toggle class="toggle-button" value="easy">Novice</mat-button-toggle>
-                <mat-button-toggle class="toggle-button" value="hard">Expert</mat-button-toggle>
-            </mat-button-toggle-group>
-        </ng-template>
+        <div class="toggle-switch flex-row">
+            <mat-label>Bonus aléatoire</mat-label>
+            <mat-slide-toggle (change)="randomized = !randomized"></mat-slide-toggle>
+        </div>
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="nameControl.invalid" (click)="newGame()">Jouer</button>
+        <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="createGame()">Jouer</button>
 
-        <button mat-button (click)="this.goBack.emit('Back')">Retour</button>
-    </form>
+        <button mat-button (click)="this.buttonClick.emit('Back')">Retour</button>
+    </div>
 </mat-card>

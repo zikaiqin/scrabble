@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { GameMode } from '@app/classes/game-info';
 import { MenuButton } from '@app/classes/menu-button';
-import { GameMode } from '@app/pages/home-page/home-page.component';
 
 @Component({
     selector: 'app-main-menu',
@@ -10,7 +10,7 @@ import { GameMode } from '@app/pages/home-page/home-page.component';
 export class MainMenuComponent {
     @Input() gameMode: number;
     @Input() gameType: number;
-    @Output() readonly navigationEvent = new EventEmitter<string>();
+    @Output() readonly buttonClick = new EventEmitter<string>();
 
     readonly mainMenu: MenuButton[] = [
         { name: 'Classical', text: 'Scrabble Classique' },
@@ -20,27 +20,15 @@ export class MainMenuComponent {
     readonly secondMenu: MenuButton[] = [
         { name: 'Single', text: 'Jouer Solo' },
         { name: 'Multi', text: 'Jouer Ensemble' },
-        { name: 'BrowseGames', text: 'Joindre une partie' },
+        { name: 'Browse', text: 'Joindre une partie' },
         { name: 'Back' },
     ];
 
     getTitle(): string {
-        if (!this.gameMode) {
-            return 'Scrabble';
-        } else {
-            return this.gameMode === GameMode.Classical ? 'Mode Classique' : 'Mode LOG2990';
-        }
+        return this.gameMode ? (this.gameMode === GameMode.Classical ? 'Mode Classique' : 'Mode LOG2990') : 'Scrabble';
     }
 
     getButtons(): MenuButton[] {
-        if (!this.gameMode) {
-            return this.mainMenu;
-        } else {
-            return this.secondMenu;
-        }
-    }
-
-    buttonClick(name: string) {
-        this.navigationEvent.emit(name);
+        return this.gameMode ? this.secondMenu : this.mainMenu;
     }
 }

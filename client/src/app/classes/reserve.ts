@@ -1,13 +1,16 @@
 export class Reserve {
     readonly letters: string[];
     size: number;
+
     constructor() {
         this.letters = Object.assign([], BASE_RESERVE);
         this.size = this.letters.length;
     }
+
     getSize(): number {
         return this.size;
     }
+
     drawOne(): string | undefined {
         if (this.size <= 0) {
             return undefined;

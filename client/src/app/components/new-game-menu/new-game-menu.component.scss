@@ -2,25 +2,13 @@
     margin-bottom: 0 !important;
 }
 
-.toggle-button {
-    font-size: 15pt;
-    font-weight: lighter;
-    flex-grow: 1;
+.toggle-switch {
+    margin-bottom: 20px;
 }
 
-mat-label {
-    font-size: 15pt;
-    font-weight: lighter;
-}
-
-mat-label#toggle-button {
-    padding-bottom: 10px;
-}
-
-mat-form-field.mat-form-field {
-    font-size: 15pt;
-    margin-bottom: 40px;
-    padding-top: 0;
+.flex-row {
+    display: flex;
+    justify-content: space-between;
 }
 
 mat-slider {
@@ -28,5 +16,5 @@ mat-slider {
 }
 
 mat-button-toggle-group {
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }

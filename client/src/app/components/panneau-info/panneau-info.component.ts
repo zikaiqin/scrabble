@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
+import { PlayerHand } from '@app/classes/player-hand';
 import { EndGameService } from '@app/services/end-game.service';
 import { GameService } from '@app/services/game.service';
 import { TurnService } from '@app/services/turn.service';
@@ -23,6 +24,11 @@ export class PanneauInfoComponent {
 
     subscription: Subscription;
     turn: boolean;
+    playerHand: PlayerHand = new PlayerHand();
+    opponentHand: PlayerHand = new PlayerHand();
+
+    playerScore = 0;
+    opponentScore = 0;
 
     isVisibleWinner: boolean;
     isVisiblePlayer: boolean;
@@ -37,8 +43,20 @@ export class PanneauInfoComponent {
         this.subscription = this.turnService.getState().subscribe((turn) => {
             this.turn = turn;
         });
-        this.gameService.turnState.subscribe({
+        this.gameService.turnState.asObservable().subscribe({
             next: (turn: boolean) => (this.isMyTurn = turn),
+        });
+        this.gameService.playerHand.asObservable().subscribe((playerHand) => {
+            this.playerHand = playerHand;
+        });
+        this.gameService.opponentHand.asObservable().subscribe((opponentHand) => {
+            this.opponentHand = opponentHand;
+        });
+        this.gameService.playerScore.asObservable().subscribe((playerScore) => {
+            this.playerScore = playerScore;
+        });
+        this.gameService.opponentScore.asObservable().subscribe((opponentScore) => {
+            this.opponentScore = opponentScore;
         });
         this.isVisiblePlayer = true;
         this.isVisibleOpponent = true;
@@ -60,22 +78,23 @@ export class PanneauInfoComponent {
 
     getHandSize(player: number): number | null {
         if (player === PlayerType.Human) {
-            if (this.gameService.playerHand.size > DEFAULT_HAND_SIZE) {
+            if (this.playerHand.size > DEFAULT_HAND_SIZE) {
                 this.isVisiblePlayer = false;
                 return null;
             }
-            return this.gameService.playerHand.size;
+            return this.playerHand.size;
         } else {
-            if (this.gameService.opponentHand.size > DEFAULT_HAND_SIZE) {
+            if (this.opponentHand.size > DEFAULT_HAND_SIZE) {
                 this.isVisibleOpponent = false;
                 return null;
             }
-            return this.gameService.opponentHand.size;
+            return this.opponentHand.size;
         }
     }
 
     getScore(player: number): number {
-        return player === PlayerType.Human ? this.gameService.playerScore : this.gameService.opponentScore;
+        // Converting Number to number cuz number is primitive and Number is an Oject
+        return player === PlayerType.Human ? this.playerScore : this.opponentScore;
     }
 
     getName(player: number): string {

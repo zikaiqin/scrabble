@@ -1,0 +1,27 @@
+button {
+    width: 47.5%;
+    font-size: 15pt;
+    font-weight: normal;
+    padding: 10px 20px 10px 20px;
+    margin: 0 0 0 0;
+}
+
+.dialog {
+    margin: 20px 0 20px 0;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+}
+
+.title {
+    font-size: 24pt;
+    margin-bottom: 2px;
+}
+
+.title-container {
+    margin-bottom: 10px;
+}
