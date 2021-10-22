@@ -16,7 +16,7 @@ export class WebsocketService {
             // eslint-disable-next-line no-console
             console.log(`connection to server on socket: ${this.socket.id}`);
             this.socket.on('roomFull', (message: string) => {
-                return this.roomState = message;
+                return (this.roomState = message);
             });
         });
     }

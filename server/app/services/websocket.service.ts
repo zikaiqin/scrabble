@@ -43,10 +43,6 @@ export class WebSocketService {
                     }
                 }
             });
-
-            socket.on('test', (message: string) => {
-                console.log(message);
-            })
         });
     }
 }
