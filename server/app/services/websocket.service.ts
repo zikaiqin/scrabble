@@ -25,7 +25,7 @@ export class WebSocketService {
             console.log(`new client connected on socket: ${socket.id}`);
 
             socket.on('createRoom', (roomName: string) => {
-                this.rooms.set(roomName, 1);
+                this.rooms.set(roomName, 2);
                 socket.join(roomName);
             });
 
@@ -43,6 +43,10 @@ export class WebSocketService {
                     }
                 }
             });
+
+            socket.on('test', (message: string) => {
+                console.log(message);
+            })
         });
     }
 }
