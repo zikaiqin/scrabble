@@ -24,6 +24,7 @@ export class WebsocketService {
 
     joinRoom(room: string): string {
         this.socket.emit('joinRoom', room);
+        // eslint-disable-next-line no-console
         console.log('join room client');
         this.socket.on('roomFull', (message: string) => {
             return message;

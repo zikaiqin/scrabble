@@ -36,6 +36,7 @@ export class WebSocketService {
                         this.sio.emit('roomFull', 'Room is full');
                     } else {
                         socket.join(roomName);
+                        // eslint-disable-next-line no-console
                         console.log('room joined');
                         clients++;
                         this.rooms.set(roomName, clients);
