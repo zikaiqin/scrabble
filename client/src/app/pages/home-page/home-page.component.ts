@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { GameService } from '@app/services/game.service';
 import { GameInfo, GameMode, GameType } from '@app/classes/game-info';
 import { WaitingRoomComponent } from '@app/components/waiting-room/waiting-room.component';
+import { WebsocketService } from '@app/services/websocket.service';
 
 @Component({
     selector: 'app-home-page',
@@ -24,7 +25,7 @@ export class HomePageComponent {
     gameList: GameInfo[];
     gameConfigs: GameInfo;
 
-    constructor(private router: Router, private gameService: GameService, private snackBar: MatSnackBar) {
+    constructor(private router: Router, private gameService: GameService, private snackBar: MatSnackBar, private webSocketService: WebsocketService) {
         this.gameListSubject.asObservable().subscribe((gameList) => {
             this.gameList = gameList;
         });
@@ -85,6 +86,10 @@ export class HomePageComponent {
             this.gameConfigs = configs;
             this.showWaitingRoom = true;
         }
+    }
+
+    joinRoom(room: string): void {
+        this.webSocketService.joinRoom(room);
     }
 
     // TODO: join a game

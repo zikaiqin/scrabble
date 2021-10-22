@@ -5,7 +5,6 @@
 
     <div class="table-container mat-elevation-z1">
         <table mat-table [dataSource]="tableData">
-
             <!-- Username Column -->
             <ng-container matColumnDef="username">
                 <th mat-header-cell *matHeaderCellDef>Nom du joueur</th>
@@ -37,7 +36,7 @@
             </ng-container>
 
             <!-- Row definition -->
-            <tr mat-header-row *matHeaderRowDef="tableColumns; sticky: true;" class="table-header-row"></tr>
+            <tr mat-header-row *matHeaderRowDef="tableColumns; sticky: true" class="table-header-row"></tr>
             <tr mat-row *matRowDef="let row; columns: tableColumns" (click)="selectRoom(row)" class="table-row"></tr>
 
             <!-- Row shown when there is no data -->
