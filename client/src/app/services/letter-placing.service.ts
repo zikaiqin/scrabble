@@ -11,6 +11,7 @@ const BOUNDARY = 15;
 const VALIDATION_TIMEOUT = 3000;
 const CENTER_TILE = 'h8';
 const WILDCARD = '*';
+const WILDCARD_RE = /[A-Z]/;
 const SPECIAL_CHARS = new Map<string, string>([
     ['à', 'a'],
     ['è', 'e'],
@@ -81,7 +82,7 @@ export class LetterPlacingService {
             return false;
         }
         this.letters = new Map<string, string>();
-        this.generateLetters();
+        this.generateLetters(this.letters, this.word, this.startCoords, this.direction);
 
         const canPlace =
             this.isAdjacent(this.gameBoard, this.letters, this.startCoords, this.endCoords) && this.isInHand(this.letters, this.playerHand);
@@ -96,27 +97,23 @@ export class LetterPlacingService {
     /**
      * @description Generate a map of coords/letter pairs from startCoords and direction
      */
-    generateLetters(): void {
-        const letters = this.word.split('');
-
-        if (this.direction === 'h') {
-            letters.forEach((letter, index) => {
-                this.letters.set(this.startCoords.charAt(0) + String(Number(this.startCoords.slice(1)) + index), letter);
-            });
-        } else {
-            letters.forEach((letter, index) => {
-                this.letters.set(String.fromCharCode(this.startCoords.charCodeAt(0) + index) + this.startCoords.slice(1), letter);
-            });
-        }
+    generateLetters(letters: Map<string, string>, word: string, startCoords: string, direction: string): void {
+        word.split('').forEach((letter, index) => {
+            if (direction === 'h') {
+                letters.set(startCoords.charAt(0) + String(Number(startCoords.slice(1)) + index), letter);
+            } else {
+                letters.set(String.fromCharCode(startCoords.charCodeAt(0) + index) + startCoords.slice(1), letter);
+            }
+        });
     }
 
     /**
      * @description Place the letters onto the board
      */
     placeLetters(letters: Map<string, string>, gameBoard: GameBoard, playerHand: PlayerHand): void {
-        Array.from(letters.entries()).forEach((entry) => {
-            gameBoard.placeLetter(entry[0], entry[1]);
-            playerHand.remove(entry[1]);
+        letters.forEach((letter, coords) => {
+            gameBoard.placeLetter(coords, letter);
+            playerHand.remove(WILDCARD_RE.test(letter) ? '*' : letter);
         });
         this.gameService.gameBoard.next(this.gameBoard);
         this.gameService.playerHand.next(this.playerHand);
@@ -126,9 +123,9 @@ export class LetterPlacingService {
      * @description Remove the placed letters from the board and return them to the hand
      */
     returnLetters(letters: Map<string, string>, gameBoard: GameBoard, playerHand: PlayerHand): void {
-        Array.from(letters.entries()).forEach((entry) => {
-            gameBoard.removeAt(entry[0]);
-            playerHand.add(entry[1]);
+        letters.forEach((letter, coords) => {
+            gameBoard.removeAt(coords);
+            playerHand.add(WILDCARD_RE.test(letter) ? '*' : letter);
         });
         this.gameService.gameBoard.next(this.gameBoard);
         this.gameService.playerHand.next(this.playerHand);
@@ -256,10 +253,9 @@ export class LetterPlacingService {
      * @description Assert that the player has the required letters in hand
      */
     isInHand(expectedHand: Map<string, string>, actualHand: PlayerHand): boolean {
-        const wildCard = /[A-Z]/;
         const letters = Array.from(expectedHand.values());
         const testHand: PlayerHand = new PlayerHand();
-        letters.forEach((letter) => testHand.add(wildCard.test(letter) ? WILDCARD : letter));
+        letters.forEach((letter) => testHand.add(WILDCARD_RE.test(letter) ? WILDCARD : letter));
 
         // using unique set of letters in word as key, compare to amount of letters in hand
         const isInHand: boolean = [...new Set<string>(testHand.letters)].every((letter) => {
