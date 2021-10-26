@@ -34,7 +34,7 @@ describe('LetterPlacingService', () => {
         service.letters = new Map<string, string>();
         service.startCoords = 'a1';
         service.direction = 'h';
-        service.generateLetters();
+        service.generateLetters(service.letters, service.word, service.startCoords, service.direction);
         expect(Array.from(service.letters.entries())).toEqual([
             ['a1', 's'],
             ['a2', 't'],
@@ -46,7 +46,7 @@ describe('LetterPlacingService', () => {
         service.word = 'flaShY';
         service.startCoords = 'j15';
         service.direction = 'v';
-        service.generateLetters();
+        service.generateLetters(service.letters, service.word, service.startCoords, service.direction);
         expect(Array.from(service.letters.entries())).toEqual([
             ['j15', 'f'],
             ['k15', 'l'],
