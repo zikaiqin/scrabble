@@ -1,17 +1,9 @@
 import * as io from 'socket.io';
 import * as http from 'http';
-
-export const MAX_CLIENT_PER_ROOM = 3;
-export const DEFAULT_EMPTY_ROOM = 1;
+import { GameInfo } from '@app/classes/game-info';
 
 export class WebSocketService {
-    rooms: Map<string, number> = new Map([
-        ['room1', DEFAULT_EMPTY_ROOM],
-        ['room2', DEFAULT_EMPTY_ROOM],
-        ['room3', DEFAULT_EMPTY_ROOM],
-        ['room4', DEFAULT_EMPTY_ROOM],
-        ['room5', DEFAULT_EMPTY_ROOM],
-    ]);
+    waitingRooms = new Map<string, GameInfo>();
 
     private sio: io.Server;
 
@@ -22,27 +14,55 @@ export class WebSocketService {
     handleSockets() {
         this.sio.on('connection', (socket: io.Socket) => {
             // eslint-disable-next-line no-console
-            console.log(`new client connected on socket: ${socket.id}`);
+            console.log(`new client connected on socket: "${socket.id}"`);
+            socket.emit('updateRooms', this.roomList);
 
-            socket.on('createRoom', (roomName: string) => {
-                this.rooms.set(roomName, 2);
-                socket.join(roomName);
+            socket.on('createRoom', (configs: GameInfo) => {
+                // eslint-disable-next-line no-console
+                console.log(`new room created by client on socket: "${socket.id}"`);
+                this.waitingRooms.set(socket.id, configs);
+                this.sio.emit('updateRooms', this.roomList);
             });
 
-            socket.on('joinRoom', (roomName: string) => {
-                let clients = this.rooms.get(roomName);
-                if (clients) {
-                    if (clients === MAX_CLIENT_PER_ROOM) {
-                        this.sio.emit('roomFull', 'Room is full');
-                    } else {
-                        socket.join(roomName);
-                        // eslint-disable-next-line no-console
-                        console.log('room joined');
-                        clients++;
-                        this.rooms.set(roomName, clients);
-                    }
+            socket.on('joinRoom', (room: string) => {
+                if (!this.waitingRooms.has(room)) {
+                    // eslint-disable-next-line no-console
+                    console.log(`client on socket: "${socket.id}" attempted to join non-existent room with id: "${room}"`);
+                    socket.emit('roomNotFound');
+                } else {
+                    socket.join(room);
+                    // eslint-disable-next-line no-console
+                    console.log(`client on socket: "${socket.id}" joined room with id: "${room}"`);
+                    this.waitingRooms.delete(room);
+                    this.sio.emit('updateRooms', this.roomList);
                 }
             });
+
+            socket.on('fetchRooms', () => {
+                // eslint-disable-next-line no-console
+                console.log(`rooms requested by client on socket: "${socket.id}"`);
+                socket.emit('updateRooms', this.roomList);
+            });
+
+            socket.on('leaveRoom', () => {
+                // eslint-disable-next-line no-console
+                console.log(`room vacated by client on socket: "${socket.id}"`);
+                this.waitingRooms.delete(socket.id);
+                this.sio.emit('updateRooms', this.roomList);
+            });
+
+            socket.on('disconnect', (reason) => {
+                // eslint-disable-next-line no-console
+                console.log(`client on socket: "${socket.id}" has disconnected with reason: "${reason}"`);
+                this.waitingRooms.delete(socket.id);
+                this.sio.emit('updateRooms', this.roomList);
+            });
+        });
+    }
+
+    get roomList(): GameInfo[] {
+        return Array.from(this.waitingRooms.entries(), ([roomID, configs]) => {
+            return { ...configs, roomID };
         });
     }
 }

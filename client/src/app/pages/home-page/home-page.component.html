@@ -11,9 +11,9 @@
 
     <app-game-browser
         *ngIf="showPage() === 'Browser'"
-        [gameList]="gameListSubject.asObservable()"
+        [gameList]="roomList"
         (buttonClick)="handleClick($event)"
-        (joinRoom)="joinGame($event)"
+        (joinRoom)="joinRoom($event)"
     ></app-game-browser>
 
     <app-waiting-room
@@ -21,6 +21,6 @@
         [configs]="gameConfigs"
         (buttonClick)="handleClick($event)"
         (newGame)="createGame($event)"
-        (leaveRoom)="leaveGame()"
+        (leaveRoom)="leaveRoom()"
     ></app-waiting-room>
 </div>

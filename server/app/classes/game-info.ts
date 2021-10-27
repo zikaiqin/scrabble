@@ -5,7 +5,7 @@ export interface GameInfo {
     gameMode?: number;
     gameType?: number;
     difficulty?: number;
-    roomID?: number;
+    roomID?: string;
 }
 
 export enum GameMode {
