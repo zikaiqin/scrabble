@@ -18,16 +18,20 @@ export class HomePageComponent {
     gameConfigs: GameInfo;
 
     constructor(private router: Router, private gameService: GameService, private snackBar: MatSnackBar, private webSocketService: WebsocketService) {
-        this.webSocketService.socketError.asObservable().subscribe((error) => {
-            if (error === 'roomNotFound') {
+        this.webSocketService.socketEvent.asObservable().subscribe((event) => {
+            if (event === 'roomNotFound') {
                 this.showAlert("La partie que vous avez essayé de joindre n'est plus disponible");
             }
-            if (error === 'connectionLost') {
+            if (event === 'connectionLost') {
                 this.showAlert('La connexion au serveur a été interrompue');
                 if (this.showWaitingRoom) {
                     this.showWaitingRoom = false;
                 }
             }
+        });
+        this.webSocketService.startGame.asObservable().subscribe((configs) => {
+            this.gameService.init(configs);
+            this.router.navigateByUrl('/game');
         });
     }
 

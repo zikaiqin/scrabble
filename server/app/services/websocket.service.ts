@@ -1,9 +1,11 @@
 import * as io from 'socket.io';
 import * as http from 'http';
 import { GameInfo } from '@app/classes/game-info';
+import { MessageType } from '@app/classes/message';
 
 export class WebSocketService {
     waitingRooms = new Map<string, GameInfo>();
+    activeRooms = new Map<string, string>();
 
     private sio: io.Server;
 
@@ -20,7 +22,10 @@ export class WebSocketService {
             socket.on('createRoom', (configs: GameInfo) => {
                 // eslint-disable-next-line no-console
                 console.log(`new room created by client on socket: "${socket.id}"`);
-                this.waitingRooms.set(socket.id, configs);
+                const room = `_${socket.id}`;
+                socket.join(room);
+                this.waitingRooms.set(room, configs);
+                this.activeRooms.set(socket.id, room);
                 this.sio.emit('updateRooms', this.roomList);
             });
 
@@ -35,6 +40,8 @@ export class WebSocketService {
                     socket.join(room);
                     // eslint-disable-next-line no-console
                     console.log(`client on socket: "${socket.id}" joined room with id: "${room}"`);
+                    this.activeRooms.set(socket.id, room);
+                    this.sio.to(room).emit('startGame', this.waitingRooms.get(room));
                     this.waitingRooms.delete(room);
                     this.sio.emit('updateRooms', this.roomList);
                     response({
@@ -55,6 +62,14 @@ export class WebSocketService {
                 console.log(`client on socket: "${socket.id}" has disconnected with reason: "${reason}"`);
                 this.waitingRooms.delete(socket.id);
                 this.sio.emit('updateRooms', this.roomList);
+            });
+
+            socket.on('message', (message: string) => {
+                const room = this.activeRooms.get(socket.id);
+                if (room === undefined) {
+                    return;
+                }
+                this.sio.to(room).emit('remessage', MessageType.User, message);
             });
         });
     }

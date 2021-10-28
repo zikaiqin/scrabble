@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { GameInfo } from '@app/classes/game-info';
 import { Subject } from 'rxjs';
+import { MessageType } from '@app/classes/message';
+import { TextboxService } from './textbox.service';
 
 const url = '//localhost:3000';
 
@@ -10,11 +12,13 @@ const url = '//localhost:3000';
 })
 export class WebsocketService {
     socket: Socket;
-    socketError = new Subject<string>();
+    socketEvent = new Subject<string>();
+    startGame = new Subject<GameInfo>();
     roomList = new Subject<GameInfo[]>();
+    currentRoom: string;
 
-    constructor() {
-        this.socket = io(url, { autoConnect: false, reconnection: false });
+    constructor(private textBox: TextboxService) {
+        this.socket = io(url);
         this.socket.on('connect', () => {
             this.socket.on('updateRooms', (rooms) => this.roomList.next(rooms));
 
@@ -22,15 +26,27 @@ export class WebsocketService {
             this.socket.on('startGame', () => {
                 void 0;
             });
+
+            this.socket.on('remessage', (type: MessageType, message: string) => {
+                this.textBox.sendMessage(type, message);
+            });
+
+            this.socket.on('startGame', (configs: GameInfo) => {
+                this.startGame.next(configs);
+            });
         });
         this.socket.on('disconnect', (reason) => {
             if (reason === 'io client disconnect') {
                 return;
             }
             this.roomList.next([]);
-            this.socketError.next('connectionLost');
+            this.socketEvent.next('connectionLost');
             this.socket.connect();
         });
+    }
+
+    sendMessage(message: string): void {
+        this.socket.emit('message', message);
     }
 
     // TODO?: using acknowledgement, throw on timeout
@@ -41,7 +57,7 @@ export class WebsocketService {
     joinRoom(roomID: string): void {
         this.socket.emit('joinRoom', roomID, (response: string) => {
             if (response !== 'ok') {
-                this.socketError.next('roomNotFound');
+                this.socketEvent.next('roomNotFound');
             }
         });
     }

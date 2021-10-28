@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MessageType } from '@app/classes/message';
 import { CommandService } from '@app/services/command.service';
 import { TextboxService } from '@app/services/textbox.service';
+import { WebsocketService } from '@app/services/websocket.service';
 
 const MAX_MESSAGE_LENGTH = 512;
 
@@ -13,7 +14,7 @@ const MAX_MESSAGE_LENGTH = 512;
 export class InputbarComponent {
     message: string;
 
-    constructor(private textboxService: TextboxService, private commandService: CommandService) {}
+    constructor(private textboxService: TextboxService, private commandService: CommandService, private websocket: WebsocketService) {}
 
     isCommand(input: string): boolean {
         return input[0] === '!';
@@ -29,7 +30,7 @@ export class InputbarComponent {
         if (this.isCommand(this.message)) {
             this.commandService.parseCommand(this.message);
         } else {
-            this.textboxService.sendMessage(MessageType.User, this.message);
+            this.websocket.sendMessage(this.message);
         }
         this.message = '';
     }
