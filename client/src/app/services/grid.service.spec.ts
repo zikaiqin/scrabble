@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { GridService } from '@app/services/grid.service';
+import { GameBoard } from '@app/classes/game-board';
+import { DEFAULT_BONUSES } from '@app/classes/game-config';
 
 describe('GridService', () => {
     let service: GridService;
@@ -9,14 +11,14 @@ describe('GridService', () => {
     const CANVAS_WIDTH = 500;
     const CANVAS_HEIGHT = 500;
     const DEFAULT_NB_CASES = 16;
-    // const NEGATIVE_NB = -1;
-    // const size = 6;
+
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(GridService);
         ctxStub = CanvasTestHelper.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         service.gridContext = ctxStub;
         service.handContext = ctxStub;
+        service.gameBoard = new GameBoard(DEFAULT_BONUSES);
         pointOnMap.set('o11', 'a');
         pointOnMap.set('b11', 'b');
         pointOnMap.set('a2', 'c');
@@ -50,9 +52,9 @@ describe('GridService', () => {
     });
     it(' drawBonus should drawNONE', () => {
         const drawNONESpy = spyOn(service, 'drawNONE').and.callThrough();
-        service.drawBonus(1, DEFAULT_NB_CASES);
+        service.drawBonus(0, 1);
 
-        expect(drawNONESpy).toHaveBeenCalledTimes(0);
+        expect(drawNONESpy).toHaveBeenCalled();
     });
     it(' drawGridLetters should call drawGridLetters', () => {
         const drawGridLettersSpy = spyOn(service, 'drawGridLetters').and.callThrough();
@@ -90,10 +92,10 @@ describe('GridService', () => {
         expect(afterSize).toBeGreaterThan(beforeSize);
     });
 
-    it(' drawGrid should increment tuilePosY and tuilePosX', () => {
+    /* it(' drawGrid should increment tuilePosY and tuilePosX', () => {
         service.drawGrid();
     });
-    /* it('should increment scaleCounter when maxGrid', () => {
+    it('should increment scaleCounter when maxGrid', () => {
         service.maxGrid();
         expect(service.scaleCounter).toBe(1);
     });

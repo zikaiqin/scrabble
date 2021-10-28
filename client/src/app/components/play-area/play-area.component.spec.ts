@@ -1,15 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Vec2 } from '@app/classes/vec2';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
+import { GridService } from '@app/services/grid.service';
+import { GameBoard } from '@app/classes/game-board';
+import { DEFAULT_BONUSES } from '@app/classes/game-config';
+import { GameService } from '@app/services/game.service';
 
 describe('PlayAreaComponent', () => {
     let component: PlayAreaComponent;
     let fixture: ComponentFixture<PlayAreaComponent>;
     let mouseEvent: MouseEvent;
+    const gridService = new GridService(new GameService());
+    gridService.gameBoard = new GameBoard(DEFAULT_BONUSES);
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [PlayAreaComponent],
+            providers: [{ provide: GridService, useValue: gridService }],
         }).compileComponents();
     });
 
