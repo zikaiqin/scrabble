@@ -24,24 +24,23 @@ export class WebSocketService {
                 this.sio.emit('updateRooms', this.roomList);
             });
 
-            socket.on('joinRoom', (room: string) => {
+            socket.on('joinRoom', (room: string, response) => {
                 if (!this.waitingRooms.has(room)) {
                     // eslint-disable-next-line no-console
                     console.log(`client on socket: "${socket.id}" attempted to join non-existent room with id: "${room}"`);
-                    socket.emit('roomNotFound');
+                    response({
+                        status: 'fail',
+                    });
                 } else {
                     socket.join(room);
                     // eslint-disable-next-line no-console
                     console.log(`client on socket: "${socket.id}" joined room with id: "${room}"`);
                     this.waitingRooms.delete(room);
                     this.sio.emit('updateRooms', this.roomList);
+                    response({
+                        status: 'ok',
+                    });
                 }
-            });
-
-            socket.on('fetchRooms', () => {
-                // eslint-disable-next-line no-console
-                console.log(`rooms requested by client on socket: "${socket.id}"`);
-                socket.emit('updateRooms', this.roomList);
             });
 
             socket.on('leaveRoom', () => {

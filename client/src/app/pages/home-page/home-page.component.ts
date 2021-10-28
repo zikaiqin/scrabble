@@ -1,9 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GameService } from '@app/services/game.service';
 import { GameInfo, GameMode, GameType } from '@app/classes/game-info';
-import { WaitingRoomComponent } from '@app/components/waiting-room/waiting-room.component';
 import { WebsocketService } from '@app/services/websocket.service';
 
 @Component({
@@ -12,8 +11,6 @@ import { WebsocketService } from '@app/services/websocket.service';
     styleUrls: ['./home-page.component.scss'],
 })
 export class HomePageComponent {
-    @ViewChild(WaitingRoomComponent) waitingRoom: WaitingRoomComponent;
-
     gameMode = GameMode.None;
     gameType = GameType.None;
     showBrowser = false;
@@ -24,6 +21,12 @@ export class HomePageComponent {
         this.webSocketService.socketError.asObservable().subscribe((error) => {
             if (error === 'roomNotFound') {
                 this.showAlert("La partie que vous avez essayé de joindre n'est plus disponible");
+            }
+            if (error === 'connectionLost') {
+                this.showAlert('La connexion au serveur a été interrompue');
+                if (this.showWaitingRoom) {
+                    this.showWaitingRoom = false;
+                }
             }
         });
     }
@@ -36,14 +39,16 @@ export class HomePageComponent {
             this.gameType = GameType[button];
         }
         if (button === 'Browse') {
-            this.webSocketService.fetchRooms();
+            this.webSocketService.connect();
             this.showBrowser = true;
         }
         if (button === 'Back') {
             if (this.showBrowser) {
                 this.showBrowser = false;
+                this.webSocketService.disconnect();
                 return;
             }
+            // TODO?: timeout detection ("connecting...", then "waiting on player" or "connection failed")
             if (this.showWaitingRoom) {
                 this.showWaitingRoom = false;
                 this.leaveRoom();
@@ -73,6 +78,7 @@ export class HomePageComponent {
             this.gameService.init(configs);
             this.router.navigateByUrl('/game');
         } else {
+            this.webSocketService.connect();
             this.webSocketService.createRoom(configs);
             this.gameConfigs = configs;
             this.showWaitingRoom = true;
@@ -89,6 +95,7 @@ export class HomePageComponent {
 
     leaveRoom(): void {
         this.webSocketService.leaveRoom();
+        this.webSocketService.disconnect();
     }
 
     showAlert(message: string): void {

@@ -14,14 +14,8 @@ export class WebsocketService {
     roomList = new Subject<GameInfo[]>();
 
     constructor() {
-        this.socket = io(url);
+        this.socket = io(url, { autoConnect: false, reconnection: false });
         this.socket.on('connect', () => {
-            // eslint-disable-next-line no-console
-            console.log(`connection to server on socket: ${this.socket.id}`);
-
-            // FIXME: switch to using acknowledgement -- see https://socket.io/docs/v4/emitting-events/#acknowledgements
-            this.socket.on('roomNotFound', () => this.socketError.next('roomNotFound'));
-
             this.socket.on('updateRooms', (rooms) => this.roomList.next(rooms));
 
             // TODO: implement logic to start game (switch to game view, init gameService) upon receiving signal from server
@@ -29,21 +23,27 @@ export class WebsocketService {
                 void 0;
             });
         });
+        this.socket.on('disconnect', (reason) => {
+            if (reason === 'io client disconnect') {
+                return;
+            }
+            this.roomList.next([]);
+            this.socketError.next('connectionLost');
+            this.socket.connect();
+        });
     }
 
+    // TODO?: using acknowledgement, throw on timeout
     createRoom(configs: GameInfo): void {
         this.socket.emit('createRoom', configs);
     }
 
-    // TODO: use acknowledgement for error detection
     joinRoom(roomID: string): void {
-        this.socket.emit('joinRoom', roomID);
-        // eslint-disable-next-line no-console
-        console.log('join room client');
-    }
-
-    fetchRooms(): void {
-        this.socket.emit('fetchRooms');
+        this.socket.emit('joinRoom', roomID, (response: string) => {
+            if (response !== 'ok') {
+                this.socketError.next('roomNotFound');
+            }
+        });
     }
 
     /**
@@ -58,5 +58,13 @@ export class WebsocketService {
      */
     abandonGame(): void {
         void 0;
+    }
+
+    connect(): void {
+        this.socket.connect();
+    }
+
+    disconnect(): void {
+        this.socket.disconnect();
     }
 }

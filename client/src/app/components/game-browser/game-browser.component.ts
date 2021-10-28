@@ -33,7 +33,7 @@ export class GameBrowserComponent implements OnInit {
     }
 
     formatTime(time: number): string {
-        return time <= MINUTE ? `${time}s` : `${Math.floor(time / MINUTE)}m${time % MINUTE === 0 ? '00' : time % MINUTE}s`;
+        return `${Math.floor(time / MINUTE)}:${time % MINUTE === 0 ? '00' : time % MINUTE}`;
     }
 
     selectRoom(gameInfo: GameInfo): void {
