@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GameBoard } from '@app/classes/game-board';
-import { DEFAULT_BONUSES } from '@app/classes/game-config';
 import { Vec2 } from '@app/classes/vec2';
-import { GameService } from './game.service';
-import { tableau } from './tableau.config';
+import { GameService } from '@app/services/game.service';
 
 const CHARCODE_SMALL_A = 97;
 
@@ -13,8 +11,6 @@ const DEFAULT_SCALE = 0.04;
 
 const DEFAULT_NB_CASES = 16;
 const STROKE_RANGE = 4;
-// const DEFAULT_WIDTH_CHEVALET = 385;
-// const DEFAULT_HEIGHT_CHEVALET = 55;
 const NB_CASE_CHEVALET = 7;
 
 @Injectable({
@@ -23,10 +19,8 @@ const NB_CASE_CHEVALET = 7;
 export class GridService {
     gridContext: CanvasRenderingContext2D;
     handContext: CanvasRenderingContext2D;
-    gameBoard: GameBoard = new GameBoard(DEFAULT_BONUSES);
+    gameBoard: GameBoard;
     private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
-    // private tuileSizeChevalet: number = DEFAULT_HEIGHT_CHEVALET;
-    // private indexChevalet: number = 0;
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
     private startNumberPos: number = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private startLetterPos: number = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
@@ -68,7 +62,6 @@ export class GridService {
             this.tuilePosY += this.tuileSize;
             this.tuilePosX = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         }
-        // this.drawPlayerHand();
         this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
 
@@ -209,33 +202,33 @@ export class GridService {
     }
     /**
      * @description Wrapper function to fill the slots of the board
-     * @param x index [x] in the container tableau.config.ts
-     * @param y index [y] in the container tableau.config.ts
+     * @param x the X position in the gameBoard container
+     * @param y the Y position in the gameBoard container
      * @returns nothing just in case the indexes are out of bound
      */
     drawBonus(x: number, y: number) {
-        if (x < 0 || x >= DEFAULT_NB_CASES || y < 0 || y >= DEFAULT_NB_CASES) {
-            return;
-        }
-        // CASE MOT X 3
-        if (tableau[x][y] === 'Wx3') {
-            this.drawMx3();
-        }
-        // CASE MOT X 2
-        else if (tableau[x][y] === 'Wx2') {
-            this.drawMx2();
-        }
-        // CASE LETTRE X 2
-        else if (tableau[x][y] === 'Lx2') {
-            this.drawLx2();
-        }
-        // CASE LETTRE X 3
-        else if (tableau[x][y] === 'Lx3') {
-            this.drawLx3();
-        }
-        // case NONE
-        else if (tableau[x][y] === 'VIDE') {
-            this.drawNONE();
+        const bonus = this.gameBoard.getBonus(String.fromCharCode(CHARCODE_SMALL_A + x) + String(y + 1));
+        switch (bonus) {
+            case 'Lx2': {
+                this.drawLx2();
+                break;
+            }
+            case 'Lx3': {
+                this.drawLx3();
+                break;
+            }
+            case 'Wx2': {
+                this.drawMx2();
+                break;
+            }
+            case 'Wx3': {
+                this.drawMx3();
+                break;
+            }
+            default: {
+                this.drawNONE();
+                break;
+            }
         }
     }
     /**
