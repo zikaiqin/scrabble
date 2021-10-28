@@ -70,7 +70,7 @@ export class HomePageComponent {
     // TODO: move all game logic serverside
     createGame(configs: GameInfo): void {
         if (configs.gameType === GameType.Single) {
-            this.gameService.init(configs.username);
+            this.gameService.init(configs);
             this.router.navigateByUrl('/game');
         } else {
             this.webSocketService.createRoom(configs);

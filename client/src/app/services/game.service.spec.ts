@@ -27,7 +27,7 @@ describe('GameService', () => {
     });
 
     it('init should affect values correctly', () => {
-        service.init(username);
+        service.init({ username });
         expect(service.player).toEqual(username);
         expect(service.isInit).toBeTrue();
         expect(service.isStarted).toBeFalse();

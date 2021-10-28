@@ -4,6 +4,7 @@ import { DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_HAND_SIZE } from '@app/clas
 import { PlayerHand } from '@app/classes/player-hand';
 import { Reserve } from '@app/classes/reserve';
 import { Subject } from 'rxjs';
+import { GameInfo } from '@app/classes/game-info';
 
 @Injectable({
     providedIn: 'root',
@@ -24,18 +25,20 @@ export class GameService {
     reserve: Reserve;
 
     gameBoard = new Subject<GameBoard>();
+    randomized: boolean;
 
     turnState = new Subject<boolean>();
 
     /**
      * @description Function that initializes the variables
-     * @param username the name chosen by the user/player
+     * @param configs game settings
      */
-    init(username: string): void {
-        const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== username);
+    init(configs: GameInfo): void {
+        const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== configs.username);
 
-        this.player = username;
+        this.player = configs.username;
         this.opponent = validBotNames[Math.floor(Math.random() * validBotNames.length)];
+        this.randomized = !!configs.randomized;
 
         this.isInit = true;
         this.isStarted = false;
@@ -47,7 +50,7 @@ export class GameService {
     start(): void {
         this.reserve = new Reserve();
 
-        this.gameBoard.next(new GameBoard(DEFAULT_BONUSES));
+        this.gameBoard.next(new GameBoard(this.bonuses));
 
         this.playerScore.next(0);
         this.opponentScore.next(0);
@@ -67,4 +70,15 @@ export class GameService {
         const turnState = Boolean(Math.floor(Math.random() * 2));
         this.turnState.next(turnState);
     }
+
+    get bonuses(): Map<string, string> {
+        if (!this.randomized) {
+            return DEFAULT_BONUSES;
+        }
+        const keys = Array.from(DEFAULT_BONUSES.keys()).sort(() => HALF - Math.random());
+        const values = Array.from(DEFAULT_BONUSES.values());
+        return new Map(keys.map((key, index) => [key, values[index]]));
+    }
 }
+
+const HALF = 0.5;
