@@ -22,7 +22,7 @@ export class WebSocketService {
             socket.on('createRoom', (configs: GameInfo) => {
                 // eslint-disable-next-line no-console
                 console.log(`new room created by client on socket: "${socket.id}"`);
-                const room = `_${socket.id}`;
+                const room = `Room${socket.id}`;
                 socket.join(room);
                 this.waitingRooms.set(room, configs);
                 this.activeRooms.set(socket.id, room);
@@ -64,12 +64,12 @@ export class WebSocketService {
                 this.sio.emit('updateRooms', this.roomList);
             });
 
-            socket.on('message', (message: string) => {
+            socket.on('sendMessage', (message: string) => {
                 const room = this.activeRooms.get(socket.id);
                 if (room === undefined) {
                     return;
                 }
-                this.sio.to(room).emit('remessage', MessageType.User, message);
+                this.sio.to(room).emit('receiveMessage', MessageType.User, message);
             });
         });
     }

@@ -18,7 +18,7 @@ export class WebsocketService {
     currentRoom: string;
 
     constructor(private textBox: TextboxService) {
-        this.socket = io(url);
+        this.socket = io(url, { autoConnect: false, reconnection: false });
         this.socket.on('connect', () => {
             this.socket.on('updateRooms', (rooms) => this.roomList.next(rooms));
 
@@ -27,7 +27,7 @@ export class WebsocketService {
                 void 0;
             });
 
-            this.socket.on('remessage', (type: MessageType, message: string) => {
+            this.socket.on('receiveMessage', (type: MessageType, message: string) => {
                 this.textBox.sendMessage(type, message);
             });
 
@@ -46,7 +46,7 @@ export class WebsocketService {
     }
 
     sendMessage(message: string): void {
-        this.socket.emit('message', message);
+        this.socket.emit('sendMessage', message);
     }
 
     // TODO?: using acknowledgement, throw on timeout
