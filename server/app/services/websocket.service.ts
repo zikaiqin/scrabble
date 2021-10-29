@@ -37,9 +37,9 @@ export class WebSocketService {
                         status: 'fail',
                     });
                 } else {
-                    socket.join(room);
                     // eslint-disable-next-line no-console
                     console.log(`client on socket: "${socket.id}" joined room with id: "${room}"`);
+                    socket.join(room);
                     this.activeRooms.set(socket.id, room);
                     this.sio.to(room).emit('startGame', this.waitingRooms.get(room));
                     this.waitingRooms.delete(room);

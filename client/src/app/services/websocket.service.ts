@@ -15,24 +15,18 @@ export class WebsocketService {
     socketEvent = new Subject<string>();
     startGame = new Subject<GameInfo>();
     roomList = new Subject<GameInfo[]>();
-    currentRoom: string;
 
     constructor(private textBox: TextboxService) {
         this.socket = io(url, { autoConnect: false, reconnection: false });
         this.socket.on('connect', () => {
             this.socket.on('updateRooms', (rooms) => this.roomList.next(rooms));
 
-            // TODO: implement logic to start game (switch to game view, init gameService) upon receiving signal from server
-            this.socket.on('startGame', () => {
-                void 0;
+            this.socket.on('startGame', (configs: GameInfo) => {
+                this.startGame.next(configs);
             });
 
             this.socket.on('receiveMessage', (type: MessageType, message: string) => {
                 this.textBox.sendMessage(type, message);
-            });
-
-            this.socket.on('startGame', (configs: GameInfo) => {
-                this.startGame.next(configs);
             });
         });
         this.socket.on('disconnect', (reason) => {
