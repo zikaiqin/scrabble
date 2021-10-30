@@ -16,9 +16,12 @@ export class WebsocketService {
     startGame = new Subject<GameInfo>();
     roomList = new Subject<GameInfo[]>();
 
-    constructor(private textBox: TextboxService) {
-        this.socket = io(url, { autoConnect: false, reconnection: false });
+    constructor(private textBox: TextboxService) {}
+
+    handleSocket(): void {
         this.socket.on('connect', () => {
+            // eslint-disable-next-line no-console
+            console.log(`connection on socket: "${this.socket.id}"`);
             this.socket.on('updateRooms', (rooms) => this.roomList.next(rooms));
 
             this.socket.on('startGame', (configs: GameInfo) => {
@@ -26,6 +29,8 @@ export class WebsocketService {
             });
 
             this.socket.on('receiveMessage', (type: MessageType, message: string) => {
+                // eslint-disable-next-line no-console
+                console.log(`received message on socket: "${this.socket.id}"`);
                 this.textBox.sendMessage(type, message);
             });
         });
@@ -43,14 +48,13 @@ export class WebsocketService {
         this.socket.emit('sendMessage', message);
     }
 
-    // TODO?: using acknowledgement, throw on timeout
     createRoom(configs: GameInfo): void {
         this.socket.emit('createRoom', configs);
     }
 
     joinRoom(roomID: string): void {
-        this.socket.emit('joinRoom', roomID, (response: string) => {
-            if (response !== 'ok') {
+        this.socket.emit('joinRoom', roomID, (response: { status: string; configs: GameInfo }) => {
+            if (response.status !== 'ok') {
                 this.socketEvent.next('roomNotFound');
             }
         });
@@ -71,7 +75,8 @@ export class WebsocketService {
     }
 
     connect(): void {
-        this.socket.connect();
+        this.socket = io(url).connect();
+        this.handleSocket();
     }
 
     disconnect(): void {

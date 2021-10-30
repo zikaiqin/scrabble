@@ -52,7 +52,7 @@ export class HomePageComponent {
                 this.webSocketService.disconnect();
                 return;
             }
-            // TODO?: timeout detection ("connecting...", then "waiting on player" or "connection failed")
+
             if (this.showWaitingRoom) {
                 this.showWaitingRoom = false;
                 this.leaveRoom();
