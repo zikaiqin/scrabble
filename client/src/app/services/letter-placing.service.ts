@@ -152,14 +152,16 @@ export class LetterPlacingService {
     isValidParam(position: string, word: string): boolean {
         const validPosition = /[a-o](?:1[0-5]|[1-9])[vh]/;
         const validWord = /^[a-zA-Z]+$/;
-        word = word
-            .split('')
-            .map((letter) => this.mapSpecialChars(letter))
-            .join('');
-
-        const isValid: boolean = word !== undefined && validPosition.test(position) && validWord.test(word);
+        let isValid = false;
+        if (word !== undefined) {
+            word = word
+                .split('')
+                .map((letter) => this.mapSpecialChars(letter))
+                .join('');
+            isValid = validPosition.test(position) && validWord.test(word);
+        }
         if (!isValid) {
-            this.textboxService.sendMessage(MessageType.System, 'La commande !placer requiert des paramètres valides');
+            this.textboxService.displayMessage(MessageType.System, 'La commande !placer requiert des paramètres valides');
         } else {
             this.startCoords = position.slice(0, position.length - 1);
             this.direction = position.charAt(position.length - 1);
@@ -173,7 +175,7 @@ export class LetterPlacingService {
      */
     isMyTurn(isMyTurn: boolean | undefined): boolean {
         if (!isMyTurn) {
-            this.textboxService.sendMessage(MessageType.System, 'La commande !placer peut seulement être utilisé lors de votre tour');
+            this.textboxService.displayMessage(MessageType.System, 'La commande !placer peut seulement être utilisé lors de votre tour');
         }
         return Boolean(isMyTurn);
     }
@@ -190,7 +192,7 @@ export class LetterPlacingService {
         }
         const inBounds: boolean = endCoords.charAt(0) < 'p' && Number(endCoords.slice(1)) <= BOUNDARY;
         if (!inBounds) {
-            this.textboxService.sendMessage(MessageType.System, 'Le mot ne peut être placé à cet endroit car il dépasserait le plateau');
+            this.textboxService.displayMessage(MessageType.System, 'Le mot ne peut être placé à cet endroit car il dépasserait le plateau');
         } else {
             this.endCoords = endCoords;
         }
@@ -207,7 +209,7 @@ export class LetterPlacingService {
         if (gameBoard.size() === 0) {
             isAdjacent = toPlace.has(CENTER_TILE);
             if (!isAdjacent) {
-                this.textboxService.sendMessage(MessageType.System, 'Le mot doit toucher la case H8 lors du premier tour');
+                this.textboxService.displayMessage(MessageType.System, 'Le mot doit toucher la case H8 lors du premier tour');
             }
             return isAdjacent;
         }
@@ -215,7 +217,7 @@ export class LetterPlacingService {
         if (overlaps) {
             isAdjacent = overlaps.every((entry) => gameBoard.getLetter(entry[0]) === entry[1]);
             if (!isAdjacent) {
-                this.textboxService.sendMessage(MessageType.System, 'Le mot cause un conflit avec des lettres déjà placées');
+                this.textboxService.displayMessage(MessageType.System, 'Le mot cause un conflit avec des lettres déjà placées');
                 return false;
             }
             overlaps.forEach((entry) => toPlace.delete(entry[0]));
@@ -244,7 +246,7 @@ export class LetterPlacingService {
 
         isAdjacent = adjacentTiles.some((coords) => gameBoard.hasCoords(coords));
         if (!isAdjacent) {
-            this.textboxService.sendMessage(MessageType.System, 'Le mot doit toucher au moins une lettre déjà placée');
+            this.textboxService.displayMessage(MessageType.System, 'Le mot doit toucher au moins une lettre déjà placée');
         }
         return isAdjacent;
     }
@@ -264,7 +266,7 @@ export class LetterPlacingService {
             return amountRequired <= amountInHand;
         });
         if (!isInHand) {
-            this.textboxService.sendMessage(
+            this.textboxService.displayMessage(
                 MessageType.System,
                 'Le mot ne peut être placé car il contient des lettres qui ne sont pas dans votre main',
             );
@@ -283,7 +285,7 @@ export class LetterPlacingService {
                 this.gameService.playerScore.next(this.playerScore);
                 this.replenishHand(this.letters, this.gameService.reserve, this.playerHand);
             } else {
-                this.textboxService.sendMessage(MessageType.System, 'Le mot ne figure pas dans le dictionnaire de jeu');
+                this.textboxService.displayMessage(MessageType.System, 'Le mot ne figure pas dans le dictionnaire de jeu');
                 this.returnLetters(this.letters, this.gameBoard, this.playerHand);
             }
             this.gameService.turnState.next(false);

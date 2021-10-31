@@ -24,14 +24,18 @@ export class InputbarComponent {
         if (this.message === '') {
             return;
         }
-        if (this.message.length > MAX_MESSAGE_LENGTH) {
-            this.textboxService.sendMessage(MessageType.System, `Votre message dépasse ${MAX_MESSAGE_LENGTH} caractères`);
-        }
-        if (this.isCommand(this.message)) {
-            this.commandService.parseCommand(this.message);
-        } else {
-            this.websocket.sendMessage(this.message);
-        }
+        const message = this.message;
         this.message = '';
+
+        if (message.length > MAX_MESSAGE_LENGTH) {
+            this.textboxService.displayMessage(MessageType.System, `Votre message dépasse ${MAX_MESSAGE_LENGTH} caractères`);
+            return;
+        }
+        this.textboxService.displayMessage(MessageType.Own, message);
+        if (this.isCommand(message)) {
+            this.commandService.parseCommand(message);
+        } else {
+            this.websocket.sendMessage(message);
+        }
     }
 }

@@ -64,10 +64,7 @@ export class EndGameService {
                 return true;
             }
         }
-        if (this.turnSkipCounter === MAX_TURN_SKIP_COUNT) {
-            return true;
-        }
-        return false;
+        return this.turnSkipCounter === MAX_TURN_SKIP_COUNT;
     }
     /**
      * @description Function that subtracts the remaining letters value to the score
@@ -129,9 +126,9 @@ export class EndGameService {
         for (const it of opponentHand.letters) {
             this.opponentLettersLeft.push(it[0]);
         }
-        this.textboxService.sendMessage(MessageType.System, 'Fin de partie - lettres restantes');
-        this.textboxService.sendMessage(MessageType.System, this.gameService.player + ': ' + this.playerLettersLeft.join('').toString());
-        this.textboxService.sendMessage(MessageType.System, this.gameService.opponent + ': ' + this.opponentLettersLeft.join('').toString());
+        this.textboxService.displayMessage(MessageType.System, 'Fin de partie - lettres restantes');
+        this.textboxService.displayMessage(MessageType.System, this.gameService.player + ': ' + this.playerLettersLeft.join('').toString());
+        this.textboxService.displayMessage(MessageType.System, this.gameService.opponent + ': ' + this.opponentLettersLeft.join('').toString());
     }
     /**
      * @description Wrapper function that runs the procedures to end the game

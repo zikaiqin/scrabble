@@ -1,7 +1,7 @@
-import * as io from 'socket.io';
-import * as http from 'http';
 import { GameInfo } from '@app/classes/game-info';
 import { MessageType } from '@app/classes/message';
+import * as http from 'http';
+import * as io from 'socket.io';
 
 export class WebSocketService {
     waitingRooms = new Map<string, GameInfo>();
@@ -60,7 +60,27 @@ export class WebSocketService {
                 if (room === undefined) {
                     return;
                 }
-                this.sio.to(room).emit('receiveMessage', MessageType.User, message);
+                socket.broadcast.to(room).emit('receiveMessage', MessageType.User, message);
+            });
+
+            // TODO: Implement serverside word validation
+            socket.on('place', (position: string, word: string) => {
+                const room = this.activeSockets.get(socket.id);
+                const message = `Succès de la commande : !placer ${position} ${word}`;
+                if (room === undefined) {
+                    return;
+                }
+                socket.emit('receiveMessage', MessageType.System, message);
+            });
+
+            // TODO?: Implement serverside command validation
+            socket.on('exchange', (letters: string) => {
+                const room = this.activeSockets.get(socket.id);
+                const message = `Succès de la commande : !échanger ${letters}`;
+                if (room === undefined) {
+                    return;
+                }
+                socket.emit('receiveMessage', MessageType.System, message);
             });
         });
     }

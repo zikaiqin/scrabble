@@ -101,7 +101,7 @@ describe('LetterPlacingService', () => {
 
         service = new LetterPlacingService(
             // eslint-disable-next-line no-unused-vars,@typescript-eslint/no-empty-function --- not worth declaring textBoxService just for this test
-            { sendMessage: (type: string, text: string) => {} } as TextboxService,
+            { displayMessage: (_: string, __: string) => {} } as TextboxService,
             gameServiceSpy as unknown as GameService,
             {} as ValidationService,
         );

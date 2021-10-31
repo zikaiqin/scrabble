@@ -6,11 +6,11 @@ import { Message } from '@app/classes/message';
 export class TextboxService {
     private subject = new Subject<Message>();
 
-    sendMessage(type: string, text: string) {
+    displayMessage(type: string, text: string) {
         this.subject.next({ type, text });
     }
 
-    getMessage(): Observable<Message> {
+    get messages(): Observable<Message> {
         return this.subject.asObservable();
     }
 }

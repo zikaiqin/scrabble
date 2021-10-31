@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
 import { GameInfo } from '@app/classes/game-info';
-import { Subject } from 'rxjs';
 import { MessageType } from '@app/classes/message';
+import { Subject } from 'rxjs';
+import { io, Socket } from 'socket.io-client';
 import { TextboxService } from './textbox.service';
 import { AlertService } from '@app/services/alert.service';
 
@@ -30,7 +30,7 @@ export class WebsocketService {
             });
 
             this.socket.on('receiveMessage', (type: MessageType, message: string) => {
-                this.textBox.sendMessage(type, message);
+                this.textBox.displayMessage(type, message);
             });
         });
         this.socket.on('disconnect', (reason) => {
@@ -41,6 +41,14 @@ export class WebsocketService {
             this.alertService.showAlert('La connexion au serveur a été interrompue');
             this.socketEvent.next('connectionLost');
         });
+    }
+
+    placeLetters(position: string, word: string): void {
+        this.socket.emit('place', position, word);
+    }
+
+    exchangeLetters(letters: string): void {
+        this.socket.emit('exchange', letters);
     }
 
     sendMessage(message: string): void {

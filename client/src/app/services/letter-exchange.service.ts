@@ -35,12 +35,12 @@ export class LetterExchangeService {
 
         // Doit etre entre 1 et 7
         if (letters.length < 1 || letters.length > HAND_SIZE) {
-            this.textboxService.sendMessage(MessageType.System, 'Doit etre entre 1 et 7');
+            this.textboxService.displayMessage(MessageType.System, 'Doit etre entre 1 et 7');
             return false;
         }
         // Verifie si ils sont tous en mimuscule
         if (letters !== letters.toLowerCase()) {
-            this.textboxService.sendMessage(MessageType.System, 'Doit etre en miniscule');
+            this.textboxService.displayMessage(MessageType.System, 'Doit etre en miniscule');
             return false;
         }
         // Seulement a mon tour
@@ -108,7 +108,7 @@ export class LetterExchangeService {
             return amountRequired <= amountInHand;
         });
         if (!isInHand) {
-            this.textboxService.sendMessage(
+            this.textboxService.displayMessage(
                 MessageType.System,
                 'Les lettres ne peuvent pas être exchange car il contient des lettres qui ne sont pas dans votre main',
             );
@@ -122,7 +122,7 @@ export class LetterExchangeService {
      */
     isMyTurn(): boolean {
         if (!this.turnState) {
-            this.textboxService.sendMessage(MessageType.System, 'La commande !échanger peut seulement être utilisé lors de votre tour');
+            this.textboxService.displayMessage(MessageType.System, 'La commande !échanger peut seulement être utilisé lors de votre tour');
         }
         return this.turnState;
     }

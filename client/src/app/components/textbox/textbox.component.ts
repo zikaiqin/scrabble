@@ -7,7 +7,8 @@ const MESSAGE_REFRESH_DELAY = 100;
 
 const messageTypeMap = new Map<string, string>([
     [MessageType.System, 'Système :'],
-    [MessageType.User, 'Utilisateur :'],
+    [MessageType.User, 'Adversaire :'],
+    [MessageType.Own, 'Vous :'],
 ]);
 
 @Component({
@@ -20,7 +21,7 @@ export class TextboxComponent implements OnDestroy {
     subscription: Subscription;
 
     constructor(private textboxService: TextboxService) {
-        this.subscription = this.textboxService.getMessage().subscribe((message) => {
+        this.subscription = this.textboxService.messages.subscribe((message) => {
             if (message) {
                 this.messages.push(message);
                 setTimeout(() => {

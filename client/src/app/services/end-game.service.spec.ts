@@ -22,7 +22,7 @@ describe('GameService', () => {
         gameServiceSpy.playerScore = new Subject<number>();
         gameServiceSpy.opponentHand = new Subject<PlayerHand>();
         gameServiceSpy.opponentScore = new Subject<number>();
-        textboxServiceSpy = jasmine.createSpyObj('TextboxService', ['sendMessage']);
+        textboxServiceSpy = jasmine.createSpyObj('TextboxService', ['displayMessage']);
 
         TestBed.configureTestingModule({
             providers: [
@@ -115,7 +115,7 @@ describe('GameService', () => {
         service.playerHand.add('a');
         service.opponentHand.add('c');
         service.showLettersLeft(service.playerHand, service.opponentHand);
-        expect(textboxServiceSpy.sendMessage).toHaveBeenCalled();
+        expect(textboxServiceSpy.displayMessage).toHaveBeenCalled();
     });
 
     it(' endGame should run deductPoint, addPoint and showLettersLeft if checkIfGameEnd return true ', () => {

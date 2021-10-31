@@ -1,4 +1,4 @@
-.textThread {
+.textbox {
     font-size: 15px;
     border: 5px solid black;
     border-radius: 5px;
@@ -10,9 +10,13 @@
 }
 
 .system-message {
-    color: red;
+    color: crimson;
 }
 
 .user-message {
-    color: cornflowerblue;
+    color: goldenrod;
+}
+
+.own-message {
+    color: dodgerblue;
 }
