@@ -2,6 +2,8 @@ import { GameInfo } from '@app/classes/game-info';
 import { MessageType } from '@app/classes/message';
 import * as http from 'http';
 import * as io from 'socket.io';
+import { GameService } from './game.service';
+import { LetterExchangeService } from './letter-exchange.service';
 
 export class WebSocketService {
     waitingRooms = new Map<string, GameInfo>();
@@ -9,7 +11,7 @@ export class WebSocketService {
 
     private sio: io.Server;
 
-    constructor(server: http.Server) {
+    constructor(server: http.Server, private exchangeService: LetterExchangeService, private gameService: GameService) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
 
@@ -63,7 +65,6 @@ export class WebSocketService {
                 socket.broadcast.to(room).emit('receiveMessage', MessageType.User, message);
             });
 
-            // TODO: Implement serverside word validation
             socket.on('place', (position: string, word: string) => {
                 const room = this.activeSockets.get(socket.id);
                 const message = `Succès de la commande : !placer ${position} ${word}`;
@@ -80,7 +81,12 @@ export class WebSocketService {
                 if (room === undefined) {
                     return;
                 }
-                socket.emit('receiveMessage', MessageType.System, message);
+                if (this.exchangeService.capacityReserve()) {
+                    socket.emit('receiveMessage', MessageType.System, message);
+                    // TODO: add an identification method for each player
+                    this.gameService.player1Hand = this.exchangeService.exchangeLetter(letters);
+                    socket.emit('newExchangeHand', this.gameService.player1Hand);
+                }
             });
         });
     }

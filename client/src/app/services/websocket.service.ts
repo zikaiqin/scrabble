@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { GameInfo } from '@app/classes/game-info';
 import { MessageType } from '@app/classes/message';
+import { AlertService } from '@app/services/alert.service';
 import { Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
+import { GameService } from './game.service';
 import { TextboxService } from './textbox.service';
-import { AlertService } from '@app/services/alert.service';
 
 const url = '//localhost:3000';
 
@@ -17,7 +18,7 @@ export class WebsocketService {
     startGame = new Subject<GameInfo>();
     roomList = new Subject<GameInfo[]>();
 
-    constructor(private textBox: TextboxService, private alertService: AlertService) {}
+    constructor(private textBox: TextboxService, private alertService: AlertService, private gameService: GameService) {}
 
     attachListeners(): void {
         this.socket.on('connect', () => {
@@ -31,6 +32,10 @@ export class WebsocketService {
 
             this.socket.on('receiveMessage', (type: MessageType, message: string) => {
                 this.textBox.displayMessage(type, message);
+            });
+
+            this.socket.on('newExchangeHand', (playerHand) => {
+                this.gameService.playerHand = playerHand;
             });
         });
         this.socket.on('disconnect', (reason) => {

@@ -34,7 +34,7 @@ export class GameService {
         const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== configs.username);
 
         this.player1 = configs.username;
-        this.player2 = validBotNames[Math.floor(Math.random() * validBotNames.length)]; // TODO get the actual name of the second user
+        this.player2 = validBotNames[Math.floor(Math.random() * validBotNames.length)]; // TODO: get the actual name of the second user
         this.randomized = !!configs.randomized;
 
         this.player1Hand = new PlayerHand();
