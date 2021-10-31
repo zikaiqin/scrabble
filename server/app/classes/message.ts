@@ -5,4 +5,5 @@ export interface Message {
 export enum MessageType {
     System = 'system-message',
     User = 'user-message',
+    Own = 'own-message',
 }

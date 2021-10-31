@@ -16,6 +16,8 @@
         "noImplicitReturns": true,
         "suppressImplicitAnyIndexErrors": true,
         "strictNullChecks": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "paths": {
             "@app/*": ["./app/*"]
         }
