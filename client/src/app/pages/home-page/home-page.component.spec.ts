@@ -2,16 +2,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HomePageComponent } from './home-page.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AlertService } from '@app/services/alert.service';
 
 describe('HomePageComponent', () => {
     let component: HomePageComponent;
     let fixture: ComponentFixture<HomePageComponent>;
+    const alertServiceSpy = jasmine.createSpyObj('AlertService', ['showAlert']);
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [RouterTestingModule, MatSnackBarModule],
+            imports: [RouterTestingModule],
             declarations: [HomePageComponent],
+            providers: [{ provide: AlertService, useValue: alertServiceSpy }],
         }).compileComponents();
     });
 

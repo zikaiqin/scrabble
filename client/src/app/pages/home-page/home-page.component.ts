@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { GameService } from '@app/services/game.service';
 import { GameInfo, GameMode, GameType } from '@app/classes/game-info';
 import { WebsocketService } from '@app/services/websocket.service';
@@ -17,13 +16,9 @@ export class HomePageComponent {
     showWaitingRoom = false;
     gameConfigs: GameInfo;
 
-    constructor(private router: Router, private gameService: GameService, private snackBar: MatSnackBar, private webSocketService: WebsocketService) {
+    constructor(private router: Router, private gameService: GameService, private webSocketService: WebsocketService) {
         this.webSocketService.socketEvent.asObservable().subscribe((event) => {
-            if (event === 'roomNotFound') {
-                this.showAlert("La partie que vous avez essayé de joindre n'est plus disponible");
-            }
             if (event === 'connectionLost') {
-                this.showAlert('La connexion au serveur a été interrompue');
                 if (this.showWaitingRoom) {
                     this.showWaitingRoom = false;
                 }
@@ -55,7 +50,7 @@ export class HomePageComponent {
 
             if (this.showWaitingRoom) {
                 this.showWaitingRoom = false;
-                this.leaveRoom();
+                this.webSocketService.disconnect();
                 return;
             }
             if (this.gameType) {
@@ -92,18 +87,11 @@ export class HomePageComponent {
     joinRoom(configs: GameInfo): void {
         if (configs.roomID !== undefined) {
             this.webSocketService.joinRoom(configs.roomID);
-        } else {
-            this.showAlert("Une erreur s'est produite lors de la connexion à une partie");
         }
     }
 
     leaveRoom(): void {
-        this.webSocketService.leaveRoom();
         this.webSocketService.disconnect();
-    }
-
-    showAlert(message: string): void {
-        this.snackBar.open(message, 'Fermer');
     }
 
     get roomList() {

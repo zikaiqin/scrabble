@@ -4,6 +4,7 @@ import { GameInfo } from '@app/classes/game-info';
 import { Subject } from 'rxjs';
 import { MessageType } from '@app/classes/message';
 import { TextboxService } from './textbox.service';
+import { AlertService } from '@app/services/alert.service';
 
 const url = '//localhost:3000';
 
@@ -16,21 +17,19 @@ export class WebsocketService {
     startGame = new Subject<GameInfo>();
     roomList = new Subject<GameInfo[]>();
 
-    constructor(private textBox: TextboxService) {}
+    constructor(private textBox: TextboxService, private alertService: AlertService) {}
 
-    handleSocket(): void {
+    attachListeners(): void {
         this.socket.on('connect', () => {
-            // eslint-disable-next-line no-console
-            console.log(`connection on socket: "${this.socket.id}"`);
-            this.socket.on('updateRooms', (rooms) => this.roomList.next(rooms));
+            this.socket.on('updateRooms', (rooms: GameInfo[]) => {
+                this.roomList.next(rooms);
+            });
 
             this.socket.on('startGame', (configs: GameInfo) => {
                 this.startGame.next(configs);
             });
 
             this.socket.on('receiveMessage', (type: MessageType, message: string) => {
-                // eslint-disable-next-line no-console
-                console.log(`received message on socket: "${this.socket.id}"`);
                 this.textBox.sendMessage(type, message);
             });
         });
@@ -39,8 +38,8 @@ export class WebsocketService {
                 return;
             }
             this.roomList.next([]);
+            this.alertService.showAlert('La connexion au serveur a été interrompue');
             this.socketEvent.next('connectionLost');
-            this.socket.connect();
         });
     }
 
@@ -55,16 +54,9 @@ export class WebsocketService {
     joinRoom(roomID: string): void {
         this.socket.emit('joinRoom', roomID, (response: { status: string; configs: GameInfo }) => {
             if (response.status !== 'ok') {
-                this.socketEvent.next('roomNotFound');
+                this.alertService.showAlert("La partie que vous avez essayé de joindre n'est plus disponible");
             }
         });
-    }
-
-    /**
-     * @description Leave the waiting room
-     */
-    leaveRoom(): void {
-        this.socket.emit('leaveRoom');
     }
 
     /**
@@ -76,7 +68,7 @@ export class WebsocketService {
 
     connect(): void {
         this.socket = io(url).connect();
-        this.handleSocket();
+        this.attachListeners();
     }
 
     disconnect(): void {

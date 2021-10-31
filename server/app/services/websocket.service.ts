@@ -5,7 +5,7 @@ import { MessageType } from '@app/classes/message';
 
 export class WebSocketService {
     waitingRooms = new Map<string, GameInfo>();
-    activeRooms = new Map<string, string>();
+    activeSockets = new Map<string, string>();
 
     private sio: io.Server;
 
@@ -25,7 +25,7 @@ export class WebSocketService {
                 const room = `_${socket.id}`;
                 socket.join(room);
                 this.waitingRooms.set(room, configs);
-                this.activeRooms.set(socket.id, room);
+                this.activeSockets.set(socket.id, room);
                 this.sio.emit('updateRooms', this.roomList);
             });
 
@@ -40,35 +40,23 @@ export class WebSocketService {
                     // eslint-disable-next-line no-console
                     console.log(`client on socket: "${socket.id}" joined room with id: "${room}"`);
                     socket.join(room);
-                    this.activeRooms.set(socket.id, room);
-                    const configs = this.waitingRooms.get(room);
-                    this.waitingRooms.delete(room);
-                    this.sio.emit('updateRooms', this.roomList);
-                    this.sio.to(room).emit('startGame', configs);
+                    this.activeSockets.set(socket.id, room);
+                    this.sio.to(room).emit('startGame', this.waitingRooms.get(room));
+                    this.deleteRoom(room);
                     response({
                         status: 'ok',
                     });
                 }
             });
 
-            socket.on('leaveRoom', () => {
-                // eslint-disable-next-line no-console
-                console.log(`room vacated by client on socket: "${socket.id}"`);
-                this.leaveRoom(socket);
-                this.waitingRooms.delete(socket.id);
-                this.sio.emit('updateRooms', this.roomList);
-            });
-
             socket.on('disconnect', (reason) => {
                 // eslint-disable-next-line no-console
                 console.log(`client on socket: "${socket.id}" has disconnected with reason: "${reason}"`);
-                this.leaveRoom(socket);
-                this.waitingRooms.delete(socket.id);
-                this.sio.emit('updateRooms', this.roomList);
+                this.disconnect(socket);
             });
 
             socket.on('sendMessage', (message: string) => {
-                const room = this.activeRooms.get(socket.id);
+                const room = this.activeSockets.get(socket.id);
                 if (room === undefined) {
                     return;
                 }
@@ -77,12 +65,19 @@ export class WebSocketService {
         });
     }
 
-    leaveRoom(socket: io.Socket) {
-        const roomID = this.activeRooms.get(socket.id);
-        if (roomID !== undefined) {
-            socket.leave(roomID);
+    disconnect(socket: io.Socket) {
+        const roomID = this.activeSockets.get(socket.id);
+        if (roomID === undefined) {
+            return;
         }
-        this.activeRooms.delete(socket.id);
+        socket.leave(roomID);
+        this.activeSockets.delete(socket.id);
+        this.deleteRoom(roomID);
+    }
+
+    deleteRoom(roomID: string) {
+        this.waitingRooms.delete(roomID);
+        this.sio.emit('updateRooms', this.roomList);
     }
 
     get roomList(): GameInfo[] {
