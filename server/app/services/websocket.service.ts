@@ -82,23 +82,6 @@ export class WebSocketService {
                 }
                 socket.emit('receiveMessage', MessageType.System, message);
             });
-            /* TEMPORARY */
-            socket.on('place', (position: string, word: string) => {
-                const room = this.activeRooms.get(socket.id);
-                const message = 'Placed successfully ' + position + ' and ' + word;
-                if (room === undefined) {
-                    return;
-                }
-                this.sio.to(room).emit('receiveMessage', MessageType.User, message);
-            });
-            socket.on('exchange', (letters: string) => {
-                const room = this.activeRooms.get(socket.id);
-                const message = 'Exchanged successfully ' + letters;
-                if (room === undefined) {
-                    return;
-                }
-                this.sio.to(room).emit('receiveMessage', MessageType.User, message);
-            });
         });
     }
 
