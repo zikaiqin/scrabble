@@ -86,7 +86,7 @@ export class HomePageComponent {
 
     joinRoom(configs: GameInfo): void {
         if (configs.roomID !== undefined) {
-            this.webSocketService.joinRoom(configs.roomID);
+            this.webSocketService.joinRoom(configs);
         }
     }
 

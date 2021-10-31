@@ -31,7 +31,7 @@ export class WebSocketService {
                 this.sio.emit('updateRooms', this.roomList);
             });
 
-            socket.on('joinRoom', (room: string, response) => {
+            socket.on('joinRoom', (username: string, room: string, response) => {
                 if (!this.waitingRooms.has(room)) {
                     // eslint-disable-next-line no-console
                     console.log(`client on socket: "${socket.id}" attempted to join non-existent room with id: "${room}"`);
