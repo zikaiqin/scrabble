@@ -50,11 +50,7 @@ export class LetterExchangeService {
         // contient dans la main
 
         // au moins 7 lettres dans la reserve
-        const canExchange = this.isInHand(this.letters, this.playerHand) && this.capacityReserve();
-        if (canExchange) {
-            this.exchangeLetter();
-            this.gameService.turnState.next(!this.turnState);
-        }
+        const canExchange = this.isInHand(this.letters, this.playerHand);
         return canExchange;
     }
 

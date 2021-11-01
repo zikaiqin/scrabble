@@ -1,8 +1,10 @@
 import { Application } from '@app/app';
+import { WebSocketService } from '@app/services/websocket.service';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
-import { WebSocketService } from '@app/services/websocket.service';
+import { GameService } from './services/game.service';
+import { LetterExchangeService } from './services/letter-exchange.service';
 
 @Service()
 export class Server {
@@ -12,7 +14,7 @@ export class Server {
     private server: http.Server;
     private websocketService: WebSocketService;
 
-    constructor(private readonly application: Application) {}
+    constructor(private readonly application: Application, private exchangeService: LetterExchangeService, private gameService: GameService) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
         const port: number = typeof val === 'string' ? parseInt(val, this.baseDix) : val;
@@ -29,7 +31,7 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
-        this.websocketService = new WebSocketService(this.server);
+        this.websocketService = new WebSocketService(this.server, this.exchangeService, this.gameService);
         this.websocketService.handleSockets();
 
         this.server.listen(Server.appPort);

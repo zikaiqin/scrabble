@@ -36,6 +36,7 @@ export class WebsocketService {
 
             this.socket.on('newExchangeHand', (playerHand) => {
                 this.gameService.playerHand = playerHand;
+                console.log(this.gameService.playerHand);
             });
         });
         this.socket.on('disconnect', (reason) => {
