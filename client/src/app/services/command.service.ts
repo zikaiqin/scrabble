@@ -40,7 +40,7 @@ export class CommandService {
                 '!placer',
                 (position: string, word: string): boolean => {
                     if (this.letterPlacingService.validateCommand(position, word)) {
-                        this.websocketService.placeLetters(position, word);
+                        this.websocketService.placeLetters(this.letterPlacingService.startCoords, this.letterPlacingService.letters);
                         return true;
                     }
                     return false;

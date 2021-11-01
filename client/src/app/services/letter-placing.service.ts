@@ -16,10 +16,10 @@ export class LetterPlacingService {
     direction: string;
     word: string;
     letters: Map<string, string>;
+    gameBoard: GameBoard;
 
     private playerScore: number = 0;
     private turnState: boolean;
-    private gameBoard: GameBoard;
     private playerHand: PlayerHand = new PlayerHand();
 
     constructor(private textboxService: TextboxService, private gameService: GameService, private validationService: ValidationService) {

@@ -66,16 +66,17 @@ export class SocketService {
                 socket.broadcast.to(room).emit('receiveMessage', MessageType.User, message);
             });
 
-            socket.on('place', (position: string, word: string) => {
+            // TODO
+            socket.on('place', (startCoord: string, letters: Map<string, string>) => {
                 const room = this.activeRooms.get(socket.id);
-                const message = `Succès de la commande : !placer ${position} ${word}`;
                 if (room === undefined) {
                     return;
                 }
+                void [startCoord, letters];
                 this.socketEvents.emit('place');
-                socket.emit('receiveMessage', MessageType.System, message);
             });
 
+            // TODO
             socket.on('exchange', (letters: string) => {
                 const room = this.activeRooms.get(socket.id);
                 const message = `Succès de la commande : !échanger ${letters}`;
