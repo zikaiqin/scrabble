@@ -32,15 +32,22 @@ export class GameService {
                 // TODO: letter exchange logic
                 this.exchangeService.exchangeLetters('', new Player(''), new Reserve());
             })
-            .on('place', () => {
-                // TODO: letter placing logic
-                this.placingService.replenishHand(new Reserve(), new Player(''));
+            .on('place', (startCoord, letters, roomId, socketId) => {
+                // TODO: add emits back to the client for visual updates (if not already done)
+                const room = this.games.get(roomId);
+                if (room === undefined) return;
+                const player = room.players.get(socketId);
+                if (player === undefined) return;
 
-                // TODO: validation logic
-                void this.validationService.index;
+                this.placingService.placeLetters(letters, room.board, player);
 
-                // TODO: update points
-                // scores are stored in a Player, which are obtained using Game.players.get(socketID) => Player
+                this.validationService.init(startCoord, letters, room.board);
+
+                // scores are stored in a Player, they are tracked inside a Game using players.get(socketID) => Player
+                if (this.validationService.findWord(this.validationService.fetchWords())) {
+                    player.score += this.validationService.calcPoints();
+                    this.placingService.replenishHand(room.reserve, player);
+                } else this.placingService.returnLetters(letters, room.board, player);
             })
             .on('skipTurn', (roomID: string) => {
                 // TODO: count turn skips

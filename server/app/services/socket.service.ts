@@ -1,8 +1,8 @@
-import * as http from 'http';
-import * as io from 'socket.io';
-import EventEmitter from 'events';
 import { GameInfo } from '@app/classes/game-info';
 import { MessageType } from '@app/classes/message';
+import EventEmitter from 'events';
+import * as http from 'http';
+import * as io from 'socket.io';
 import { Service } from 'typedi';
 
 @Service()
@@ -71,8 +71,7 @@ export class SocketService {
                 if (room === undefined) {
                     return;
                 }
-                void [startCoord, letters];
-                this.socketEvents.emit('place');
+                this.socketEvents.emit('place', startCoord, letters, room, socket.id);
             });
 
             // TODO
