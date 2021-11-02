@@ -140,6 +140,10 @@ export class SocketService {
         this.sio.to(socketID).emit('updateTurn', turnState);
     }
 
+    displayLettersLeft(roomID: string, messageType: MessageType, message: string) {
+        this.sio.to(roomID).emit('receiveMessage', messageType, message);
+    }
+
     get roomList(): GameInfo[] {
         return Array.from(this.waitingRooms.entries(), ([roomID, configs]) => {
             return { ...configs, roomID };

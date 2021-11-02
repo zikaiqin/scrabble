@@ -10,6 +10,7 @@ import { ValidationService } from '@app/services/validation.service';
 import { ExchangeService } from '@app/services/exchange.service';
 import { PlacingService } from '@app/services/placing.service';
 import { DEFAULT_BONUSES, DEFAULT_TURN_LENGTH } from '@app/classes/game-config';
+import { EndGameService } from '@app/services/end-game.service';
 
 @Service()
 export class GameService {
@@ -21,6 +22,7 @@ export class GameService {
         private exchangeService: ExchangeService,
         private placingService: PlacingService,
         private validationService: ValidationService,
+        private endGameService: EndGameService,
     ) {}
 
     attachListeners() {
@@ -50,7 +52,7 @@ export class GameService {
                 } else this.placingService.returnLetters(letters, room.board, player);
             })
             .on('skipTurn', (roomID: string) => {
-                // TODO: count turn skips
+                this.endGameService.turnSkipCount();
                 this.changeTurn(roomID);
             })
             .on('disconnect', (socketID: string, roomID: string) => {
@@ -114,6 +116,7 @@ export class GameService {
             .on('updateTurn', (turnState: boolean) => {
                 this.updateTurn(players[0].socketID, turnState, timer);
                 this.updateTurn(players[1].socketID, !turnState, timer);
+                this.endGameService.endGame(roomID, game.reserve, hands[0], hands[1]);
             });
 
         timer.changeTurn();
