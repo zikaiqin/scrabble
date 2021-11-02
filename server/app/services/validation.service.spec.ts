@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { GameBoard } from '@app/classes/game-board';
+import { Board } from '@app/classes/board';
 import { DEFAULT_BONUSES } from '@app/classes/game-config';
 import { ASCII_SMALL_A, ValidationService } from './validation.service';
 
@@ -39,7 +39,7 @@ describe('ValidationService', () => {
         validDictSearch = ['abaca', 'aas', 'abacule'];
         invalidDictSearch = ['aaa', 'aasss', 'xfdjk'];
 
-        service.gameBoard = new GameBoard(DEFAULT_BONUSES);
+        service.gameBoard = new Board(DEFAULT_BONUSES);
     });
 
     it('should be created', () => {

@@ -1,4 +1,4 @@
-export class GameBoard {
+export class Board {
     readonly letters: Map<string, string>;
     readonly bonuses: Map<string, string>;
 

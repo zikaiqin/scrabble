@@ -4,11 +4,11 @@ import { Subject } from 'rxjs';
 import { GameService } from './game.service';
 // import { GridService } from '@app/services/grid.service';
 // import { GameService } from '@app/services/game.service';
-import { LetterExchangeService } from './letter-exchange.service';
+import { ExchangeService } from './exchange.service';
 // import { PlayerHand } from '@app/classes/player-hand';
 // const HAND_SIZE = 7;
 describe('LetterExchangeService', () => {
-    let service: LetterExchangeService;
+    let service: ExchangeService;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
 
     beforeEach(() => {
@@ -18,7 +18,7 @@ describe('LetterExchangeService', () => {
         TestBed.configureTestingModule({
             providers: [{ provide: GameService, useValue: gameServiceSpy }],
         });
-        service = TestBed.inject(LetterExchangeService);
+        service = TestBed.inject(ExchangeService);
     });
 
     it('should be created', () => {

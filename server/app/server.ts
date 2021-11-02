@@ -1,10 +1,12 @@
 import { Application } from '@app/app';
-import { WebSocketService } from '@app/services/websocket.service';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
 import { GameService } from './services/game.service';
-import { LetterExchangeService } from './services/letter-exchange.service';
+import { SocketService } from '@app/services/socket.service';
+import { ExchangeService } from '@app/services/exchange.service';
+import { PlacingService } from '@app/services/placing.service';
+import { ValidationService } from '@app/services/validation.service';
 
 @Service()
 export class Server {
@@ -12,9 +14,15 @@ export class Server {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     private static readonly baseDix: number = 10;
     private server: http.Server;
-    private websocketService: WebSocketService;
+    private websocketService: SocketService;
+    private gameService: GameService;
 
-    constructor(private readonly application: Application, private exchangeService: LetterExchangeService, private gameService: GameService) {}
+    constructor(
+        private readonly application: Application,
+        private exchangeService: ExchangeService,
+        private placingService: PlacingService,
+        private validationService: ValidationService,
+    ) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
         const port: number = typeof val === 'string' ? parseInt(val, this.baseDix) : val;
@@ -31,8 +39,11 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
-        this.websocketService = new WebSocketService(this.server, this.exchangeService, this.gameService);
+        this.websocketService = new SocketService(this.server);
         this.websocketService.handleSockets();
+
+        this.gameService = new GameService(this.websocketService, this.exchangeService, this.placingService, this.validationService);
+        this.gameService.attachListeners();
 
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));

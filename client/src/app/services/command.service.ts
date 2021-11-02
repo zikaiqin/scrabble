@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { MessageType } from '@app/classes/message';
+import { Subscription } from 'rxjs';
 import { LetterExchangeService } from '@app/services/letter-exchange.service';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
-import { Subscription } from 'rxjs';
-import { EndGameService } from './end-game.service';
-import { TurnService } from './turn.service';
-import { WebsocketService } from './websocket.service';
+import { EndGameService } from '@app/services/end-game.service';
+import { TurnService } from '@app/services/turn.service';
+import { WebsocketService } from '@app/services/websocket.service';
+import { MessageType } from '@app/classes/message';
 
 @Injectable({
     providedIn: 'root',
@@ -87,8 +87,8 @@ export class CommandService {
             ],
         ]);
 
-        this.subscription = this.turnService.getState().subscribe((turn) => {
-            this.turn = turn;
+        this.subscription = this.websocketService.gameTurn.asObservable().subscribe((turnState) => {
+            this.turn = !!turnState;
         });
     }
 

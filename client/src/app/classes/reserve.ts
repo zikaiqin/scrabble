@@ -1,21 +1,14 @@
 export class Reserve {
     readonly letters: string[];
-    size: number;
 
     constructor() {
         this.letters = Object.assign([], BASE_RESERVE);
-        this.size = this.letters.length;
-    }
-
-    getSize(): number {
-        return this.size;
     }
 
     drawOne(): string | undefined {
         if (this.size <= 0) {
             return undefined;
         }
-        this.size--;
         const index = Math.floor(Math.random() * this.size);
         return this.letters.splice(index, 1)[0];
     }
@@ -33,7 +26,10 @@ export class Reserve {
 
     receiveOne(word: string): void {
         this.letters.push(word);
-        this.size++;
+    }
+
+    get size(): number {
+        return this.letters.length;
     }
 }
 

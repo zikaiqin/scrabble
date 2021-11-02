@@ -76,14 +76,23 @@
     border-top: 5px solid black;
 }
 
-#timer {
+.timer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.time {
     padding: 40px;
     font-size: 1cm;
     text-align: center;
 }
 
-#passer {
-    padding: 40px;
+.pass-button {
+    font-size: 18pt;
+    font-weight: normal;
+    padding: 10px 30px 10px 30px;
 }
 
 .end {

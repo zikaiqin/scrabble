@@ -1,80 +1,115 @@
-import { GameBoard } from '@app/classes/game-board';
-import { DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_HAND_SIZE } from '@app/classes/game-config';
-import { GameInfo } from '@app/classes/game-info';
-import { PlayerHand } from '@app/classes/player-hand';
-import { Reserve } from '@app/classes/reserve';
 import { Service } from 'typedi';
+import { GameInfo } from '@app/classes/game-info';
+import { Game } from '@app/classes/game';
+import { Board } from '@app/classes/board';
+import { Player } from '@app/classes/player';
+import { Reserve } from '@app/classes/reserve';
+import { Timer } from '@app/classes/timer';
+import { SocketService } from '@app/services/socket.service';
+import { ValidationService } from '@app/services/validation.service';
+import { ExchangeService } from '@app/services/exchange.service';
+import { PlacingService } from '@app/services/placing.service';
+import { DEFAULT_BONUSES, DEFAULT_TURN_LENGTH } from '@app/classes/game-config';
 
 @Service()
 export class GameService {
-    isInit: boolean;
-    isStarted: boolean;
+    games = new Map<string, Game>();
+    timers = new Map<string, Timer>();
 
-    player1: string;
-    player2: string;
+    constructor(
+        private socketService: SocketService,
+        private exchangeService: ExchangeService,
+        private placingService: PlacingService,
+        private validationService: ValidationService,
+    ) {}
 
-    player1Hand: PlayerHand;
-    player2Hand: PlayerHand;
+    attachListeners() {
+        this.socketService.socketEvents
+            .on('createGame', (roomID, configs, players) => {
+                this.createGame(roomID, configs, players);
+            })
+            .on('exchange', () => {
+                // TODO: letter exchange logic
+                this.exchangeService.exchangeLetters('', new Player(''), new Reserve());
+            })
+            .on('place', () => {
+                // TODO: letter placing logic
+                this.placingService.replenishHand(new Reserve(), new Player(''));
 
-    player1Score: number;
-    player2Score: number;
+                // TODO: validation logic
+                void this.validationService.index;
 
-    reserve: Reserve;
-
-    gameBoard: GameBoard;
-    randomized: boolean;
-
-    turnState: boolean;
-
-    /**
-     * @description Function that initializes the variables
-     * @param configs game settings
-     */
-    init(configs: GameInfo): void {
-        const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== configs.username);
-
-        this.player1 = configs.username;
-        this.player2 = validBotNames[Math.floor(Math.random() * validBotNames.length)]; // TODO: get the actual name of the second user
-        this.randomized = !!configs.randomized;
-
-        this.player1Hand = new PlayerHand();
-        this.player2Hand = new PlayerHand();
-
-        this.isInit = true;
-        this.isStarted = false;
+                // TODO: update points
+            })
+            .on('skipTurn', (roomID: string) => {
+                this.changeTurn(roomID);
+            })
+            .on('disconnect', (socketID: string, roomID: string) => {
+                if (Array.from(this.socketService.activeRooms.values()).includes(roomID)) {
+                    // TODO: declare forfeit by player on socketID
+                } else {
+                    // TODO?: event listener lifecycle unclear -- detach event listeners associated to the timer if necessary
+                    this.games.delete(roomID);
+                    this.timers.get(roomID)?.clearTimer();
+                    this.timers.delete(roomID);
+                }
+            });
     }
 
-    /**
-     * @description Function that declares the start of the game (assignation of turns, filling up the player's hand, etc)
-     */
-    start(): void {
-        this.reserve = new Reserve();
+    createGame(roomID: string, configs: GameInfo, players: { socketID: string; username: string }[]) {
+        const bonuses = this.getBonuses(!!configs.randomized);
 
-        this.gameBoard = new GameBoard(this.bonuses);
+        const game = new Game(new Board(bonuses), new Map(players.map((entry) => [entry.socketID, new Player(entry.username)])));
+        const timer = new Timer(roomID, configs.turnLength ? configs.turnLength : DEFAULT_TURN_LENGTH);
 
-        this.player1Score = 0;
-        this.player2Score = 0;
+        this.games.set(roomID, game);
+        this.timers.set(roomID, timer);
 
-        const playerHand = this.reserve.draw(DEFAULT_HAND_SIZE);
-        const opponentHand = this.reserve.draw(DEFAULT_HAND_SIZE);
+        timer.timerEvents
+            .on('updateTime', (time: number) => {
+                this.socketService.updateTime(roomID, time);
+            })
+            .on('updateTurn', (turnState: boolean) => {
+                this.updateTurn(players[0].socketID, turnState, timer);
+                this.updateTurn(players[1].socketID, !turnState, timer);
+            });
 
-        if (playerHand !== undefined && opponentHand !== undefined) {
-            this.player1Hand.addAll(playerHand);
-            this.player2Hand.addAll(opponentHand);
-        }
-
-        const turnState = Boolean(Math.floor(Math.random() * 2));
-        this.turnState = turnState;
+        timer.changeTurn();
     }
 
-    get bonuses(): Map<string, string> {
-        if (!this.randomized) {
+    getBonuses(randomized: boolean): Map<string, string> {
+        if (!randomized) {
             return DEFAULT_BONUSES;
         }
         const keys = Array.from(DEFAULT_BONUSES.keys()).sort(() => HALF - Math.random());
         const values = Array.from(DEFAULT_BONUSES.values());
         return new Map(keys.map((key, index) => [key, values[index]]));
     }
+
+    changeTurn(roomID: string): void {
+        const timer = this.timers.get(roomID);
+        if (timer !== undefined) {
+            timer.changeTurn();
+        }
+    }
+
+    /**
+     * @description Send turn updates to sockets. Ends one's turn immediately, but waits 3 seconds to start other's turn.
+     * @param socketID
+     * @param turnState
+     * @param timer
+     */
+    updateTurn(socketID: string, turnState: boolean, timer: Timer) {
+        if (turnState) {
+            setTimeout(() => {
+                timer.startTimer();
+                this.socketService.updateTurn(socketID, turnState);
+            }, CHANGE_TURN_DELAY);
+        } else {
+            this.socketService.updateTurn(socketID, turnState);
+        }
+    }
 }
 
+const CHANGE_TURN_DELAY = 3000;
 const HALF = 0.5;

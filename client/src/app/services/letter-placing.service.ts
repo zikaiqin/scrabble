@@ -7,40 +7,6 @@ import { GameService } from '@app/services/game.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { ValidationService } from '@app/services/validation.service';
 
-const BOUNDARY = 15;
-const VALIDATION_TIMEOUT = 3000;
-const CENTER_TILE = 'h8';
-const WILDCARD = '*';
-const WILDCARD_RE = /[A-Z]/;
-const SPECIAL_CHARS = new Map<string, string>([
-    ['à', 'a'],
-    ['è', 'e'],
-    ['ù', 'u'],
-    ['é', 'e'],
-    ['â', 'a'],
-    ['ê', 'e'],
-    ['î', 'i'],
-    ['ô', 'o'],
-    ['û', 'u'],
-    ['ë', 'e'],
-    ['ï', 'i'],
-    ['ü', 'u'],
-    ['ç', 'c'],
-    ['À', 'A'],
-    ['È', 'E'],
-    ['Ù', 'U'],
-    ['É', 'E'],
-    ['Â', 'A'],
-    ['Ê', 'E'],
-    ['Î', 'I'],
-    ['Ô', 'O'],
-    ['Û', 'U'],
-    ['Ë', 'E'],
-    ['Ï', 'I'],
-    ['Ü', 'U'],
-    ['Ç', 'C'],
-]);
-
 @Injectable({
     providedIn: 'root',
 })
@@ -298,3 +264,37 @@ export class LetterPlacingService {
         return specialChars.test(letter) ? SPECIAL_CHARS.get(letter) : letter;
     }
 }
+
+const BOUNDARY = 15;
+const VALIDATION_TIMEOUT = 3000;
+const CENTER_TILE = 'h8';
+const WILDCARD = '*';
+const WILDCARD_RE = /[A-Z]/;
+const SPECIAL_CHARS = new Map<string, string>([
+    ['à', 'a'],
+    ['è', 'e'],
+    ['ù', 'u'],
+    ['é', 'e'],
+    ['â', 'a'],
+    ['ê', 'e'],
+    ['î', 'i'],
+    ['ô', 'o'],
+    ['û', 'u'],
+    ['ë', 'e'],
+    ['ï', 'i'],
+    ['ü', 'u'],
+    ['ç', 'c'],
+    ['À', 'A'],
+    ['È', 'E'],
+    ['Ù', 'U'],
+    ['É', 'E'],
+    ['Â', 'A'],
+    ['Ê', 'E'],
+    ['Î', 'I'],
+    ['Ô', 'O'],
+    ['Û', 'U'],
+    ['Ë', 'E'],
+    ['Ï', 'I'],
+    ['Ü', 'U'],
+    ['Ç', 'C'],
+]);

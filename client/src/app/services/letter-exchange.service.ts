@@ -3,8 +3,7 @@ import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
 import { GameService } from '@app/services/game.service';
 import { TextboxService } from '@app/services/textbox.service';
-
-const HAND_SIZE = 7;
+import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 
 @Injectable({
     providedIn: 'root',
@@ -31,60 +30,30 @@ export class LetterExchangeService {
     validateCommand(letters: string): boolean {
         this.letters = letters;
 
-        // Conditions d'une commande valide
-
-        // Doit etre entre 1 et 7
-        if (letters.length < 1 || letters.length > HAND_SIZE) {
+        if (letters.length < 1 || letters.length > DEFAULT_HAND_SIZE) {
             this.textboxService.displayMessage(MessageType.System, 'Doit etre entre 1 et 7');
             return false;
         }
-        // Verifie si ils sont tous en mimuscule
         if (letters !== letters.toLowerCase()) {
             this.textboxService.displayMessage(MessageType.System, 'Doit etre en miniscule');
             return false;
         }
-        // Seulement a mon tour
-        if (!this.isMyTurn()) {
-            return false;
-        }
-        // contient dans la main
-
-        // au moins 7 lettres dans la reserve
-        const canExchange = this.isInHand(this.letters, this.playerHand);
-        return canExchange;
+        return this.gameService.reserve.size >= DEFAULT_HAND_SIZE && this.isMyTurn() && this.isInHand(this.letters, this.playerHand);
     }
 
     /**
      * @description Function that does the action of exchanging the letters in the playerHand with the reserve
      */
     exchangeLetter(): void {
-        this.removeFromHand();
-        this.letters.split('').forEach(() => {
-            const letter = this.gameService.reserve.drawOne();
-            if (letter !== undefined) {
-                this.playerHand.add(letter);
+        this.letters.split('').forEach((oldLetter) => {
+            this.playerHand.remove(oldLetter);
+            this.gameService.reserve.receiveOne(oldLetter);
+            const newLetter = this.gameService.reserve.drawOne();
+            if (newLetter !== undefined) {
+                this.playerHand.add(newLetter);
                 this.gameService.playerHand.next(this.playerHand);
             }
         });
-    }
-
-    /**
-     * @description Function to remove letters from the player's hand
-     */
-    removeFromHand(): void {
-        this.letters.split('').forEach((letter) => {
-            this.playerHand.remove(letter);
-            this.gameService.playerHand.next(this.playerHand);
-            this.gameService.reserve.receiveOne(letter);
-        });
-    }
-
-    /**
-     * @description Function check the capacity of the reserve
-     * @returns true if reserve size is bigger than the player's maximum hand
-     */
-    capacityReserve(): boolean {
-        return this.gameService.reserve.getSize() >= HAND_SIZE;
     }
 
     /**
@@ -104,10 +73,7 @@ export class LetterExchangeService {
             return amountRequired <= amountInHand;
         });
         if (!isInHand) {
-            this.textboxService.displayMessage(
-                MessageType.System,
-                'Les lettres ne peuvent pas être exchange car il contient des lettres qui ne sont pas dans votre main',
-            );
+            this.textboxService.displayMessage(MessageType.System, 'Vous ne pouvez pas échanger des lettres qui ne sont pas dans votre main');
         }
         return isInHand;
     }
@@ -118,7 +84,7 @@ export class LetterExchangeService {
      */
     isMyTurn(): boolean {
         if (!this.turnState) {
-            this.textboxService.displayMessage(MessageType.System, 'La commande !échanger peut seulement être utilisé lors de votre tour');
+            this.textboxService.displayMessage(MessageType.System, 'La commande !échanger peut seulement être utilisée lors de votre tour');
         }
         return this.turnState;
     }

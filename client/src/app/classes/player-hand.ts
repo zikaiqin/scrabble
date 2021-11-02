@@ -1,10 +1,8 @@
 export class PlayerHand {
     readonly letters: string[];
-    size: number;
 
     constructor() {
         this.letters = [];
-        this.size = 0;
     }
 
     has(letter: string): boolean {
@@ -17,19 +15,20 @@ export class PlayerHand {
 
     add(letter: string): void {
         this.letters.push(letter);
-        this.size++;
     }
 
     addAll(letters: string[]): void {
         this.letters.push(...letters);
-        this.size += letters.length;
     }
 
     remove(letter: string): void {
         const index = this.letters.indexOf(letter);
         if (index >= 0) {
             this.letters.splice(index, 1);
-            this.size--;
         }
+    }
+
+    get size(): number {
+        return this.letters.length;
     }
 }

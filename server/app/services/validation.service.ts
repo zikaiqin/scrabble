@@ -1,4 +1,4 @@
-import { GameBoard } from '@app/classes/game-board';
+import { Board } from '@app/classes/board';
 import { DEFAULT_POINTS } from '@app/classes/game-config';
 import { Vec2 } from '@app/classes/vec2';
 import * as data from '@app/services/dictionnary.json';
@@ -22,7 +22,7 @@ export class ValidationService {
     index = 1;
     coordContainer: string[][]; // Contains the formed words' index where the letter is placed
     newWord: Map<string, string>;
-    gameBoard: GameBoard;
+    gameBoard: Board;
 
     private dictionnary = JSON.parse(JSON.stringify(data));
     /**
@@ -31,7 +31,7 @@ export class ValidationService {
      * @param word the word/letter that has been placed on the gameBoard
      * @param gameBoard the current state of the board/game
      */
-    init(startCoords: string, word: Map<string, string>, gameBoard: GameBoard) {
+    init(startCoords: string, word: Map<string, string>, gameBoard: Board) {
         this.startCoord = {
             x: startCoords.charCodeAt(0),
             y: Number(startCoords.slice(1)),

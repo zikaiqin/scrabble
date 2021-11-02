@@ -1,18 +1,13 @@
 import { Component } from '@angular/core';
 import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 import { PlayerHand } from '@app/classes/player-hand';
-import { EndGameService } from '@app/services/end-game.service';
 import { GameService } from '@app/services/game.service';
-import { TurnService } from '@app/services/turn.service';
-import { Subscription } from 'rxjs';
+import { WebsocketService } from '@app/services/websocket.service';
 
 enum PlayerType {
     Human,
     Bot,
 }
-
-const TIMER = 60000; // temporary value just here for demo
-const TIMER_INTERVAL = 1000;
 
 @Component({
     selector: 'app-panneau-info',
@@ -22,8 +17,6 @@ const TIMER_INTERVAL = 1000;
 export class PanneauInfoComponent {
     readonly playerType = PlayerType;
 
-    subscription: Subscription;
-    turn: boolean;
     playerHand: PlayerHand = new PlayerHand();
     opponentHand: PlayerHand = new PlayerHand();
 
@@ -36,15 +29,14 @@ export class PanneauInfoComponent {
     isVisibleGiveUp: boolean;
     isMyTurn: boolean;
 
-    // eslint-disable-next-line no-undef
-    timer: NodeJS.Timeout; // Variable for timer
+    turnTime: number;
 
-    constructor(private gameService: GameService, private turnService: TurnService, private endGameService: EndGameService) {
-        this.subscription = this.turnService.getState().subscribe((turn) => {
-            this.turn = turn;
+    constructor(private gameService: GameService, private websocketService: WebsocketService) {
+        this.websocketService.gameTurn.asObservable().subscribe((turn) => {
+            this.isMyTurn = turn;
         });
-        this.gameService.turnState.asObservable().subscribe({
-            next: (turn: boolean) => (this.isMyTurn = turn),
+        this.websocketService.gameTime.asObservable().subscribe((time) => {
+            this.turnTime = time;
         });
         this.gameService.playerHand.asObservable().subscribe((playerHand) => {
             this.playerHand = playerHand;
@@ -72,6 +64,12 @@ export class PanneauInfoComponent {
         return this.isMyTurn === undefined ? 'LightGray' : this.isMyTurn ? 'Green' : 'Red';
     }
 
+    getTurnTime(): string {
+        const minutes = Math.floor(this.turnTime / MINUTE);
+        const seconds = this.turnTime - minutes * MINUTE;
+        return `${minutes}:${seconds >= MIN_SECONDS ? seconds : `0${seconds}`}`;
+    }
+
     getReserveSize(): number {
         return this.gameService.reserve === undefined ? 0 : this.gameService.reserve.size;
     }
@@ -93,7 +91,6 @@ export class PanneauInfoComponent {
     }
 
     getScore(player: number): number {
-        // Converting Number to number cuz number is primitive and Number is an Oject
         return player === PlayerType.Human ? this.playerScore : this.opponentScore;
     }
 
@@ -101,33 +98,10 @@ export class PanneauInfoComponent {
         return player === PlayerType.Human ? this.gameService.player : this.gameService.opponent;
     }
 
-    startGame(): void {
-        this.isVisibleGiveUp = true;
-        this.gameService.start();
-        this.startTimer();
-    }
-
-    startTimer(): void {
-        let time = TIMER;
-        this.timer = setInterval(() => {
-            const element = document.getElementById('timer');
-            if (element !== null) {
-                element.innerHTML = (time / TIMER_INTERVAL).toString();
-                time -= TIMER_INTERVAL;
-                if (time < 0 || !this.turn) {
-                    this.turnService.changeTurn(false);
-                    element.innerHTML = 'Tour fini';
-                    this.clearTimer();
-                    if (!this.endGameService.checkIfGameEnd()) {
-                        this.endGameService.turnSkipCount();
-                        this.endGameService.endGame();
-                    }
-                }
-            }
-        }, TIMER_INTERVAL);
-    }
-
-    clearTimer(): void {
-        clearInterval(this.timer);
+    skipTurn(): void {
+        this.websocketService.skipturn();
     }
 }
+
+const MINUTE = 60;
+const MIN_SECONDS = 10;

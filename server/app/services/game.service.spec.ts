@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { PlayerHand } from '@app/classes/player-hand';
+import { Player } from '@app/classes/player';
 import { Subject } from 'rxjs';
 import { GameService } from './game.service';
 import { GridService } from './grid.service';
@@ -16,8 +16,8 @@ describe('GameService', () => {
         service = TestBed.inject(GameService);
 
         username = 'testName';
-        service.playerHand = new Subject<PlayerHand>();
-        service.opponentHand = new Subject<PlayerHand>();
+        service.playerHand = new Subject<Player>();
+        service.opponentHand = new Subject<Player>();
         service.playerScore = new Subject<number>();
         service.opponentScore = new Subject<number>();
     });

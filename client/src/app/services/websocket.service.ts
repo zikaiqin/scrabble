@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { GameInfo } from '@app/classes/game-info';
-import { MessageType } from '@app/classes/message';
-import { AlertService } from '@app/services/alert.service';
 import { Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { GameService } from './game.service';
-import { TextboxService } from './textbox.service';
+import { AlertService } from '@app/services/alert.service';
+import { TextboxService } from '@app/services/textbox.service';
+import { GameInfo } from '@app/classes/game-info';
 
 const url = '//localhost:3000';
 
@@ -14,11 +12,15 @@ const url = '//localhost:3000';
 })
 export class WebsocketService {
     socket: Socket;
+
     socketEvent = new Subject<string>();
     startGame = new Subject<GameInfo>();
     roomList = new Subject<GameInfo[]>();
 
-    constructor(private textBox: TextboxService, private alertService: AlertService, private gameService: GameService) {}
+    gameTime = new Subject<number>();
+    gameTurn = new Subject<boolean>();
+
+    constructor(private textBox: TextboxService, private alertService: AlertService) {}
 
     attachListeners(): void {
         this.socket.on('connect', () => {
@@ -26,17 +28,37 @@ export class WebsocketService {
                 this.roomList.next(rooms);
             });
 
-            this.socket.on('startGame', (configs: GameInfo) => {
+            this.socket.on('setConfigs', (configs: GameInfo) => {
                 this.startGame.next(configs);
             });
 
-            this.socket.on('receiveMessage', (type: MessageType, message: string) => {
+            this.socket.on('receiveMessage', (type: string, message: string) => {
                 this.textBox.displayMessage(type, message);
             });
 
-            this.socket.on('newExchangeHand', (playerHand) => {
-                this.gameService.playerHand = playerHand;
-                console.log(this.gameService.playerHand);
+            this.socket.on('updateHand', (hand: string[]) => {
+                void hand;
+            });
+
+            this.socket.on('updateBoard', (board: string[][]) => {
+                void board;
+            });
+
+            this.socket.on('updateReserve', (reserve: string[]) => {
+                void reserve;
+            });
+
+            this.socket.on('updateScores', (scores: number[]) => {
+                // scores[0]: own score | scores[1]: opponent score
+                void scores;
+            });
+
+            this.socket.on('updateTime', (time: number) => {
+                this.gameTime.next(time);
+            });
+
+            this.socket.on('updateTurn', (turn: boolean) => {
+                this.gameTurn.next(turn);
             });
         });
         this.socket.on('disconnect', (reason) => {
@@ -47,18 +69,6 @@ export class WebsocketService {
             this.alertService.showAlert('La connexion au serveur a été interrompue');
             this.socketEvent.next('connectionLost');
         });
-    }
-
-    placeLetters(position: string, word: string): void {
-        this.socket.emit('place', position, word);
-    }
-
-    exchangeLetters(letters: string): void {
-        this.socket.emit('exchange', letters);
-    }
-
-    sendMessage(message: string): void {
-        this.socket.emit('sendMessage', message);
     }
 
     /**
@@ -79,6 +89,22 @@ export class WebsocketService {
                 this.alertService.showAlert("La partie que vous avez essayé de joindre n'est plus disponible");
             }
         });
+    }
+
+    sendMessage(message: string): void {
+        this.socket.emit('sendMessage', message);
+    }
+
+    placeLetters(position: string, word: string): void {
+        this.socket.emit('place', position, word);
+    }
+
+    exchangeLetters(letters: string): void {
+        this.socket.emit('exchange', letters);
+    }
+
+    skipturn(): void {
+        this.socket.emit('skipTurn');
     }
 
     /**

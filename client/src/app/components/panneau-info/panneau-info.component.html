@@ -20,13 +20,10 @@
         </div>
         <div class="reserve">Il reste {{ getReserveSize() }} piece(s) dans la reserve</div>
         <div class="tour" [style.backgroundColor]="getTurnColor()">{{ getTurnMessage() }}</div>
-        <ng-template [ngIf]="isMyTurn !== undefined" [ngIfElse]="startButton">
-            <p id="timer">----</p>
-            <app-pass-turn id="passer" [activePlayer]="isMyTurn"></app-pass-turn>
-        </ng-template>
-        <ng-template #startButton>
-            <button mat-raised-button class="start" (click)="startGame()">Commencer</button>
-        </ng-template>
+        <div class="timer-container">
+            <p class="time">{{ getTurnTime() }}</p>
+            <button mat-raised-button class="pass-button" [disabled]="!isMyTurn" (click)="skipTurn()">Passer</button>
+        </div>
         <app-end-game class="end" [style.display]="isVisibleGiveUp ? 'block' : 'none'"></app-end-game>
     </div>
 </div>

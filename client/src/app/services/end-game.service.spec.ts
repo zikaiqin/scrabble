@@ -55,7 +55,6 @@ describe('GameService', () => {
     it(' checkIfGameEnd should return true if reserve is empty and one of the hand is empty', () => {
         service.opponentHand.add('a');
         gameServiceSpy.reserve.letters.splice(0, gameServiceSpy.reserve.letters.length);
-        gameServiceSpy.reserve.size = EMPTY;
         expect(service.opponentHand.letters).toEqual(['a']);
         expect(service.checkIfGameEnd()).toBe(true);
     });
@@ -68,7 +67,6 @@ describe('GameService', () => {
     it(' checkIfGameEnd should return false if none of the above is true ', () => {
         service.opponentHand.add('a');
         service.playerHand.add('a');
-        gameServiceSpy.reserve.size = EMPTY;
         const result = service.checkIfGameEnd();
         expect(result).toBeFalse();
     });
