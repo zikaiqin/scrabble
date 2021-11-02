@@ -3,6 +3,9 @@ import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 import { PlayerHand } from '@app/classes/player-hand';
 import { GameService } from '@app/services/game.service';
 import { WebsocketService } from '@app/services/websocket.service';
+import { CommandService } from '@app/services/command.service';
+import { MessageType } from '@app/classes/message';
+import { TextboxService } from '@app/services/textbox.service';
 
 enum PlayerType {
     Human,
@@ -31,7 +34,12 @@ export class PanneauInfoComponent {
 
     turnTime: number;
 
-    constructor(private gameService: GameService, private websocketService: WebsocketService) {
+    constructor(
+        private commandService: CommandService,
+        private gameService: GameService,
+        private textboxService: TextboxService,
+        private websocketService: WebsocketService,
+    ) {
         this.websocketService.gameTurn.asObservable().subscribe((turn) => {
             this.isMyTurn = turn;
         });
@@ -99,7 +107,9 @@ export class PanneauInfoComponent {
     }
 
     skipTurn(): void {
-        this.websocketService.skipturn();
+        const command = '!passer';
+        this.textboxService.displayMessage(MessageType.Own, command);
+        this.commandService.parseCommand(command);
     }
 }
 

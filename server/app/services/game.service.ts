@@ -13,8 +13,8 @@ import { DEFAULT_BONUSES, DEFAULT_TURN_LENGTH } from '@app/classes/game-config';
 
 @Service()
 export class GameService {
-    games = new Map<string, Game>();
-    timers = new Map<string, Timer>();
+    readonly games = new Map<string, Game>();
+    readonly timers = new Map<string, Timer>();
 
     constructor(
         private socketService: SocketService,
@@ -40,6 +40,7 @@ export class GameService {
                 void this.validationService.index;
 
                 // TODO: update points
+                // scores are stored in a Player, they are tracked inside a Game using players.get(socketID) => Player
             })
             .on('skipTurn', (roomID: string) => {
                 this.changeTurn(roomID);

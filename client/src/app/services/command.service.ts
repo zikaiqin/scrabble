@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { LetterExchangeService } from '@app/services/letter-exchange.service';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
-import { EndGameService } from '@app/services/end-game.service';
-import { TurnService } from '@app/services/turn.service';
 import { WebsocketService } from '@app/services/websocket.service';
 import { MessageType } from '@app/classes/message';
 
@@ -13,7 +10,6 @@ import { MessageType } from '@app/classes/message';
 })
 export class CommandService {
     debugActive: boolean = false;
-    subscription: Subscription;
     turn: boolean;
     readonly commandLookup: Map<string, (...params: string[]) => boolean>;
 
@@ -21,8 +17,6 @@ export class CommandService {
         private textboxService: TextboxService,
         private letterPlacingService: LetterPlacingService,
         private letterExchangeService: LetterExchangeService,
-        private turnService: TurnService,
-        private endGameService: EndGameService,
         private websocketService: WebsocketService,
     ) {
         this.commandLookup = new Map<string, (...params: string[]) => boolean>([
@@ -76,18 +70,14 @@ export class CommandService {
                         this.textboxService.displayMessage(MessageType.System, "Ce n'est pas votre tour");
                         return false;
                     }
-                    this.turnService.changeTurn(false);
-                    if (!this.endGameService.checkIfGameEnd()) {
-                        this.endGameService.turnSkipCount();
-                        this.endGameService.endGame();
-                    }
                     this.textboxService.displayMessage(MessageType.System, 'Votre tour a été passé');
+                    this.websocketService.skipturn();
                     return true;
                 },
             ],
         ]);
 
-        this.subscription = this.websocketService.gameTurn.asObservable().subscribe((turnState) => {
+        this.websocketService.gameTurn.asObservable().subscribe((turnState) => {
             this.turn = !!turnState;
         });
     }

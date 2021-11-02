@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 
 export class Timer {
-    timerEvents = new EventEmitter();
+    readonly timerEvents = new EventEmitter();
 
     // Locking mechanism to prevent modification during turn transition
     private locked = false;

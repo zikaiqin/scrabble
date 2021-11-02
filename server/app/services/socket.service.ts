@@ -7,9 +7,9 @@ import { Service } from 'typedi';
 
 @Service()
 export class SocketService {
-    waitingRooms = new Map<string, GameInfo>();
-    activeRooms = new Map<string, string>();
-    socketEvents = new EventEmitter();
+    readonly waitingRooms = new Map<string, GameInfo>();
+    readonly activeRooms = new Map<string, string>();
+    readonly socketEvents = new EventEmitter();
 
     private sio: io.Server;
 

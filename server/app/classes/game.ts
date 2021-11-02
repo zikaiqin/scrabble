@@ -4,7 +4,7 @@ import { Board } from '@app/classes/board';
 import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 
 export class Game {
-    private reserve = new Reserve();
+    readonly reserve = new Reserve();
 
     constructor(readonly board: Board, readonly players: Map<string, Player>) {
         Array.from(this.players.values()).forEach((player) => {
