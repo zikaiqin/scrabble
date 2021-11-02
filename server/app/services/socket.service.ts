@@ -46,7 +46,6 @@ export class SocketService {
                     console.log(`client on socket: "${socket.id}" joined room with id: "${room}"`);
                     socket.join(room);
                     this.activeRooms.set(socket.id, room);
-                    this.sio.to(room).emit('setConfigs', configs);
                     this.socketEvents.emit('createGame', room, configs, [
                         { socketID: room.slice(1), username: configs.username },
                         { socketID: socket.id, username },
@@ -116,6 +115,10 @@ export class SocketService {
     deleteRoom(roomID: string) {
         this.waitingRooms.delete(roomID);
         this.sio.emit('updateRooms', this.roomList);
+    }
+
+    setConfigs(socketID: string, self: string, opponent: string, bonuses: Map<string, string>, hand: string[]) {
+        this.sio.to(socketID).emit('setConfigs', self, opponent, bonuses, hand);
     }
 
     updateTime(roomID: string, time: number) {

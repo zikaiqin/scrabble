@@ -13,7 +13,7 @@ const url = '//localhost:3000';
 export class WebsocketService {
     socket: Socket;
 
-    socketEvent = new Subject<string>();
+    connectionEvent = new Subject<string>();
     startGame = new Subject<GameInfo>();
     roomList = new Subject<GameInfo[]>();
 
@@ -28,8 +28,9 @@ export class WebsocketService {
                 this.roomList.next(rooms);
             });
 
-            this.socket.on('setConfigs', (configs: GameInfo) => {
-                this.startGame.next(configs);
+            this.socket.on('setConfigs', (self: string, opponent: string, bonuses: Map<string, string>, hand: string[]) => {
+                void [self, opponent, bonuses, hand];
+                this.startGame.next(/* send configs to game-page */);
             });
 
             this.socket.on('receiveMessage', (type: string, message: string) => {
@@ -67,7 +68,7 @@ export class WebsocketService {
             }
             this.roomList.next([]);
             this.alertService.showAlert('La connexion au serveur a été interrompue');
-            this.socketEvent.next('connectionLost');
+            this.connectionEvent.next('connectionLost');
         });
     }
 

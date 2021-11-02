@@ -42,21 +42,6 @@ export class LetterExchangeService {
     }
 
     /**
-     * @description Function that does the action of exchanging the letters in the playerHand with the reserve
-     */
-    exchangeLetter(): void {
-        this.letters.split('').forEach((oldLetter) => {
-            this.playerHand.remove(oldLetter);
-            this.gameService.reserve.receiveOne(oldLetter);
-            const newLetter = this.gameService.reserve.drawOne();
-            if (newLetter !== undefined) {
-                this.playerHand.add(newLetter);
-                this.gameService.playerHand.next(this.playerHand);
-            }
-        });
-    }
-
-    /**
      * @description Function to check if the letters that the user tries to exchange are in his hand
      * @param expectedHand the hand that the code thinks the player has
      * @param actualHand the hand that contains all the real letters

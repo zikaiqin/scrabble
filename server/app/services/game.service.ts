@@ -40,9 +40,10 @@ export class GameService {
                 void this.validationService.index;
 
                 // TODO: update points
-                // scores are stored in a Player, they are tracked inside a Game using players.get(socketID) => Player
+                // scores are stored in a Player, which are obtained using Game.players.get(socketID) => Player
             })
             .on('skipTurn', (roomID: string) => {
+                // TODO: count turn skips
                 this.changeTurn(roomID);
             })
             .on('disconnect', (socketID: string, roomID: string) => {
@@ -59,12 +60,27 @@ export class GameService {
 
     createGame(roomID: string, configs: GameInfo, players: { socketID: string; username: string }[]) {
         const bonuses = this.getBonuses(!!configs.randomized);
+        const hands: Player[] = [];
 
-        const game = new Game(new Board(bonuses), new Map(players.map((entry) => [entry.socketID, new Player(entry.username)])));
+        const game = new Game(
+            new Board(bonuses),
+            new Map(
+                players.map((entry) => {
+                    const player = new Player(entry.username);
+                    hands.push(player);
+                    return [entry.socketID, player];
+                }),
+            ),
+        );
         const timer = new Timer(roomID, configs.turnLength ? configs.turnLength : DEFAULT_TURN_LENGTH);
 
         this.games.set(roomID, game);
         this.timers.set(roomID, timer);
+
+        hands.forEach((player) => this.placingService.replenishHand(game.reserve, player));
+
+        this.socketService.setConfigs(players[0].socketID, players[0].username, players[1].username, bonuses, hands[0].hand);
+        this.socketService.setConfigs(players[1].socketID, players[1].username, players[0].username, bonuses, hands[1].hand);
 
         timer.timerEvents
             .on('updateTime', (time: number) => {
@@ -95,7 +111,7 @@ export class GameService {
     }
 
     /**
-     * @description Send turn updates to sockets. Ends one's turn immediately, but waits 3 seconds to start other's turn.
+     * @description Sends turn updates to sockets. Ends one's turn immediately, but waits 3 seconds to start other's turn.
      * @param socketID
      * @param turnState
      * @param timer

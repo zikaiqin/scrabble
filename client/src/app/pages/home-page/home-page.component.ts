@@ -17,7 +17,7 @@ export class HomePageComponent {
     gameConfigs: GameInfo;
 
     constructor(private router: Router, private gameService: GameService, private webSocketService: WebsocketService) {
-        this.webSocketService.socketEvent.asObservable().subscribe((event) => {
+        this.webSocketService.connectionEvent.asObservable().subscribe((event) => {
             if (event === 'connectionLost') {
                 if (this.showWaitingRoom) {
                     this.showWaitingRoom = false;
