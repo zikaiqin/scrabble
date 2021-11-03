@@ -7,6 +7,7 @@ import { SocketService } from '@app/services/socket.service';
 import { ExchangeService } from '@app/services/exchange.service';
 import { PlacingService } from '@app/services/placing.service';
 import { ValidationService } from '@app/services/validation.service';
+import { EndGameService } from '@app/services/end-game.service';
 
 @Service()
 export class Server {
@@ -22,6 +23,7 @@ export class Server {
         private exchangeService: ExchangeService,
         private placingService: PlacingService,
         private validationService: ValidationService,
+        private endGameService: EndGameService,
     ) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
@@ -42,7 +44,7 @@ export class Server {
         this.websocketService = new SocketService(this.server);
         this.websocketService.handleSockets();
 
-        this.gameService = new GameService(this.websocketService, this.exchangeService, this.placingService, this.validationService);
+        this.gameService = new GameService(this.websocketService, this.exchangeService, this.placingService, this.validationService, this.endGameService);
         this.gameService.attachListeners();
 
         this.server.listen(Server.appPort);
