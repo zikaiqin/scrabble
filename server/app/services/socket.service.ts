@@ -116,8 +116,20 @@ export class SocketService {
         this.sio.emit('updateRooms', this.roomList);
     }
 
-    setConfigs(socketID: string, self: string, opponent: string, bonuses: Map<string, string>, hand: string[]) {
-        this.sio.to(socketID).emit('setConfigs', self, opponent, bonuses, hand);
+    sendSystemMessage(roomID: string, message: string) {
+        this.sio.to(roomID).emit('receiveMessage', MessageType.System, message);
+    }
+
+    setConfigs(
+        socketID: string,
+        self: string,
+        opponent: string,
+        bonuses: Map<string, string>,
+        reserve: string[],
+        hand: string[],
+        turnState?: boolean,
+    ) {
+        this.sio.to(socketID).emit('initGame', self, opponent, Array.from(bonuses.entries()), reserve, hand, turnState);
     }
 
     updateTime(roomID: string, time: number) {

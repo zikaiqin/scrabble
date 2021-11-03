@@ -1,17 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameService } from '@app/services/game.service';
+import { WebsocketService } from '@app/services/websocket.service';
 
 @Component({
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
 })
-export class GamePageComponent implements OnInit {
-    constructor(private router: Router, private gameService: GameService) {}
+export class GamePageComponent implements AfterViewInit {
+    isInit = false;
 
-    ngOnInit(): void {
-        if (!this.gameService.isInit) {
+    constructor(private router: Router, private websocketService: WebsocketService) {
+        this.websocketService.init.subscribe(() => {
+            this.isInit = true;
+        });
+    }
+
+    ngAfterViewInit(): void {
+        if (!this.isInit) {
             this.router.navigateByUrl('/home');
         }
     }

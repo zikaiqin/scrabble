@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { EndGameService } from '@app/services/end-game.service';
-import { GameService } from '@app/services/game.service';
+import { WebsocketService } from '@app/services/websocket.service';
 
 @Component({
     selector: 'app-end-game',
@@ -14,12 +13,10 @@ export class EndGameComponent {
     playerScore = 0;
     opponentScore = 0;
 
-    constructor(private endGameService: EndGameService, private gameService: GameService) {
-        this.gameService.playerScore.asObservable().subscribe((playerScore) => {
-            this.playerScore = playerScore;
-        });
-        this.gameService.opponentScore.asObservable().subscribe((opponentScore) => {
-            this.opponentScore = opponentScore;
+    constructor(private websocketService: WebsocketService) {
+        this.websocketService.scores.subscribe((score) => {
+            this.playerScore = score.ownScore;
+            this.opponentScore = score.opponentScore;
         });
         this.isVisibleWinner = false;
         this.isVisibleGiveUp = false;
@@ -27,14 +24,6 @@ export class EndGameComponent {
     }
 
     getWinner(): string {
-        if (this.endGameService.checkIfGameEnd()) {
-            this.isVisibleWinner = true;
-            if (this.playerScore > this.opponentScore) {
-                return this.gameService.player;
-            } else if (this.playerScore < this.opponentScore) {
-                return this.gameService.opponent;
-            } else if (this.playerScore === this.opponentScore) return this.gameService.player + ' et ' + this.gameService.opponent;
-        }
         return '';
     }
 
@@ -43,6 +32,6 @@ export class EndGameComponent {
     }
 
     checkIfGameEnded(): boolean {
-        return this.endGameService.checkIfGameEnd();
+        return false;
     }
 }

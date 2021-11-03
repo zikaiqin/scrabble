@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
-import { GameService } from '@app/services/game.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
+import { WebsocketService } from '@app/services/websocket.service';
+import { Reserve } from '@app/classes/reserve';
 
 @Injectable({
     providedIn: 'root',
@@ -11,14 +12,18 @@ import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 export class LetterExchangeService {
     letters: string;
     private turnState: boolean;
-    private playerHand: PlayerHand = new PlayerHand();
+    private playerHand = new PlayerHand();
+    private reserve = new Reserve();
 
-    constructor(private textboxService: TextboxService, private gameService: GameService) {
-        this.gameService.turnState.subscribe({
-            next: (turn: boolean) => (this.turnState = turn),
+    constructor(private textboxService: TextboxService, private websocketService: WebsocketService) {
+        this.websocketService.turn.subscribe((turn) => {
+            this.turnState = turn;
         });
-        this.gameService.playerHand.asObservable().subscribe((playerHand) => {
-            this.playerHand = playerHand;
+        this.websocketService.hands.subscribe((hands) => {
+            this.playerHand.letters = hands.ownHand;
+        });
+        this.websocketService.reserve.subscribe((reserve) => {
+            this.reserve.letters = reserve;
         });
     }
 
@@ -38,7 +43,7 @@ export class LetterExchangeService {
             this.textboxService.displayMessage(MessageType.System, 'Doit etre en miniscule');
             return false;
         }
-        return this.gameService.reserve.size >= DEFAULT_HAND_SIZE && this.isMyTurn() && this.isInHand(this.letters, this.playerHand);
+        return this.reserve.size >= DEFAULT_HAND_SIZE && this.isMyTurn() && this.isInHand(this.letters, this.playerHand);
     }
 
     /**

@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
 import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
-import { PlayerHand } from '@app/classes/player-hand';
-import { GameService } from '@app/services/game.service';
 import { WebsocketService } from '@app/services/websocket.service';
 import { CommandService } from '@app/services/command.service';
 import { MessageType } from '@app/classes/message';
 import { TextboxService } from '@app/services/textbox.service';
 
 enum PlayerType {
-    Human,
-    Bot,
+    Self,
+    Opponent,
 }
 
 @Component({
@@ -20,56 +18,55 @@ enum PlayerType {
 export class PanneauInfoComponent {
     readonly playerType = PlayerType;
 
-    playerHand: PlayerHand = new PlayerHand();
-    opponentHand: PlayerHand = new PlayerHand();
+    isVisiblePlayer = false;
+    isVisibleOpponent = false;
+    isVisibleGiveUp = false;
 
-    playerScore = 0;
-    opponentScore = 0;
+    private turnState: boolean;
+    private turnTime = 0;
 
-    isVisibleWinner: boolean;
-    isVisiblePlayer: boolean;
-    isVisibleOpponent: boolean;
-    isVisibleGiveUp: boolean;
-    isMyTurn: boolean;
+    private playerName: string;
+    private opponentName: string;
 
-    turnTime: number;
+    private playerScore = 0;
+    private opponentScore = 0;
 
-    constructor(
-        private commandService: CommandService,
-        private gameService: GameService,
-        private textboxService: TextboxService,
-        private websocketService: WebsocketService,
-    ) {
-        this.websocketService.gameTurn.asObservable().subscribe((turn) => {
-            this.isMyTurn = turn;
+    private playerHandSize = DEFAULT_HAND_SIZE;
+    private opponentHandSize = DEFAULT_HAND_SIZE;
+    private reserveSize = 0;
+
+    constructor(private commandService: CommandService, private textboxService: TextboxService, private websocketService: WebsocketService) {
+        this.websocketService.init.subscribe((initPayload) => {
+            this.playerName = initPayload.self;
+            this.opponentName = initPayload.opponent;
+            this.reserveSize = initPayload.reserve.length;
+            if (initPayload.turnState !== undefined) {
+                this.turnState = initPayload.turnState;
+            }
         });
-        this.websocketService.gameTime.asObservable().subscribe((time) => {
+        this.websocketService.turn.subscribe((turn) => {
+            this.turnState = turn;
+        });
+        this.websocketService.time.subscribe((time) => {
             this.turnTime = time;
         });
-        this.gameService.playerHand.asObservable().subscribe((playerHand) => {
-            this.playerHand = playerHand;
+        this.websocketService.hands.subscribe((hands) => {
+            this.playerHandSize = hands.ownHand.length;
+            this.opponentHandSize = hands.opponentHand.length;
+            this.isVisiblePlayer = this.playerHandSize < DEFAULT_HAND_SIZE;
+            this.isVisibleOpponent = this.opponentHandSize < DEFAULT_HAND_SIZE;
         });
-        this.gameService.opponentHand.asObservable().subscribe((opponentHand) => {
-            this.opponentHand = opponentHand;
+        this.websocketService.scores.subscribe((scores) => {
+            this.playerScore = scores.ownScore;
+            this.opponentScore = scores.opponentScore;
         });
-        this.gameService.playerScore.asObservable().subscribe((playerScore) => {
-            this.playerScore = playerScore;
+        this.websocketService.reserve.subscribe((reserve) => {
+            this.reserveSize = reserve.length;
         });
-        this.gameService.opponentScore.asObservable().subscribe((opponentScore) => {
-            this.opponentScore = opponentScore;
-        });
-        this.isVisiblePlayer = true;
-        this.isVisibleOpponent = true;
-        this.isVisibleWinner = false;
-        this.isVisibleGiveUp = false;
     }
 
-    getTurnMessage(): string {
-        return this.isMyTurn === undefined ? 'Initiez la partie' : this.isMyTurn ? 'Votre tour' : "Tour de l'adversaire";
-    }
-
-    getTurnColor(): string {
-        return this.isMyTurn === undefined ? 'LightGray' : this.isMyTurn ? 'Green' : 'Red';
+    getTurnState(): boolean {
+        return this.turnState;
     }
 
     getTurnTime(): string {
@@ -78,32 +75,30 @@ export class PanneauInfoComponent {
         return `${minutes}:${seconds >= MIN_SECONDS ? seconds : `0${seconds}`}`;
     }
 
-    getReserveSize(): number {
-        return this.gameService.reserve === undefined ? 0 : this.gameService.reserve.size;
+    getTurnColor(): string {
+        return this.turnState === undefined ? 'LightGray' : this.turnState ? 'Green' : 'Red';
     }
 
-    getHandSize(player: number): number | null {
-        if (player === PlayerType.Human) {
-            if (this.playerHand.size > DEFAULT_HAND_SIZE) {
-                this.isVisiblePlayer = false;
-                return null;
-            }
-            return this.playerHand.size;
-        } else {
-            if (this.opponentHand.size > DEFAULT_HAND_SIZE) {
-                this.isVisibleOpponent = false;
-                return null;
-            }
-            return this.opponentHand.size;
-        }
+    getTurnMessage(): string {
+        return this.turnState === undefined ? 'Initiez la partie' : this.turnState ? 'Votre tour' : "Tour de l'adversaire";
     }
 
-    getScore(player: number): number {
-        return player === PlayerType.Human ? this.playerScore : this.opponentScore;
+    getReserveMessage(): string {
+        return `Il reste ${this.reserveSize} pièce${this.reserveSize === 1 ? 's' : ''} dans la réserve`;
+    }
+
+    getHandMessage(player: number): string {
+        const size = player === PlayerType.Self ? this.playerHandSize : this.opponentHandSize;
+        return `${size} pièce${size === 1 ? 's' : ''} en main`;
+    }
+
+    getScoreMessage(player: number): string {
+        const score = player === PlayerType.Self ? this.playerScore : this.opponentScore;
+        return `${score} point${score === 1 ? 's' : ''}`;
     }
 
     getName(player: number): string {
-        return player === PlayerType.Human ? this.gameService.player : this.gameService.opponent;
+        return player === PlayerType.Self ? this.playerName : this.opponentName;
     }
 
     skipTurn(): void {

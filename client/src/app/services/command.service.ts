@@ -77,8 +77,8 @@ export class CommandService {
             ],
         ]);
 
-        this.websocketService.gameTurn.asObservable().subscribe((turnState) => {
-            this.turn = !!turnState;
+        this.websocketService.turn.subscribe((turnState) => {
+            this.turn = turnState;
         });
     }
 

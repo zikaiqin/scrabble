@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { PlayerHand } from '@app/classes/player-hand';
-import { GameService } from '@app/services/game.service';
+import { WebsocketService } from '@app/services/websocket.service';
 
 @Component({
     selector: 'app-sidebar',
@@ -8,11 +7,14 @@ import { GameService } from '@app/services/game.service';
     styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent {
-    chevalet: PlayerHand = new PlayerHand();
+    playerHand: string[] = [];
 
-    constructor(private gameService: GameService) {
-        this.gameService.playerHand.asObservable().subscribe((playerHand) => {
-            this.chevalet = playerHand;
+    constructor(private websocketService: WebsocketService) {
+        this.websocketService.init.subscribe((initPayload) => {
+            this.playerHand = initPayload.hand;
+        });
+        this.websocketService.hands.subscribe((hands) => {
+            this.playerHand = hands.ownHand;
         });
     }
 }

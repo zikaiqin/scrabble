@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { GameService } from '@app/services/game.service';
 import { GameInfo, GameMode, GameType } from '@app/classes/game-info';
 import { WebsocketService } from '@app/services/websocket.service';
 
@@ -16,17 +14,13 @@ export class HomePageComponent {
     showWaitingRoom = false;
     gameConfigs: GameInfo;
 
-    constructor(private router: Router, private gameService: GameService, private webSocketService: WebsocketService) {
-        this.webSocketService.connectionEvent.asObservable().subscribe((event) => {
+    constructor(private webSocketService: WebsocketService) {
+        this.webSocketService.status.subscribe((event) => {
             if (event === 'connectionLost') {
                 if (this.showWaitingRoom) {
                     this.showWaitingRoom = false;
                 }
             }
-        });
-        this.webSocketService.startGame.asObservable().subscribe((configs) => {
-            this.gameService.init(configs);
-            this.router.navigateByUrl('/game');
         });
     }
 
@@ -71,17 +65,18 @@ export class HomePageComponent {
         return this.showWaitingRoom ? 'WaitingRoom' : 'NewGame';
     }
 
-    // TODO: move all game logic serverside
     createGame(configs: GameInfo): void {
-        if (configs.gameType === GameType.Single) {
-            this.gameService.init(configs);
-            this.router.navigateByUrl('/game');
-        } else {
-            this.webSocketService.connect();
-            this.webSocketService.createRoom(configs);
-            this.gameConfigs = configs;
+        this.webSocketService.connect();
+        this.webSocketService.createRoom(configs);
+        this.gameConfigs = configs;
+        if (configs.gameType === GameType.Multi) {
             this.showWaitingRoom = true;
         }
+    }
+
+    // TODO: convert to single player
+    convertGame(roomID: string): void {
+        void roomID;
     }
 
     joinRoom(configs: GameInfo): void {
@@ -95,6 +90,6 @@ export class HomePageComponent {
     }
 
     get roomList() {
-        return this.webSocketService.roomList.asObservable();
+        return this.webSocketService.rooms;
     }
 }

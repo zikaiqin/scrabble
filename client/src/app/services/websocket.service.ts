@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Router } from '@angular/router';
+import { Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { AlertService } from '@app/services/alert.service';
 import { TextboxService } from '@app/services/textbox.service';
-import { GameInfo } from '@app/classes/game-info';
+import { GameInfo, GameInit } from '@app/classes/game-info';
 
 const url = '//localhost:3000';
 
@@ -11,16 +12,20 @@ const url = '//localhost:3000';
     providedIn: 'root',
 })
 export class WebsocketService {
-    socket: Socket;
+    private socket: Socket;
 
-    connectionEvent = new Subject<string>();
-    startGame = new Subject<GameInfo>();
-    roomList = new Subject<GameInfo[]>();
+    private connectionEvent = new Subject<string>();
+    private roomList = new Subject<GameInfo[]>();
 
-    gameTime = new Subject<number>();
-    gameTurn = new Subject<boolean>();
+    private gameInit = new Subject<GameInit>();
+    private gameTime = new Subject<number>();
+    private gameTurn = new Subject<boolean>();
+    private gameBoard = new Subject<[string, string][]>();
+    private gameReserve = new Subject<string[]>();
+    private gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
+    private gameScores = new Subject<{ ownScore: number; opponentScore: number }>();
 
-    constructor(private textBox: TextboxService, private alertService: AlertService) {}
+    constructor(private router: Router, private textBox: TextboxService, private alertService: AlertService) {}
 
     attachListeners(): void {
         this.socket.on('connect', () => {
@@ -28,30 +33,25 @@ export class WebsocketService {
                 this.roomList.next(rooms);
             });
 
-            this.socket.on('setConfigs', (self: string, opponent: string, bonuses: Map<string, string>, hand: string[]) => {
-                void [self, opponent, bonuses, hand];
-                this.startGame.next(/* send configs to game-page */);
-            });
+            this.socket.on(
+                'initGame',
+                (self: string, opponent: string, bonuses: [string, string][], reserve: string[], hand: string[], turnState: boolean | undefined) => {
+                    this.router.navigateByUrl('/game').then(() => {
+                        this.gameInit.next({ self, opponent, bonuses, reserve, hand, turnState });
+                    });
+                },
+            );
 
             this.socket.on('receiveMessage', (type: string, message: string) => {
                 this.textBox.displayMessage(type, message);
             });
 
-            this.socket.on('updateHand', (hand: string[]) => {
-                void hand;
-            });
-
-            this.socket.on('updateBoard', (board: string[][]) => {
-                void board;
+            this.socket.on('updateBoard', (board: [string, string][]) => {
+                this.gameBoard.next(board);
             });
 
             this.socket.on('updateReserve', (reserve: string[]) => {
-                void reserve;
-            });
-
-            this.socket.on('updateScores', (scores: number[]) => {
-                // scores[0]: own score | scores[1]: opponent score
-                void scores;
+                this.gameReserve.next(reserve);
             });
 
             this.socket.on('updateTime', (time: number) => {
@@ -60,6 +60,14 @@ export class WebsocketService {
 
             this.socket.on('updateTurn', (turn: boolean) => {
                 this.gameTurn.next(turn);
+            });
+
+            this.socket.on('updateHands', (ownHand: string[], opponentHand: string[]) => {
+                this.gameHands.next({ ownHand, opponentHand });
+            });
+
+            this.socket.on('updateScores', (ownScore: number, opponentScore: number) => {
+                this.gameScores.next({ ownScore, opponentScore });
             });
         });
         this.socket.on('disconnect', (reason) => {
@@ -122,5 +130,41 @@ export class WebsocketService {
 
     disconnect(): void {
         this.socket.disconnect();
+    }
+
+    get status(): Observable<string> {
+        return this.connectionEvent.asObservable();
+    }
+
+    get rooms(): Observable<GameInfo[]> {
+        return this.roomList.asObservable();
+    }
+
+    get init(): Observable<GameInit> {
+        return this.gameInit.asObservable();
+    }
+
+    get time(): Observable<number> {
+        return this.gameTime.asObservable();
+    }
+
+    get turn(): Observable<boolean> {
+        return this.gameTurn.asObservable();
+    }
+
+    get board(): Observable<[string, string][]> {
+        return this.gameBoard.asObservable();
+    }
+
+    get reserve(): Observable<string[]> {
+        return this.gameReserve.asObservable();
+    }
+
+    get hands(): Observable<{ ownHand: string[]; opponentHand: string[] }> {
+        return this.gameHands.asObservable();
+    }
+
+    get scores(): Observable<{ ownScore: number; opponentScore: number }> {
+        return this.gameScores.asObservable();
     }
 }

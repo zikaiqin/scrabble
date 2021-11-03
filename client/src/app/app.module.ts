@@ -17,7 +17,6 @@ import { JoueurVirtuelleComponent } from './components/joueur-virtuelle/joueur-v
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { NewGameMenuComponent } from './components/new-game-menu/new-game-menu.component';
 import { PanneauInfoComponent } from './components/panneau-info/panneau-info.component';
-import { PassTurnComponent } from './components/pass-turn/pass-turn.component';
 import { TextboxComponent } from './components/textbox/textbox.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { GameBrowserComponent } from './components/game-browser/game-browser.component';
@@ -42,7 +41,6 @@ import { WaitingRoomDialogComponent } from './components/waiting-room-dialog/wai
         PanneauInfoComponent,
         TextboxComponent,
         InputbarComponent,
-        PassTurnComponent,
         HomePageComponent,
         MainMenuComponent,
         NewGameMenuComponent,

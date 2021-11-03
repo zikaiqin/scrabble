@@ -8,6 +8,15 @@ export interface GameInfo {
     roomID?: string;
 }
 
+export interface GameInit {
+    self: string;
+    opponent: string;
+    bonuses: [string, string][];
+    reserve: string[];
+    hand: string[];
+    turnState?: boolean;
+}
+
 export enum GameMode {
     None,
     Classical,

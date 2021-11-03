@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { PlayerHand } from '@app/classes/player-hand';
 
 @Component({
     selector: 'app-chevalet',
@@ -7,5 +6,5 @@ import { PlayerHand } from '@app/classes/player-hand';
     styleUrls: ['./chevalet.component.scss'],
 })
 export class ChevaletComponent {
-    @Input() playerHand: PlayerHand;
+    @Input() playerHand: string[] = [];
 }

@@ -1,5 +1,5 @@
 export class PlayerHand {
-    readonly letters: string[];
+    letters: string[];
 
     constructor() {
         this.letters = [];

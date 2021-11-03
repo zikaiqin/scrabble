@@ -2,10 +2,8 @@ import { Injectable } from '@angular/core';
 import { GameBoard } from '@app/classes/game-board';
 import { MessageType } from '@app/classes/message';
 import { PlayerHand } from '@app/classes/player-hand';
-import { Reserve } from '@app/classes/reserve';
-import { GameService } from '@app/services/game.service';
 import { TextboxService } from '@app/services/textbox.service';
-import { ValidationService } from '@app/services/validation.service';
+import { WebsocketService } from '@app/services/websocket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -18,22 +16,18 @@ export class LetterPlacingService {
     letters: Map<string, string>;
     gameBoard: GameBoard;
 
-    private playerScore: number = 0;
     private turnState: boolean;
     private playerHand: PlayerHand = new PlayerHand();
 
-    constructor(private textboxService: TextboxService, private gameService: GameService, private validationService: ValidationService) {
-        this.gameService.turnState.asObservable().subscribe((turn) => {
+    constructor(private textboxService: TextboxService, private websocketService: WebsocketService) {
+        this.websocketService.turn.subscribe((turn) => {
             this.turnState = turn;
         });
-        this.gameService.gameBoard.asObservable().subscribe((gameBoard) => {
-            this.gameBoard = gameBoard;
+        this.websocketService.board.subscribe((letters) => {
+            this.gameBoard.letters = new Map<string, string>(letters);
         });
-        this.gameService.playerHand.asObservable().subscribe((playerHand) => {
-            this.playerHand = playerHand;
-        });
-        this.gameService.playerScore.asObservable().subscribe((playerScore) => {
-            this.playerScore = playerScore;
+        this.websocketService.hands.subscribe((hands) => {
+            this.playerHand.letters = hands.ownHand;
         });
     }
 
@@ -50,14 +44,7 @@ export class LetterPlacingService {
         this.letters = new Map<string, string>();
         this.generateLetters(this.letters, this.word, this.startCoords, this.direction);
 
-        const canPlace =
-            this.isAdjacent(this.gameBoard, this.letters, this.startCoords, this.endCoords) && this.isInHand(this.letters, this.playerHand);
-        if (canPlace) {
-            this.placeLetters(this.letters, this.gameBoard, this.playerHand);
-            this.validationService.init(this.startCoords, this.letters);
-            this.isInDict();
-        }
-        return canPlace;
+        return this.isAdjacent(this.gameBoard, this.letters, this.startCoords, this.endCoords) && this.isInHand(this.letters, this.playerHand);
     }
 
     /**
@@ -71,43 +58,6 @@ export class LetterPlacingService {
                 letters.set(String.fromCharCode(startCoords.charCodeAt(0) + index) + startCoords.slice(1), letter);
             }
         });
-    }
-
-    /**
-     * @description Place the letters onto the board
-     */
-    placeLetters(letters: Map<string, string>, gameBoard: GameBoard, playerHand: PlayerHand): void {
-        letters.forEach((letter, coords) => {
-            gameBoard.placeLetter(coords, letter);
-            playerHand.remove(WILDCARD_RE.test(letter) ? '*' : letter);
-        });
-        this.gameService.gameBoard.next(this.gameBoard);
-        this.gameService.playerHand.next(this.playerHand);
-    }
-
-    /**
-     * @description Remove the placed letters from the board and return them to the hand
-     */
-    returnLetters(letters: Map<string, string>, gameBoard: GameBoard, playerHand: PlayerHand): void {
-        letters.forEach((letter, coords) => {
-            gameBoard.removeAt(coords);
-            playerHand.add(WILDCARD_RE.test(letter) ? '*' : letter);
-        });
-        this.gameService.gameBoard.next(this.gameBoard);
-        this.gameService.playerHand.next(this.playerHand);
-    }
-
-    /**
-     * @description Draw as many letters as possible from the reserve and place them into the hand
-     */
-    replenishHand(letters: Map<string, string>, reserve: Reserve, playerHand: PlayerHand): void {
-        Array.from(letters.keys()).forEach(() => {
-            const letter = reserve.drawOne();
-            if (letter !== undefined) {
-                playerHand.add(letter);
-            }
-        });
-        this.gameService.playerHand.next(this.playerHand);
     }
 
     /**
@@ -240,25 +190,6 @@ export class LetterPlacingService {
         return isInHand;
     }
 
-    /**
-     * @description Assert that the newly placed word is included in the dictionary
-     */
-    isInDict(): boolean {
-        const isInDict = this.validationService.findWord(this.validationService.fetchWords());
-        setTimeout(() => {
-            if (isInDict) {
-                this.playerScore = this.playerScore + this.validationService.calcPoints();
-                this.gameService.playerScore.next(this.playerScore);
-                this.replenishHand(this.letters, this.gameService.reserve, this.playerHand);
-            } else {
-                this.textboxService.displayMessage(MessageType.System, 'Le mot ne figure pas dans le dictionnaire de jeu');
-                this.returnLetters(this.letters, this.gameBoard, this.playerHand);
-            }
-            this.gameService.turnState.next(false);
-        }, VALIDATION_TIMEOUT);
-        return isInDict;
-    }
-
     mapSpecialChars(letter: string): string | undefined {
         const specialChars = /[àèùéâêîôûëïüç]/i;
         return specialChars.test(letter) ? SPECIAL_CHARS.get(letter) : letter;
@@ -266,7 +197,6 @@ export class LetterPlacingService {
 }
 
 const BOUNDARY = 15;
-const VALIDATION_TIMEOUT = 3000;
 const CENTER_TILE = 'h8';
 const WILDCARD = '*';
 const WILDCARD_RE = /[A-Z]/;

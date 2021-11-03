@@ -1,6 +1,6 @@
 export class GameBoard {
-    readonly letters: Map<string, string>;
-    readonly bonuses: Map<string, string>;
+    letters: Map<string, string>;
+    bonuses: Map<string, string>;
 
     constructor(bonuses: Map<string, string>) {
         this.letters = new Map<string, string>();

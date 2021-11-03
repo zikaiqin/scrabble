@@ -1,5 +1,5 @@
 export class Reserve {
-    readonly letters: string[];
+    letters: string[];
 
     constructor() {
         this.letters = Object.assign([], BASE_RESERVE);

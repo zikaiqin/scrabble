@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { GameService } from '@app/services/game.service';
 import { Subscription } from 'rxjs';
+import { WebsocketService } from '@app/services/websocket.service';
 
 const JV_DELAY = 5000;
 
@@ -12,10 +12,10 @@ const JV_DELAY = 5000;
 export class JoueurVirtuelleComponent {
     subscription: Subscription;
 
-    constructor(private gameService: GameService) {
-        this.subscription = this.gameService.turnState.asObservable().subscribe((turn) => {
+    constructor(private gameService: WebsocketService) {
+        this.subscription = this.gameService.turn.subscribe((turn) => {
             setTimeout(() => {
-                if (!turn) this.gameService.turnState.next(!turn);
+                if (!turn) void turn;
             }, JV_DELAY);
         });
     }

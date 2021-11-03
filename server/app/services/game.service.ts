@@ -55,6 +55,10 @@ export class GameService {
             })
             .on('disconnect', (socketID: string, roomID: string) => {
                 if (Array.from(this.socketService.activeRooms.values()).includes(roomID)) {
+                    const username = this.games.get(roomID)?.players.get(socketID);
+                    if (username !== undefined) {
+                        this.socketService.sendSystemMessage(roomID, `${username.name} a quitté le jeu!`);
+                    }
                     // TODO: declare forfeit by player on socketID
                 } else {
                     // TODO?: event listener lifecycle unclear -- detach event listeners associated to the timer if necessary
@@ -84,10 +88,24 @@ export class GameService {
         this.games.set(roomID, game);
         this.timers.set(roomID, timer);
 
-        hands.forEach((player) => this.placingService.replenishHand(game.reserve, player));
-
-        this.socketService.setConfigs(players[0].socketID, players[0].username, players[1].username, bonuses, hands[0].hand);
-        this.socketService.setConfigs(players[1].socketID, players[1].username, players[0].username, bonuses, hands[1].hand);
+        this.socketService.setConfigs(
+            players[0].socketID,
+            players[0].username,
+            players[1].username,
+            bonuses,
+            game.reserve.letters,
+            hands[0].hand,
+            false,
+        );
+        this.socketService.setConfigs(
+            players[1].socketID,
+            players[1].username,
+            players[0].username,
+            bonuses,
+            game.reserve.letters,
+            hands[1].hand,
+            false,
+        );
 
         timer.timerEvents
             .on('updateTime', (time: number) => {

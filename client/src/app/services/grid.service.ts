@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { GameBoard } from '@app/classes/game-board';
 import { Vec2 } from '@app/classes/vec2';
-import { GameService } from '@app/services/game.service';
+import { WebsocketService } from '@app/services/websocket.service';
 
 const CHARCODE_SMALL_A = 97;
 
@@ -19,7 +18,6 @@ const NB_CASE_CHEVALET = 7;
 export class GridService {
     gridContext: CanvasRenderingContext2D;
     handContext: CanvasRenderingContext2D;
-    gameBoard: GameBoard;
     private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
     private startNumberPos: number = DEFAULT_WIDTH / DEFAULT_NB_CASES;
@@ -30,9 +28,15 @@ export class GridService {
     private scaleCounter: number = 0;
     private counter: number = 0;
 
-    constructor(private gameService: GameService) {
-        this.gameService.gameBoard.asObservable().subscribe((gameBoard) => {
-            this.gameBoard = gameBoard;
+    private bonuses = new Map<string, string>();
+    private letters = new Map<string, string>();
+
+    constructor(private websocketService: WebsocketService) {
+        this.websocketService.init.subscribe((init) => {
+            this.bonuses = new Map<string, string>(init.bonuses);
+        });
+        this.websocketService.board.subscribe((letters) => {
+            this.letters = new Map<string, string>(letters);
             if (this.counter > 0) this.drawGrid();
         });
     }
@@ -65,7 +69,7 @@ export class GridService {
         this.tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
         this.tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
 
-        this.drawGridLetters(this.gameBoard.letters);
+        this.drawGridLetters(this.letters);
         this.counter++;
     }
     /**
@@ -207,7 +211,7 @@ export class GridService {
      * @returns nothing just in case the indexes are out of bound
      */
     drawBonus(x: number, y: number) {
-        const bonus = this.gameBoard.getBonus(String.fromCharCode(CHARCODE_SMALL_A + x) + String(y + 1));
+        const bonus = this.bonuses.get(String.fromCharCode(CHARCODE_SMALL_A + x) + String(y + 1));
         switch (bonus) {
             case 'Lx2': {
                 this.drawLx2();
