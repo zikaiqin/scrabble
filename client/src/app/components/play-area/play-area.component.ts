@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
+import { WebsocketService } from '@app/services/websocket.service';
 
 // import { GridChevalet } from '@app/services/chevalet.service';
 // TODO : Avoir un fichier séparé pour les constantes!
@@ -30,16 +31,29 @@ export class PlayAreaComponent implements AfterViewInit {
     buttonPressed = '';
 
     private canvasSize = { x: DEFAULT_WIDTH_ALL, y: DEFAULT_HEIGHT_ALL };
+    isVisible: boolean;
 
-    constructor(private readonly gridService: GridService) {}
+    constructor(private readonly gridService: GridService, private webSocketService: WebsocketService) {
+        this.isVisible = false;
+    }
 
     @HostListener('keydown', ['$event'])
     buttonDetect(event: KeyboardEvent) {
         this.buttonPressed = event.key;
     }
-    redirectTo() {
+    redirectTo(): void {
+        this.webSocketService.giveUp();
         window.location.reload();
     }
+
+    openConfirmWindow(): void {
+        this.isVisible = true;
+    }
+
+    cancel(): void {
+        this.isVisible = false;
+    }
+
 
     maximize(): void {
         this.gridService.clearGrid();

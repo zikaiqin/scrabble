@@ -4,6 +4,7 @@ import EventEmitter from 'events';
 import * as http from 'http';
 import * as io from 'socket.io';
 import { Service } from 'typedi';
+// import { EndGameService } from '@app/services/end-game.service';
 
 @Service()
 export class SocketService {
@@ -97,6 +98,15 @@ export class SocketService {
                 console.log(`client on socket: "${socket.id}" has disconnected with reason: "${reason}"`);
                 this.disconnect(socket);
             });
+
+            socket.on('gaveUp', () => {
+                const room = this.activeRooms.get(socket.id);
+                if (room === undefined) {
+                    return;
+                }
+                this.sio.to(room).emit('playerGaveUp');
+                this.disconnect(socket);
+            })
         });
     }
 
@@ -142,6 +152,14 @@ export class SocketService {
 
     displayLettersLeft(roomID: string, messageType: MessageType, message: string) {
         this.sio.to(roomID).emit('receiveMessage', messageType, message);
+    }
+
+    gameEnded(roomId: string) {
+        this.sio.to(roomId).emit('gameEnded');
+    }
+
+    getWinner(roomId: string, winner: string) {
+        this.sio.to(roomId).emit('getWinner', winner);
     }
 
     get roomList(): GameInfo[] {

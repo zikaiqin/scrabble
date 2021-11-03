@@ -24,8 +24,14 @@ export class WebsocketService {
     private gameReserve = new Subject<string[]>();
     private gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
     private gameScores = new Subject<{ ownScore: number; opponentScore: number }>();
+    gameGaveUp = new Subject<boolean>();
+    gameEnded = new Subject<boolean>();
+    winner = new Subject<string>();
 
-    constructor(private router: Router, private textBox: TextboxService, private alertService: AlertService) {}
+    constructor(private router: Router, private textBox: TextboxService, private alertService: AlertService) {
+        this.gameGaveUp.next(false);
+        this.gameEnded.next(false);
+    }
 
     attachListeners(): void {
         this.socket.on('connect', () => {
@@ -68,6 +74,15 @@ export class WebsocketService {
 
             this.socket.on('updateScores', (ownScore: number, opponentScore: number) => {
                 this.gameScores.next({ ownScore, opponentScore });
+            });
+            this.socket.on('playerGaveUp', () => {
+                this.gameGaveUp.next(true);
+            });
+            this.socket.on('gameEnded', () => {
+                this.gameEnded.next(true);
+            });
+            this.socket.on('getWinner', (winner) => {
+                this.winner.next(winner);
             });
         });
         this.socket.on('disconnect', (reason) => {
@@ -119,8 +134,9 @@ export class WebsocketService {
     /**
      * @description Leave an active game
      */
-    abandonGame(): void {
-        void 0;
+    giveUp(): void {
+        this.socket.emit('gaveUp');
+        this.socket.disconnect();
     }
 
     connect(): void {

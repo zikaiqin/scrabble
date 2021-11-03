@@ -12,18 +12,31 @@ export class EndGameComponent {
     isVisibleButton: boolean;
     playerScore = 0;
     opponentScore = 0;
+    gameEnded: boolean;
+    gameGaveUp: boolean;
+    winner: string;
 
-    constructor(private websocketService: WebsocketService) {
-        this.websocketService.scores.subscribe((score) => {
-            this.playerScore = score.ownScore;
-            this.opponentScore = score.opponentScore;
+    constructor(private webSocketService: WebsocketService) {
+        this.webSocketService.gameEnded.asObservable().subscribe((gameEnded) => {
+            this.gameEnded = gameEnded;
+        });
+        this.webSocketService.gameGaveUp.asObservable().subscribe((gameGaveUp) => {
+            this.gameGaveUp = gameGaveUp;
+        });
+        this.webSocketService.winner.asObservable().subscribe((winner) => {
+            this.winner = winner;
         });
         this.isVisibleWinner = false;
-        this.isVisibleGiveUp = false;
         this.isVisibleButton = true;
     }
 
     getWinner(): string {
+        if (this.gameEnded) {
+            this.isVisibleWinner = true;
+            return this.winner;
+        } else if (this.gameGaveUp) {
+            return 'Toi';
+        }
         return '';
     }
 
@@ -32,6 +45,6 @@ export class EndGameComponent {
     }
 
     checkIfGameEnded(): boolean {
-        return false;
+        return this.gameEnded;
     }
 }

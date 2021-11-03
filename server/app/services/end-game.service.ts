@@ -9,8 +9,6 @@ export const START_TURN_COUNT = 0;
 export const MAX_TURN_SKIP_COUNT = 6;
 export const DEFAULT_POINT = 0;
 export const EMPTY = 0;
-export const PLAYER = 1;
-export const OPPONENT = 2;
 
 @Service()
 export class EndGameService {
@@ -20,6 +18,7 @@ export class EndGameService {
     private pointAdded: number = DEFAULT_POINT;
     private playerLettersLeft: string[] = [];
     private opponentLettersLeft: string[] = [];
+
 
     constructor(private socketService: SocketService) {}
     /**
@@ -104,14 +103,22 @@ export class EndGameService {
         this.socketService.displayLettersLeft(roomID, MessageType.System, player1.name + ': ' + this.playerLettersLeft.join('').toString());
         this.socketService.displayLettersLeft(roomID, MessageType.System, player2.name + ': ' + this.opponentLettersLeft.join('').toString());
     }
+
+    getWinner(player1: Player, player2: Player): string{
+        return player1.score > player2.score ? player1.name :
+            player1.score < player2.score ? player2.name :
+            player1.name + 'et' + player2.name;
+    }
     /**
      * @description Wrapper function that runs the procedures to end the game
      */
     endGame(roomID: string, reserve: Reserve, player1: Player, player2: Player): void {
         if (this.checkIfGameEnd(reserve, player1, player2)) {
             this.deductPoint(player1, player2);
-            /*this.addPoint(this.checkWhoEmptiedHand(player1, player2));
-            this.showLettersLeft(roomID, player1, player2);*/
+            this.addPoint(this.checkWhoEmptiedHand(player1, player2));
+            this.socketService.gameEnded(roomID);
+            this.socketService.getWinner(roomID, this.getWinner(player1, player2));
+            this.showLettersLeft(roomID, player1, player2);
         }
     }
 }

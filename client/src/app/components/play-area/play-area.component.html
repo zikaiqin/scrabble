@@ -4,4 +4,10 @@
 
 <button type="button" (click)="minimize()">Minimize</button>
 
-<button (click)="redirectTo()">Abandonner</button>
+<button type="button" (click)="openConfirmWindow()">Abandonner</button>
+
+<div class="confirmWindow" [style.display]="isVisible ? 'block' : 'none'">
+    <h1>Abandonner la partie et retourner à la page d'accueil?</h1>
+    <button type="button" (click)="redirectTo()">Confirmer</button>
+    <button type="button" (click)="cancel()">Annuler</button>
+</div>
