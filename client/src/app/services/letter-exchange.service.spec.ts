@@ -31,4 +31,9 @@ describe('LetterExchangeService', () => {
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
+
+    it('should not allow placing when not my turn', () => {
+        expect(service.isMyTurn(false)).toBeFalse();
+        expect(service.isMyTurn(true)).toBeTrue();
+    });
 });

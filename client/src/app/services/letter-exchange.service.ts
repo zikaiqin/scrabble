@@ -34,7 +34,7 @@ export class LetterExchangeService {
      */
     validateCommand(letters: string): boolean {
         return (
-            this.isValidParam(letters) && this.isFullReserve(this.reserve) && this.isMyTurn(this.turnState) && this.isInHand(letters, this.playerHand)
+            this.isMyTurn(this.turnState) && this.isValidParam(letters) && this.isFullReserve(this.reserve) && this.isInHand(letters, this.playerHand)
         );
     }
 
@@ -43,8 +43,12 @@ export class LetterExchangeService {
      * @param letters to exchange
      */
     isValidParam(letters: string) {
-        if (letters.length < 1 || letters.length > DEFAULT_HAND_SIZE) {
-            this.textboxService.displayMessage(MessageType.System, '');
+        if (letters === undefined || letters === '') {
+            this.textboxService.displayMessage(MessageType.System, 'Veuillez spécifier les lettres à échanger');
+            return false;
+        }
+        if (letters.length > DEFAULT_HAND_SIZE) {
+            this.textboxService.displayMessage(MessageType.System, 'Vous ne pouvez échanger plus que 7 lettres à la fois');
             return false;
         }
         if (letters !== letters.toLowerCase()) {
