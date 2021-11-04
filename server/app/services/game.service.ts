@@ -3,7 +3,6 @@ import { GameInfo } from '@app/classes/game-info';
 import { Game } from '@app/classes/game';
 import { Board } from '@app/classes/board';
 import { Player } from '@app/classes/player';
-import { Reserve } from '@app/classes/reserve';
 import { Timer } from '@app/classes/timer';
 import { SocketService } from '@app/services/socket.service';
 import { ValidationService } from '@app/services/validation.service';
@@ -27,29 +26,54 @@ export class GameService {
 
     attachListeners() {
         this.socketService.socketEvents
-            .on('createGame', (roomID, configs, players) => {
+            .on('createGame', (roomID: string, configs: GameInfo, players) => {
                 this.createGame(roomID, configs, players);
             })
-            .on('exchange', () => {
-                // TODO: letter exchange logic
-                this.exchangeService.exchangeLetters('', new Player(''), new Reserve());
+            .on('exchange', (socketID: string, roomId: string, letters: string) => {
+                const game = this.games.get(roomId);
+                if (game === undefined) {
+                    return;
+                }
+                const player = game.players.get(socketID);
+                if (player === undefined) {
+                    return;
+                }
+                this.exchangeService.exchangeLetters(letters, player, game.reserve);
+                this.socketService.updateReserve(roomId, game.reserve.letters);
+                this.updateHands(game);
+                this.changeTurn(roomId);
             })
-            .on('place', (startCoord, letters, roomId, socketId) => {
-                // TODO: add emits back to the client for visual updates (if not already done)
-                const room = this.games.get(roomId);
-                if (room === undefined) return;
-                const player = room.players.get(socketId);
-                if (player === undefined) return;
+            .on('place', (socketID: string, roomId: string, startCoords: string, letters: [string, string][]) => {
+                const toPlace = new Map<string, string>(letters);
+                const game = this.games.get(roomId);
+                if (game === undefined) {
+                    return;
+                }
+                const player = game.players.get(socketID);
+                if (player === undefined) {
+                    return;
+                }
+                this.validationService.init(startCoords, toPlace, game.board);
+                this.placingService.placeLetters(toPlace, game.board, player);
+                this.socketService.updateBoard(socketID, game.board.letters);
+                this.socketService.updateHands(socketID, player.hand, Array.from(game.players.values()).filter((p) => p !== player)[0].hand);
 
-                this.placingService.placeLetters(letters, room.board, player);
+                const isValidWord = this.validationService.findWord(this.validationService.fetchWords());
+                setTimeout(() => {
+                    if (isValidWord) {
+                        player.score += this.validationService.calcPoints();
+                        this.placingService.replenishHand(game.reserve, player);
+                        this.socketService.updateReserve(roomId, game.reserve.letters);
+                        this.updateScores(game);
+                    } else {
+                        this.placingService.returnLetters(toPlace, game.board, player);
+                        this.socketService.sendSystemMessage(socketID, 'Votre placement forme des mots invalides');
+                    }
+                    this.socketService.updateBoard(roomId, game.board.letters);
+                    this.updateHands(game);
+                }, CHANGE_TURN_DELAY);
 
-                this.validationService.init(startCoord, letters, room.board);
-
-                // scores are stored in a Player, they are tracked inside a Game using players.get(socketID) => Player
-                if (this.validationService.findWord(this.validationService.fetchWords())) {
-                    player.score += this.validationService.calcPoints();
-                    this.placingService.replenishHand(room.reserve, player);
-                } else this.placingService.returnLetters(letters, room.board, player);
+                this.changeTurn(roomId);
             })
             .on('skipTurn', (roomID: string) => {
                 this.endGameService.turnSkipCount(roomID);
@@ -127,19 +151,20 @@ export class GameService {
             .on('updateTurn', (turnState: boolean) => {
                 const gameEnd: boolean = this.endGameService.checkIfGameEnd(game.reserve, hands[0], hands[1], roomID);
                 if (gameEnd) {
-                    this.endGameService.endGame(hands[0], hands[1]);
+                    this.endGameService.setPoints(hands[0], hands[1]);
                     this.socketService.gameEnded(roomID, this.endGameService.getWinner(hands[0], hands[1]));
                     for (const it of this.endGameService.showLettersLeft(hands[0], hands[1])) {
                         this.socketService.sendSystemMessage(roomID, it);
                     }
                     timer.clearTimer();
                     this.socketService.updateTurn(roomID, false);
+                    this.updateScores(game);
                 } else {
                     this.updateTurn(players[0].socketID, turnState, timer);
                     this.updateTurn(players[1].socketID, !turnState, timer);
                 }
             })
-            .on('timeReachedZero', () => {
+            .on('timeElapsed', () => {
                 this.endGameService.turnSkipCount(roomID);
             });
 
@@ -162,6 +187,7 @@ export class GameService {
         if (timer === undefined) {
             return;
         }
+        // FIXME: probably jank
         if (timer.isLocked) {
             this.socketService.updateTurn(roomID, false);
         } else {
@@ -184,6 +210,18 @@ export class GameService {
         } else {
             this.socketService.updateTurn(socketID, turnState);
         }
+    }
+
+    updateHands(game: Game) {
+        const entries = Array.from(game.players.entries());
+        this.socketService.updateHands(entries[0][0], entries[0][1].hand, entries[1][1].hand);
+        this.socketService.updateHands(entries[1][0], entries[1][1].hand, entries[0][1].hand);
+    }
+
+    updateScores(game: Game) {
+        const entries = Array.from(game.players.entries());
+        this.socketService.updateScores(entries[0][0], entries[0][1].score, entries[1][1].score);
+        this.socketService.updateScores(entries[1][0], entries[1][1].score, entries[0][1].score);
     }
 }
 

@@ -18,6 +18,9 @@ export class LetterPlacingService {
     private gameBoard = new Map<string, string>();
 
     constructor(private textboxService: TextboxService, private websocketService: WebsocketService) {
+        this.websocketService.init.subscribe((initPayload) => {
+            this.playerHand = initPayload.hand;
+        });
         this.websocketService.turn.subscribe((turn) => {
             this.turnState = turn;
         });

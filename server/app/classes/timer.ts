@@ -24,7 +24,7 @@ export class Timer {
                 currentTime--;
             } else {
                 this.changeTurn();
-                this.timerEvents.emit('timeReachedZero');
+                this.timerEvents.emit('timeElapsed');
             }
         };
         callback();

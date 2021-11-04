@@ -66,23 +66,21 @@ export class SocketService {
             });
 
             // TODO
-            socket.on('place', (startCoord: string, letters: Map<string, string>) => {
-                const room = this.activeRooms.get(socket.id);
-                if (room === undefined) {
+            socket.on('place', (startCoords: string, letters: [string, string][]) => {
+                const roomID = this.activeRooms.get(socket.id);
+                if (roomID === undefined) {
                     return;
                 }
-                this.socketEvents.emit('place', startCoord, letters, room, socket.id);
+                this.socketEvents.emit('place', socket.id, roomID, startCoords, letters);
             });
 
             // TODO
             socket.on('exchange', (letters: string) => {
-                const room = this.activeRooms.get(socket.id);
-                const message = `Succès de la commande : !échanger ${letters}`;
-                if (room === undefined) {
+                const roomID = this.activeRooms.get(socket.id);
+                if (roomID === undefined) {
                     return;
                 }
-                this.socketEvents.emit('exchange');
-                socket.emit('receiveMessage', MessageType.System, message);
+                this.socketEvents.emit('exchange', socket.id, roomID, letters);
             });
 
             socket.on('skipTurn', () => {
@@ -138,6 +136,22 @@ export class SocketService {
 
     updateTurn(socketID: string, turnState: boolean) {
         this.sio.to(socketID).emit('updateTurn', turnState);
+    }
+
+    updateBoard(roomID: string, board: Map<string, string>) {
+        this.sio.to(roomID).emit('updateBoard', Array.from(board.entries()));
+    }
+
+    updateReserve(roomID: string, reserve: string[]) {
+        this.sio.to(roomID).emit('updateReserve', reserve);
+    }
+
+    updateHands(socketID: string, ownHand: string[], opponentHand: string[]) {
+        this.sio.to(socketID).emit('updateHands', ownHand, opponentHand);
+    }
+
+    updateScores(socketID: string, ownScore: number, opponentScore: number) {
+        this.sio.to(socketID).emit('updateScores', ownScore, opponentScore);
     }
 
     gameEnded(roomId: string, winner: string) {

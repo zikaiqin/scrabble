@@ -108,8 +108,8 @@ export class WebsocketService {
         this.socket.emit('sendMessage', message);
     }
 
-    placeLetters(startCoord: string, letters: Map<string, string>): void {
-        this.socket.emit('place', startCoord, letters);
+    placeLetters(startCoords: string, letters: Map<string, string>): void {
+        this.socket.emit('place', startCoords, Array.from(letters.entries()));
     }
 
     exchangeLetters(letters: string): void {

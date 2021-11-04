@@ -3,15 +3,11 @@ import { Reserve } from '@app/classes/reserve';
 import { Player } from '@app/classes/player';
 import { Service } from 'typedi';
 
-export const START_TURN_COUNT = 1;
 export const MAX_TURN_SKIP_COUNT = 6;
 
 @Service()
 export class EndGameService {
     readonly turnSkipMap = new Map<string, number>();
-    private pointDeductedPlayer: number = 0;
-    private pointDeductedOpponent: number = 0;
-    private pointAdded: number = 0;
     /**
      * @description Function that increments the turnSkipCounter to keep track of the number of turns skipped
      */
@@ -45,41 +41,37 @@ export class EndGameService {
     /**
      * @description Function that subtracts the remaining letters value to the score
      */
-    deductPoint(player1: Player, player2: Player): void {
-        for (const i of player1.hand) {
-            this.pointDeductedPlayer += DEFAULT_POINTS.get(i[0]) as number;
-        }
-
-        player1.score -= this.pointDeductedPlayer;
-        for (const i of player2.hand) {
-            this.pointDeductedOpponent += DEFAULT_POINTS.get(i[0]) as number;
-        }
-        player2.score -= this.pointDeductedOpponent;
+    deductPoints(player: Player): void {
+        player.hand.forEach((letter) => {
+            player.score -= DEFAULT_POINTS.get(letter) as number;
+        });
     }
     /**
      * @description Function that adds the remaining letters value of the enemy to the score
-     * @param player number that represents if it is the player
+     * @param player player that emptied their hand
+     * @param hand other player's hand
      */
-    addPoint(player: Player | undefined): void {
-        if (player) {
-            for (const i of player.hand) {
-                this.pointAdded += DEFAULT_POINTS.get(i[0]) as number;
-            }
-            player.score += this.pointAdded;
-        }
+    addPoints(player: Player, hand: string[]): void {
+        hand.forEach((letter) => {
+            player.score += DEFAULT_POINTS.get(letter) as number;
+        });
     }
     /**
      * @description Function that verifies who has an empty hand (bot/player)
      * @returns a number that represents one or the other (1 --> player, 2 --> opponent)
      */
-    checkWhoEmptiedHand(player1: Player, player2: Player): Player | undefined {
+    checkWhoEmptiedHand(player1: Player, player2: Player): [Player, string[]] | undefined {
         let playerWhoEmptiedHand: Player | undefined;
+        let otherHand: string[] | undefined;
         if (player1.hand.length === 0) {
             playerWhoEmptiedHand = player1;
-        } else if (player2.hand.length === 0) {
-            playerWhoEmptiedHand = player2;
+            otherHand = player2.hand;
         }
-        return playerWhoEmptiedHand;
+        if (player2.hand.length === 0) {
+            playerWhoEmptiedHand = player2;
+            otherHand = player1.hand;
+        }
+        return playerWhoEmptiedHand && otherHand ? [playerWhoEmptiedHand, otherHand] : undefined;
     }
     /**
      * @description Function that displays in the chat the remaining letter of both parties
@@ -87,19 +79,23 @@ export class EndGameService {
     showLettersLeft(player1: Player, player2: Player): string[] {
         const text: string[] = [];
         text.push('Fin de partie - lettres restantes');
-        text.push(`${player1.name}:\t${[...player1.hand].sort().join('')}`);
-        text.push(`${player2.name}:\t${[...player2.hand].sort().join('')}`);
+        text.push(`${player1.name}:\t${player1.hand.join('')}`);
+        text.push(`${player2.name}:\t${player2.hand.join('')}`);
         return text;
     }
 
     getWinner(player1: Player, player2: Player): string {
-        return player1.score > player2.score ? player1.name : player1.score < player2.score ? player2.name : player1.name + ' et ' + player2.name;
+        return player1.score > player2.score ? player1.name : player1.score < player2.score ? player2.name : `${player1.name} et ${player2.name}`;
     }
     /**
-     * @description Wrapper function that runs the procedures to end the game
+     * @description Sets the final points of each player
      */
-    endGame(player1: Player, player2: Player): void {
-        this.deductPoint(player1, player2);
-        this.addPoint(this.checkWhoEmptiedHand(player1, player2));
+    setPoints(player1: Player, player2: Player): void {
+        this.deductPoints(player1);
+        this.deductPoints(player2);
+        const result = this.checkWhoEmptiedHand(player1, player2);
+        if (result) {
+            this.addPoints(...result);
+        }
     }
 }
