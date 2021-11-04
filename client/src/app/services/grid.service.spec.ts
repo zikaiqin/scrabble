@@ -1,8 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { GridService } from '@app/services/grid.service';
-import { GameBoard } from '@app/classes/game-board';
-import { DEFAULT_BONUSES } from '@app/classes/game-config';
 
 describe('GridService', () => {
     let service: GridService;
@@ -18,7 +16,6 @@ describe('GridService', () => {
         ctxStub = CanvasTestHelper.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         service.gridContext = ctxStub;
         service.handContext = ctxStub;
-        service.gameBoard = new GameBoard(DEFAULT_BONUSES);
         pointOnMap.set('o11', 'a');
         pointOnMap.set('b11', 'b');
         pointOnMap.set('a2', 'c');

@@ -5,9 +5,9 @@
             <div class="nom-joueur">{{ getName(playerType.Self) }}</div>
             <div class="score-container">
                 <span>Score</span>
-                <div>{{ getScoreMessage(playerType.Self) }} point(s)</div>
+                <div>{{ getScoreMessage(playerType.Self) }}</div>
             </div>
-            <div class="main" *ngIf="!isVisiblePlayer">{{ getHandMessage(playerType.Self) }}</div>
+            <div class="main" *ngIf="isVisiblePlayer">{{ getHandMessage(playerType.Self) }}</div>
         </div>
         <div class="adversaire-container">
             <div class="adversaire">Adversaire</div>
@@ -16,7 +16,7 @@
                 <span>Score</span>
                 <div>{{ getScoreMessage(playerType.Opponent) }}</div>
             </div>
-            <div class="main" *ngIf="!isVisibleOpponent">{{ getHandMessage(playerType.Opponent) }}</div>
+            <div class="main" *ngIf="isVisibleOpponent">{{ getHandMessage(playerType.Opponent) }}</div>
         </div>
         <div class="reserve">{{ getReserveMessage() }}</div>
         <div class="tour" [style.backgroundColor]="getTurnColor()">{{ getTurnMessage() }}</div>
@@ -24,6 +24,6 @@
             <p class="time">{{ getTurnTime() }}</p>
             <button mat-raised-button class="pass-button" [disabled]="!getTurnState()" (click)="skipTurn()">Passer</button>
         </div>
-        <app-end-game class="end" [style.display]="isVisibleGiveUp ? 'block' : 'none'"></app-end-game>
+        <app-end-game class="end" *ngIf="isVisibleGiveUp"></app-end-game>
     </div>
 </div>

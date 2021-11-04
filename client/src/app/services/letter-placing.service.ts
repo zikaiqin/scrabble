@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-import { GameBoard } from '@app/classes/game-board';
-import { MessageType } from '@app/classes/message';
-import { PlayerHand } from '@app/classes/player-hand';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
+import { MessageType } from '@app/classes/message';
 
 @Injectable({
     providedIn: 'root',
@@ -14,20 +12,20 @@ export class LetterPlacingService {
     direction: string;
     word: string;
     letters: Map<string, string>;
-    gameBoard: GameBoard;
 
     private turnState: boolean;
-    private playerHand: PlayerHand = new PlayerHand();
+    private playerHand: string[] = [];
+    private gameBoard = new Map<string, string>();
 
     constructor(private textboxService: TextboxService, private websocketService: WebsocketService) {
         this.websocketService.turn.subscribe((turn) => {
             this.turnState = turn;
         });
         this.websocketService.board.subscribe((letters) => {
-            this.gameBoard.letters = new Map<string, string>(letters);
+            this.gameBoard = new Map<string, string>(letters);
         });
         this.websocketService.hands.subscribe((hands) => {
-            this.playerHand.letters = hands.ownHand;
+            this.playerHand = hands.ownHand;
         });
     }
 
@@ -87,9 +85,9 @@ export class LetterPlacingService {
     }
 
     /**
-     * @description Assert that it is the player's turn
+     * @description Assert that it is currently the player's turn
      */
-    isMyTurn(isMyTurn: boolean | undefined): boolean {
+    isMyTurn(isMyTurn: boolean): boolean {
         if (!isMyTurn) {
             this.textboxService.displayMessage(MessageType.System, 'La commande !placer peut seulement être utilisé lors de votre tour');
         }
@@ -116,22 +114,20 @@ export class LetterPlacingService {
     }
 
     /**
-     * @description Assert that the letters are adjacent to at least one existing letter
-     * @description Assert that overlapping letters match the ones on the board
-     * @description Remove overlapping letters from letters to be placed
+     * @description Assert that overlapping letters match the ones on the board, and that there is at least one adjacent letter on the board
      */
-    isAdjacent(gameBoard: GameBoard, toPlace: Map<string, string>, startCoords: string, endCoords: string): boolean {
+    isAdjacent(gameBoard: Map<string, string>, toPlace: Map<string, string>, startCoords: string, endCoords: string): boolean {
         let isAdjacent: boolean;
-        if (gameBoard.size() === 0) {
+        if (gameBoard.size === 0) {
             isAdjacent = toPlace.has(CENTER_TILE);
             if (!isAdjacent) {
                 this.textboxService.displayMessage(MessageType.System, 'Le mot doit toucher la case H8 lors du premier tour');
             }
             return isAdjacent;
         }
-        const overlaps = Array.from(toPlace.entries()).filter((entry) => gameBoard.hasCoords(entry[0]));
+        const overlaps = Array.from(toPlace.entries()).filter((entry) => gameBoard.has(entry[0]));
         if (overlaps) {
-            isAdjacent = overlaps.every((entry) => gameBoard.getLetter(entry[0]) === entry[1]);
+            isAdjacent = overlaps.every((entry) => gameBoard.get(entry[0]) === entry[1]);
             if (!isAdjacent) {
                 this.textboxService.displayMessage(MessageType.System, 'Le mot cause un conflit avec des lettres déjà placées');
                 return false;
@@ -160,7 +156,7 @@ export class LetterPlacingService {
             .reduce((flatArray, currentArray) => flatArray.concat(currentArray))
             .filter((coords) => !toPlace.has(coords) && !cornerTiles.includes(coords));
 
-        isAdjacent = adjacentTiles.some((coords) => gameBoard.hasCoords(coords));
+        isAdjacent = adjacentTiles.some((coords) => gameBoard.has(coords));
         if (!isAdjacent) {
             this.textboxService.displayMessage(MessageType.System, 'Le mot doit toucher au moins une lettre déjà placée');
         }
@@ -170,15 +166,15 @@ export class LetterPlacingService {
     /**
      * @description Assert that the player has the required letters in hand
      */
-    isInHand(expectedHand: Map<string, string>, actualHand: PlayerHand): boolean {
-        const letters = Array.from(expectedHand.values());
-        const testHand: PlayerHand = new PlayerHand();
-        letters.forEach((letter) => testHand.add(WILDCARD_RE.test(letter) ? WILDCARD : letter));
-
-        // using unique set of letters in word as key, compare to amount of letters in hand
-        const isInHand: boolean = [...new Set<string>(testHand.letters)].every((letter) => {
-            const amountRequired = testHand.get(letter);
-            const amountInHand = actualHand.get(letter);
+    isInHand(expectedHand: Map<string, string>, actualHand: string[]): boolean {
+        const letters = Array.from(expectedHand.values()).map((letter) => (WILDCARD_RE.test(letter) ? WILDCARD : letter));
+        const isInHand = [...new Set<string>(letters)].every((expectedLetter) => {
+            const amountRequired = letters.filter((letter) => {
+                return letter === expectedLetter;
+            }).length;
+            const amountInHand = actualHand.filter((letter) => {
+                return letter === expectedLetter;
+            }).length;
             return amountRequired <= amountInHand;
         });
         if (!isInHand) {

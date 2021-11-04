@@ -2,18 +2,37 @@ import { TestBed } from '@angular/core/testing';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
-import { GameBoard } from '@app/classes/game-board';
-import { PlayerHand } from '@app/classes/player-hand';
+import { Subject } from 'rxjs';
 
 describe('LetterPlacingService', () => {
     let service: LetterPlacingService;
     let websocketServiceSpy: jasmine.SpyObj<WebsocketService>;
+    let textboxServiceSpy: jasmine.SpyObj<WebsocketService>;
 
     beforeEach(() => {
-        websocketServiceSpy = jasmine.createSpyObj('WebsocketService', ['']);
-        TestBed.configureTestingModule({
-            providers: [{ provide: WebsocketService, useValue: websocketServiceSpy }],
+        const gameTurn = new Subject<boolean>();
+        const gameBoard = new Subject<[string, string][]>();
+        const gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
+
+        textboxServiceSpy = jasmine.createSpyObj('TextboxService', {
+            displayMessage: (_: string, __: string) => {
+                void [_, __];
+            },
         });
+
+        websocketServiceSpy = jasmine.createSpyObj('WebsocketService', [], {
+            turn: gameTurn.asObservable(),
+            board: gameBoard.asObservable(),
+            hands: gameHands.asObservable(),
+        });
+
+        TestBed.configureTestingModule({
+            providers: [
+                { provide: TextboxService, useValue: textboxServiceSpy },
+                { provide: WebsocketService, useValue: websocketServiceSpy },
+            ],
+        });
+
         service = TestBed.inject(LetterPlacingService);
     });
 
@@ -56,7 +75,6 @@ describe('LetterPlacingService', () => {
     });
 
     it('should not allow placing when not my turn', () => {
-        expect(service.isMyTurn(undefined)).toBeFalse();
         expect(service.isMyTurn(false)).toBeFalse();
         expect(service.isMyTurn(true)).toBeTrue();
     });
@@ -87,22 +105,14 @@ describe('LetterPlacingService', () => {
     });
 
     it('should not allow placing of letters not in hand', () => {
-        const fakeHand = {
-            get: (letter: string): number => ['s', 't', 'u', 'b', 'l', 'e', '*'].filter((actualLetter) => actualLetter === letter).length,
-        };
-
-        service = new LetterPlacingService(
-            // eslint-disable-next-line no-unused-vars,@typescript-eslint/no-empty-function --- not worth declaring textBoxService just for this test
-            { displayMessage: (_: string, __: string) => {} } as TextboxService,
-            websocketServiceSpy,
-        );
+        const fakeHand = ['s', 't', 'u', 'b', 'l', 'e', '*'];
         let expectedHand = new Map<string, string>([
             ['1', 's'],
             ['2', 't'],
             ['3', 'u'],
             ['4', 'b'],
         ]);
-        expect(service.isInHand(expectedHand, fakeHand as PlayerHand)).toBeTrue();
+        expect(service.isInHand(expectedHand, fakeHand)).toBeTrue();
 
         expectedHand = new Map<string, string>([
             ['1', 's'],
@@ -113,7 +123,7 @@ describe('LetterPlacingService', () => {
             ['6', 'l'],
             ['7', 'e'],
         ]);
-        expect(service.isInHand(expectedHand, fakeHand as PlayerHand)).toBeTrue();
+        expect(service.isInHand(expectedHand, fakeHand)).toBeTrue();
 
         expectedHand = new Map<string, string>([
             ['1', 'b'],
@@ -123,11 +133,11 @@ describe('LetterPlacingService', () => {
             ['5', 'l'],
             ['6', 'e'],
         ]);
-        expect(service.isInHand(expectedHand, fakeHand as PlayerHand)).toBeFalse();
+        expect(service.isInHand(expectedHand, fakeHand)).toBeFalse();
     });
 
     it('should place a letter on H8 on first turn', () => {
-        const board = new GameBoard(new Map<string, string>());
+        const board = new Map<string, string>();
         let toPlace = new Map<string, string>([
             ['g8', 's'],
             ['h8', 't'],
@@ -146,14 +156,14 @@ describe('LetterPlacingService', () => {
     });
 
     it('should not allow placing of conflicting letters', () => {
-        const board = new GameBoard(new Map<string, string>());
+        const board = new Map<string, string>();
         let toPlace = new Map<string, string>([
             ['g8', 's'],
             ['h8', 't'],
             ['i8', 'u'],
             ['j8', 'b'],
         ]);
-        toPlace.forEach((value, key) => board.placeLetter(key, value));
+        toPlace.forEach((value, key) => board.set(key, value));
 
         toPlace = new Map<string, string>([
             ['h7', 's'],
@@ -173,14 +183,14 @@ describe('LetterPlacingService', () => {
     });
 
     it('should check for adjacency', () => {
-        const board = new GameBoard(new Map<string, string>());
+        const board = new Map<string, string>();
         let toPlace = new Map<string, string>([
             ['g8', 's'],
             ['h8', 't'],
             ['i8', 'u'],
             ['j8', 'b'],
         ]);
-        toPlace.forEach((value, key) => board.placeLetter(key, value));
+        toPlace.forEach((value, key) => board.set(key, value));
 
         toPlace = new Map<string, string>([
             ['g9', 't'],

@@ -1,65 +1,80 @@
 import { Injectable } from '@angular/core';
 import { MessageType } from '@app/classes/message';
-import { PlayerHand } from '@app/classes/player-hand';
 import { TextboxService } from '@app/services/textbox.service';
 import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
 import { WebsocketService } from '@app/services/websocket.service';
-import { Reserve } from '@app/classes/reserve';
 
 @Injectable({
     providedIn: 'root',
 })
 export class LetterExchangeService {
-    letters: string;
     private turnState: boolean;
-    private playerHand = new PlayerHand();
-    private reserve = new Reserve();
+    private playerHand: string[] = [];
+    private reserve: string[] = [];
 
     constructor(private textboxService: TextboxService, private websocketService: WebsocketService) {
+        this.websocketService.init.subscribe((initPayload) => {
+            this.playerHand = initPayload.hand;
+            this.reserve = initPayload.reserve;
+        });
         this.websocketService.turn.subscribe((turn) => {
             this.turnState = turn;
         });
         this.websocketService.hands.subscribe((hands) => {
-            this.playerHand.letters = hands.ownHand;
+            this.playerHand = hands.ownHand;
         });
         this.websocketService.reserve.subscribe((reserve) => {
-            this.reserve.letters = reserve;
+            this.reserve = reserve;
         });
     }
 
     /**
-     * @description Function that makes sure the command is valid
-     * @param letters all the letters that the user tries to exchange
-     * @returns the validity of the command --> true/false
+     * @description Validates the command
+     * @param letters letters to exchange
      */
     validateCommand(letters: string): boolean {
-        this.letters = letters;
+        return (
+            this.isValidParam(letters) && this.isFullReserve(this.reserve) && this.isMyTurn(this.turnState) && this.isInHand(letters, this.playerHand)
+        );
+    }
 
+    /**
+     * @description Assert that a proper parameter has been entered
+     * @param letters to exchange
+     */
+    isValidParam(letters: string) {
         if (letters.length < 1 || letters.length > DEFAULT_HAND_SIZE) {
-            this.textboxService.displayMessage(MessageType.System, 'Doit etre entre 1 et 7');
+            this.textboxService.displayMessage(MessageType.System, '');
             return false;
         }
         if (letters !== letters.toLowerCase()) {
-            this.textboxService.displayMessage(MessageType.System, 'Doit etre en miniscule');
+            this.textboxService.displayMessage(MessageType.System, 'Les lettres doivent être en minuscule');
             return false;
         }
-        return this.reserve.size >= DEFAULT_HAND_SIZE && this.isMyTurn() && this.isInHand(this.letters, this.playerHand);
+        return true;
     }
 
     /**
-     * @description Function to check if the letters that the user tries to exchange are in his hand
-     * @param expectedHand the hand that the code thinks the player has
-     * @param actualHand the hand that contains all the real letters
-     * @returns a boolean --> true if all the letters are valid
+     * @description Asserts that there is at least 7 letters remaining in the reserve
      */
-    isInHand(expectedHand: string, actualHand: PlayerHand): boolean {
-        const testHand: PlayerHand = new PlayerHand();
-        expectedHand.split('').forEach((letter) => testHand.add(letter));
+    isFullReserve(reserve: string[]) {
+        return reserve.length >= DEFAULT_HAND_SIZE;
+    }
 
-        // using unique set of letters in word as key, compare to amount of letters in hand
-        const isInHand: boolean = [...new Set<string>(expectedHand)].every((letter) => {
-            const amountRequired = testHand.get(letter);
-            const amountInHand = actualHand.get(letter);
+    /**
+     * @description Assert that the hand contains all the letters to be exchanged
+     * @param expected letters to exchange
+     * @param actual player's current hand
+     */
+    isInHand(expected: string, actual: string[]): boolean {
+        const letters = expected.split('');
+        const isInHand = [...new Set<string>(letters)].every((expectedLetter) => {
+            const amountRequired = letters.filter((letter) => {
+                return letter === expectedLetter;
+            }).length;
+            const amountInHand = actual.filter((letter) => {
+                return letter === expectedLetter;
+            }).length;
             return amountRequired <= amountInHand;
         });
         if (!isInHand) {
@@ -69,13 +84,12 @@ export class LetterExchangeService {
     }
 
     /**
-     * @description Function that checks if it is the players turn
-     * @returns the observable that represents the turn/state of the game
+     * @description Assert that it is currently the player's turn
      */
-    isMyTurn(): boolean {
-        if (!this.turnState) {
+    isMyTurn(turnState: boolean): boolean {
+        if (!turnState) {
             this.textboxService.displayMessage(MessageType.System, 'La commande !échanger peut seulement être utilisée lors de votre tour');
         }
-        return this.turnState;
+        return turnState;
     }
 }

@@ -84,17 +84,17 @@ export class PanneauInfoComponent {
     }
 
     getReserveMessage(): string {
-        return `Il reste ${this.reserveSize} pièce${this.reserveSize === 1 ? 's' : ''} dans la réserve`;
+        return `Il reste ${this.reserveSize} pièce${this.reserveSize === 1 ? '' : 's'} dans la réserve`;
     }
 
     getHandMessage(player: number): string {
         const size = player === PlayerType.Self ? this.playerHandSize : this.opponentHandSize;
-        return `${size} pièce${size === 1 ? 's' : ''} en main`;
+        return `${size} pièce${size === 1 ? '' : 's'} en main`;
     }
 
     getScoreMessage(player: number): string {
         const score = player === PlayerType.Self ? this.playerScore : this.opponentScore;
-        return `${score} point${score === 1 ? 's' : ''}`;
+        return `${score} point${score === 1 ? '' : 's'}`;
     }
 
     getName(player: number): string {
