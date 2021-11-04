@@ -3,31 +3,27 @@ import { Reserve } from '@app/classes/reserve';
 import { Player } from '@app/classes/player';
 import { Service } from 'typedi';
 import EventEmitter from 'events';
-// import { SocketService } from '@app/services/socket.service';
 
 export const START_TURN_COUNT = 1;
 export const MAX_TURN_SKIP_COUNT = 6;
 
-
 @Service()
 export class EndGameService {
+    readonly turnSkipMap = new Map<string, number>();
+    readonly endGameEvent = new EventEmitter();
+
     private pointDeductedPlayer: number = 0;
     private pointDeductedOpponent: number = 0;
     private pointAdded: number = 0;
     private playerLettersLeft: string[] = [];
     private opponentLettersLeft: string[] = [];
-    readonly turnSkipMap = new Map<string, number>();
 
-    readonly endGameEvent = new EventEmitter();
-
-
-    constructor(/*private socketService: SocketService*/) {}
     /**
      * @description Function that increments the turnSkipCounter to keep track of the number of turns skipped
      */
     turnSkipCount(roomID: string): void {
         let roomSkipCounter = this.turnSkipMap.get(roomID);
-        if(roomSkipCounter !== undefined) {
+        if (roomSkipCounter !== undefined) {
             this.turnSkipMap.set(roomID, roomSkipCounter++);
         }
     }
@@ -35,8 +31,8 @@ export class EndGameService {
      * @description Function that resets the turnSkipCounter because people aren't AFK/doing nothing
      */
     turnSkipCountReset(roomID: string): void {
-        let roomSkipCounter = this.turnSkipMap.get(roomID);
-        if(roomSkipCounter !== undefined) {
+        const roomSkipCounter = this.turnSkipMap.get(roomID);
+        if (roomSkipCounter !== undefined) {
             this.turnSkipMap.set(roomID, 0);
         }
     }
@@ -76,9 +72,9 @@ export class EndGameService {
      * @param player number that represents if it is the player
      */
     addPoint(player: Player | undefined): void {
-        if(player) {
+        if (player) {
             for (const i of player.hand) {
-            this.pointAdded += DEFAULT_POINTS.get(i[0]) as number;
+                this.pointAdded += DEFAULT_POINTS.get(i[0]) as number;
             }
             player.score += this.pointAdded;
         }
@@ -88,7 +84,7 @@ export class EndGameService {
      * @returns a number that represents one or the other (1 --> player, 2 --> opponent)
      */
     checkWhoEmptiedHand(player1: Player, player2: Player): Player | undefined {
-        let playerWhoEmptiedHand: Player | undefined = undefined;
+        let playerWhoEmptiedHand: Player | undefined;
         if (player1.hand.length === 0) {
             playerWhoEmptiedHand = player1;
         } else if (player2.hand.length === 0) {
@@ -98,11 +94,9 @@ export class EndGameService {
     }
     /**
      * @description Function that displays in the chat the remaining letter of both parties
-     * @param playerHand the hand that the player possesses
-     * @param opponentHand the hand that the opponent possesses
      */
     showLettersLeft(player1: Player, player2: Player): string[] {
-        let text: string[] = [];
+        const text: string[] = [];
         for (const it of player1.hand) {
             this.playerLettersLeft.push(it[0]);
         }
@@ -115,10 +109,8 @@ export class EndGameService {
         return text;
     }
 
-    getWinner(player1: Player, player2: Player): string{
-        return player1.score > player2.score ? player1.name :
-            player1.score < player2.score ? player2.name :
-            player1.name + 'et' + player2.name;
+    getWinner(player1: Player, player2: Player): string {
+        return player1.score > player2.score ? player1.name : player1.score < player2.score ? player2.name : player1.name + 'et' + player2.name;
     }
     /**
      * @description Wrapper function that runs the procedures to end the game

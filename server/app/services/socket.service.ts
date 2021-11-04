@@ -4,7 +4,6 @@ import EventEmitter from 'events';
 import * as http from 'http';
 import * as io from 'socket.io';
 import { Service } from 'typedi';
-// import { EndGameService } from '@app/services/end-game.service';
 
 @Service()
 export class SocketService {
@@ -106,7 +105,7 @@ export class SocketService {
                 }
                 this.sio.to(room).emit('playerGaveUp');
                 this.disconnect(socket);
-            })
+            });
         });
     }
 

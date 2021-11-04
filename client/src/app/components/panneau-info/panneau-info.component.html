@@ -24,6 +24,6 @@
             <p class="time">{{ getTurnTime() }}</p>
             <button mat-raised-button class="pass-button" [disabled]="!getTurnState()" (click)="skipTurn()">Passer</button>
         </div>
-        <app-end-game class="end" *ngIf="isVisibleGiveUp"></app-end-game>
+        <app-end-game class="end" *ngIf="isGameEnded"></app-end-game>
     </div>
 </div>

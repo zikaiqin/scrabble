@@ -20,7 +20,7 @@ export class PanneauInfoComponent {
 
     isVisiblePlayer = false;
     isVisibleOpponent = false;
-    isVisibleGiveUp = false;
+    isGameEnded = false;
 
     private turnState: boolean;
     private turnTime = 0;

@@ -70,10 +70,9 @@ export class GameService {
                 }
             });
 
-        this.endGameService.endGameEvent
-            .on('gameEnded', (roomID: string) => {
-                this.socketService.gameEnded(roomID);
-            });
+        this.endGameService.endGameEvent.on('gameEnded', (roomID: string) => {
+            this.socketService.gameEnded(roomID);
+        });
     }
 
     createGame(roomID: string, configs: GameInfo, players: { socketID: string; username: string }[]) {
@@ -121,12 +120,12 @@ export class GameService {
             .on('updateTurn', (turnState: boolean) => {
                 this.updateTurn(players[0].socketID, turnState, timer);
                 this.updateTurn(players[1].socketID, !turnState, timer);
-                let gameEnd: boolean = this.endGameService.checkIfGameEnd(game.reserve, hands[0], hands[1], roomID);
+                const gameEnd: boolean = this.endGameService.checkIfGameEnd(game.reserve, hands[0], hands[1], roomID);
                 if (gameEnd) {
                     this.endGameService.endGame(hands[0], hands[1]);
                     this.socketService.getWinner(roomID, this.endGameService.getWinner(hands[0], hands[1]));
-                    for(const it of this.endGameService.showLettersLeft(hands[0], hands[1])) {
-                       this.socketService.displayLettersLeft(roomID, it); 
+                    for (const it of this.endGameService.showLettersLeft(hands[0], hands[1])) {
+                        this.socketService.displayLettersLeft(roomID, it);
                     }
                 }
             })
