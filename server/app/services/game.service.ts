@@ -12,8 +12,6 @@ import { PlacingService } from '@app/services/placing.service';
 import { DEFAULT_BONUSES, DEFAULT_TURN_LENGTH } from '@app/classes/game-config';
 import { EndGameService } from '@app/services/end-game.service';
 
-export const RECONNECT_DELAY = 5000;
-
 @Service()
 export class GameService {
     readonly games = new Map<string, Game>();
@@ -59,13 +57,24 @@ export class GameService {
             })
             .on('disconnect', (socketID: string, roomID: string) => {
                 if (Array.from(this.socketService.activeRooms.values()).includes(roomID)) {
-                    const username = this.games.get(roomID)?.players.get(socketID);
-                    if (username !== undefined) {
-                        this.socketService.sendSystemMessage(roomID, `${username.name} a quitté le jeu!`);
+                    const entries = this.games.get(roomID)?.players.entries();
+                    const timer = this.timers.get(roomID);
+                    if (entries === undefined || timer === undefined) {
+                        return;
                     }
-                    // TODO: declare forfeit by player on socketID
+                    timer.lock();
+                    Array.from(entries).forEach(([id, player]) => {
+                        if (id === socketID) {
+                            this.socketService.sendSystemMessage(roomID, `${player.name} a quitté le jeu!`);
+                        } else {
+                            setTimeout(() => {
+                                this.socketService.updateTurn(roomID, false);
+                                this.socketService.gameEnded(roomID, player.name);
+                                timer.clearTimer();
+                            }, DISCONNECT_DELAY);
+                        }
+                    });
                 } else {
-                    // TODO?: event listener lifecycle unclear -- detach event listeners associated to the timer if necessary
                     this.games.delete(roomID);
                     this.timers.get(roomID)?.clearTimer();
                     this.timers.delete(roomID);
@@ -116,15 +125,18 @@ export class GameService {
                 this.socketService.updateTime(roomID, time);
             })
             .on('updateTurn', (turnState: boolean) => {
-                this.updateTurn(players[0].socketID, turnState, timer);
-                this.updateTurn(players[1].socketID, !turnState, timer);
                 const gameEnd: boolean = this.endGameService.checkIfGameEnd(game.reserve, hands[0], hands[1], roomID);
                 if (gameEnd) {
                     this.endGameService.endGame(hands[0], hands[1]);
                     this.socketService.gameEnded(roomID, this.endGameService.getWinner(hands[0], hands[1]));
                     for (const it of this.endGameService.showLettersLeft(hands[0], hands[1])) {
-                        this.socketService.displayLettersLeft(roomID, it);
+                        this.socketService.sendSystemMessage(roomID, it);
                     }
+                    timer.clearTimer();
+                    this.socketService.updateTurn(roomID, false);
+                } else {
+                    this.updateTurn(players[0].socketID, turnState, timer);
+                    this.updateTurn(players[1].socketID, !turnState, timer);
                 }
             })
             .on('timeReachedZero', () => {
@@ -147,7 +159,12 @@ export class GameService {
 
     changeTurn(roomID: string): void {
         const timer = this.timers.get(roomID);
-        if (timer !== undefined) {
+        if (timer === undefined) {
+            return;
+        }
+        if (timer.isLocked) {
+            this.socketService.updateTurn(roomID, false);
+        } else {
             timer.changeTurn();
         }
     }
@@ -171,4 +188,5 @@ export class GameService {
 }
 
 const CHANGE_TURN_DELAY = 3000;
+const DISCONNECT_DELAY = 5000;
 const HALF = 0.5;

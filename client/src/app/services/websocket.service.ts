@@ -24,7 +24,7 @@ export class WebsocketService {
     private gameReserve = new Subject<string[]>();
     private gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
     private gameScores = new Subject<{ ownScore: number; opponentScore: number }>();
-    private winner = new Subject<string>();
+    private gameEnded = new Subject<string>();
 
     constructor(private router: Router, private textBox: TextboxService, private alertService: AlertService) {}
 
@@ -70,8 +70,8 @@ export class WebsocketService {
             this.socket.on('updateScores', (ownScore: number, opponentScore: number) => {
                 this.gameScores.next({ ownScore, opponentScore });
             });
-            this.socket.on('gameEnded', (winner) => {
-                this.winner.next(winner);
+            this.socket.on('gameEnded', (winner: string) => {
+                this.gameEnded.next(winner);
             });
         });
         this.socket.on('disconnect', (reason) => {
@@ -116,7 +116,7 @@ export class WebsocketService {
         this.socket.emit('exchange', letters);
     }
 
-    skipturn(): void {
+    skipTurn(): void {
         this.socket.emit('skipTurn');
     }
 
@@ -174,6 +174,6 @@ export class WebsocketService {
     }
 
     get endGame(): Observable<string> {
-        return this.winner.asObservable();
+        return this.gameEnded.asObservable();
     }
 }

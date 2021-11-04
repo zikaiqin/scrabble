@@ -46,12 +46,16 @@ export class Timer {
         this.timerEvents.emit('updateTurn', this.turnState);
     }
 
-    private lock(): void {
+    lock(): void {
         this.locked = true;
     }
 
     private unlock(): void {
         this.locked = false;
+    }
+
+    get isLocked(): boolean {
+        return this.locked;
     }
 }
 

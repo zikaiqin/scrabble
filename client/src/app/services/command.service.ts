@@ -71,7 +71,7 @@ export class CommandService {
                         return false;
                     }
                     this.textboxService.displayMessage(MessageType.System, 'Votre tour a été passé');
-                    this.websocketService.skipturn();
+                    this.websocketService.skipTurn();
                     return true;
                 },
             ],

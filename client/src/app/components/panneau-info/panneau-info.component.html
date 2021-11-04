@@ -7,7 +7,7 @@
                 <span>Score</span>
                 <div>{{ getScoreMessage(playerType.Self) }}</div>
             </div>
-            <div class="main" *ngIf="isVisiblePlayer">{{ getHandMessage(playerType.Self) }}</div>
+            <div *ngIf="isVisiblePlayer" class="main">{{ getHandMessage(playerType.Self) }}</div>
         </div>
         <div class="adversaire-container">
             <div class="adversaire">Adversaire</div>
@@ -16,14 +16,14 @@
                 <span>Score</span>
                 <div>{{ getScoreMessage(playerType.Opponent) }}</div>
             </div>
-            <div class="main" *ngIf="isVisibleOpponent">{{ getHandMessage(playerType.Opponent) }}</div>
+            <div *ngIf="isVisibleOpponent" class="main">{{ getHandMessage(playerType.Opponent) }}</div>
         </div>
         <div class="reserve">{{ getReserveMessage() }}</div>
         <div class="tour" [style.backgroundColor]="getTurnColor()">{{ getTurnMessage() }}</div>
-        <div class="timer-container">
+        <div *ngIf="!isGameEnded" class="timer-container">
             <p class="time">{{ getTurnTime() }}</p>
-            <button mat-raised-button class="pass-button" [disabled]="!getTurnState()" (click)="skipTurn()">Passer</button>
+            <button mat-raised-button [disabled]="!getTurnState()" (click)="skipTurn()">Passer</button>
         </div>
-        <app-end-game class="end" *ngIf="isGameEnded"></app-end-game>
+        <app-end-game *ngIf="isGameEnded" [winnerMessage]="getWinnerMessage()" class="end-game-container"></app-end-game>
     </div>
 </div>

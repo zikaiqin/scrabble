@@ -35,6 +35,8 @@ export class PanneauInfoComponent {
     private opponentHandSize = DEFAULT_HAND_SIZE;
     private reserveSize = 0;
 
+    private winner = '';
+
     constructor(private commandService: CommandService, private textboxService: TextboxService, private websocketService: WebsocketService) {
         this.websocketService.init.subscribe((initPayload) => {
             this.playerName = initPayload.self;
@@ -62,6 +64,10 @@ export class PanneauInfoComponent {
         });
         this.websocketService.reserve.subscribe((reserve) => {
             this.reserveSize = reserve.length;
+        });
+        this.websocketService.endGame.subscribe((winner) => {
+            this.winner = winner;
+            this.isGameEnded = true;
         });
     }
 
@@ -99,6 +105,10 @@ export class PanneauInfoComponent {
 
     getName(player: number): string {
         return player === PlayerType.Self ? this.playerName : this.opponentName;
+    }
+
+    getWinnerMessage(): string {
+        return `Félicitation à ${this.winner}!`;
     }
 
     skipTurn(): void {

@@ -12,15 +12,13 @@ export class EndGameService {
     private pointDeductedPlayer: number = 0;
     private pointDeductedOpponent: number = 0;
     private pointAdded: number = 0;
-    private playerLettersLeft: string[] = [];
-    private opponentLettersLeft: string[] = [];
     /**
      * @description Function that increments the turnSkipCounter to keep track of the number of turns skipped
      */
     turnSkipCount(roomID: string): void {
-        let roomSkipCounter = this.turnSkipMap.get(roomID);
+        const roomSkipCounter = this.turnSkipMap.get(roomID);
         if (roomSkipCounter !== undefined) {
-            this.turnSkipMap.set(roomID, roomSkipCounter++);
+            this.turnSkipMap.set(roomID, roomSkipCounter + 1);
         }
     }
     /**
@@ -42,10 +40,7 @@ export class EndGameService {
                 return true;
             }
         }
-        if (this.turnSkipMap.get(roomID) === MAX_TURN_SKIP_COUNT) {
-            return true;
-        }
-        return false;
+        return this.turnSkipMap.get(roomID) === MAX_TURN_SKIP_COUNT;
     }
     /**
      * @description Function that subtracts the remaining letters value to the score
@@ -91,20 +86,14 @@ export class EndGameService {
      */
     showLettersLeft(player1: Player, player2: Player): string[] {
         const text: string[] = [];
-        for (const it of player1.hand) {
-            this.playerLettersLeft.push(it[0]);
-        }
-        for (const it of player2.hand) {
-            this.opponentLettersLeft.push(it[0]);
-        }
         text.push('Fin de partie - lettres restantes');
-        text.push(player1.name + ': ' + this.playerLettersLeft.join('').toString());
-        text.push(player2.name + ': ' + this.opponentLettersLeft.join('').toString());
+        text.push(`${player1.name}:\t${[...player1.hand].sort().join('')}`);
+        text.push(`${player2.name}:\t${[...player2.hand].sort().join('')}`);
         return text;
     }
 
     getWinner(player1: Player, player2: Player): string {
-        return player1.score > player2.score ? player1.name : player1.score < player2.score ? player2.name : player1.name + 'et' + player2.name;
+        return player1.score > player2.score ? player1.name : player1.score < player2.score ? player2.name : player1.name + ' et ' + player2.name;
     }
     /**
      * @description Wrapper function that runs the procedures to end the game
