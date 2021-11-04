@@ -52,7 +52,7 @@ export class GameService {
                 } else this.placingService.returnLetters(letters, room.board, player);
             })
             .on('skipTurn', (roomID: string) => {
-                this.endGameService.turnSkipCount();
+                this.endGameService.turnSkipCount(roomID);
                 this.changeTurn(roomID);
             })
             .on('disconnect', (socketID: string, roomID: string) => {
@@ -68,6 +68,11 @@ export class GameService {
                     this.timers.get(roomID)?.clearTimer();
                     this.timers.delete(roomID);
                 }
+            });
+
+        this.endGameService.endGameEvent
+            .on('gameEnded', (roomID: string) => {
+                this.socketService.gameEnded(roomID);
             });
     }
 
@@ -116,10 +121,22 @@ export class GameService {
             .on('updateTurn', (turnState: boolean) => {
                 this.updateTurn(players[0].socketID, turnState, timer);
                 this.updateTurn(players[1].socketID, !turnState, timer);
-                this.endGameService.endGame(roomID, game.reserve, hands[0], hands[1]);
+                let gameEnd: boolean = this.endGameService.checkIfGameEnd(game.reserve, hands[0], hands[1], roomID);
+                if (gameEnd) {
+                    this.endGameService.endGame(hands[0], hands[1]);
+                    this.socketService.getWinner(roomID, this.endGameService.getWinner(hands[0], hands[1]));
+                    for(const it of this.endGameService.showLettersLeft(hands[0], hands[1])) {
+                       this.socketService.displayLettersLeft(roomID, it); 
+                    }
+                }
+            })
+            .on('timeReachedZero', () => {
+                this.endGameService.turnSkipCount(roomID);
             });
 
         timer.changeTurn();
+
+        this.endGameService.turnSkipMap.set(roomID, 0);
     }
 
     getBonuses(randomized: boolean): Map<string, string> {

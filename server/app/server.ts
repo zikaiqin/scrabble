@@ -44,8 +44,6 @@ export class Server {
         this.websocketService = new SocketService(this.server);
         this.websocketService.handleSockets();
 
-        this.endGameService = new EndGameService(this.websocketService);
-
         this.gameService = new GameService(this.websocketService, this.exchangeService, this.placingService, this.validationService, this.endGameService);
         this.gameService.attachListeners();
 

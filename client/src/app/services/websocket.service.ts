@@ -78,7 +78,7 @@ export class WebsocketService {
             this.socket.on('playerGaveUp', () => {
                 this.gameGaveUp.next(true);
             });
-            this.socket.on('gameEnded', () => {
+            this.socket.on('gameDone', () => {
                 this.gameEnded.next(true);
             });
             this.socket.on('getWinner', (winner) => {

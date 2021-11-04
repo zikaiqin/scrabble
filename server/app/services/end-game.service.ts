@@ -1,49 +1,58 @@
 import { DEFAULT_POINTS } from '@app/classes/game-config';
 import { Reserve } from '@app/classes/reserve';
-import { MessageType } from '@app/classes/message';
 import { Player } from '@app/classes/player';
 import { Service } from 'typedi';
-import { SocketService } from '@app/services/socket.service';
+import EventEmitter from 'events';
+// import { SocketService } from '@app/services/socket.service';
 
-export const START_TURN_COUNT = 0;
+export const START_TURN_COUNT = 1;
 export const MAX_TURN_SKIP_COUNT = 6;
-export const DEFAULT_POINT = 0;
-export const EMPTY = 0;
+
 
 @Service()
 export class EndGameService {
-    turnSkipCounter: number = START_TURN_COUNT;
-    private pointDeductedPlayer: number = DEFAULT_POINT;
-    private pointDeductedOpponent: number = DEFAULT_POINT;
-    private pointAdded: number = DEFAULT_POINT;
+    private pointDeductedPlayer: number = 0;
+    private pointDeductedOpponent: number = 0;
+    private pointAdded: number = 0;
     private playerLettersLeft: string[] = [];
     private opponentLettersLeft: string[] = [];
+    readonly turnSkipMap = new Map<string, number>();
+
+    readonly endGameEvent = new EventEmitter();
 
 
-    constructor(private socketService: SocketService) {}
+    constructor(/*private socketService: SocketService*/) {}
     /**
      * @description Function that increments the turnSkipCounter to keep track of the number of turns skipped
      */
-    turnSkipCount(): void {
-        this.turnSkipCounter++;
+    turnSkipCount(roomID: string): void {
+        let roomSkipCounter = this.turnSkipMap.get(roomID);
+        if(roomSkipCounter !== undefined) {
+            this.turnSkipMap.set(roomID, roomSkipCounter++);
+        }
     }
     /**
      * @description Function that resets the turnSkipCounter because people aren't AFK/doing nothing
      */
-    turnSkipCountReset(): void {
-        this.turnSkipCounter = START_TURN_COUNT;
+    turnSkipCountReset(roomID: string): void {
+        let roomSkipCounter = this.turnSkipMap.get(roomID);
+        if(roomSkipCounter !== undefined) {
+            this.turnSkipMap.set(roomID, 0);
+        }
     }
     /**
      * @description Function that verifies if the game met one of the ending conditions
      * @returns boolean to indicate if the game ended
      */
-    checkIfGameEnd(reserve: Reserve, player1Hand: Player, player2Hand: Player): boolean {
-        if (reserve.size === EMPTY) {
-            if (player1Hand.size === EMPTY || player2Hand.size === EMPTY) {
+    checkIfGameEnd(reserve: Reserve, player1Hand: Player, player2Hand: Player, roomID: string): boolean {
+        if (reserve.size === 0) {
+            if (player1Hand.size === 0 || player2Hand.size === 0) {
+                this.endGameEvent.emit('gameEnded', roomID);
                 return true;
             }
         }
-        if (this.turnSkipCounter === MAX_TURN_SKIP_COUNT) {
+        if (this.turnSkipMap.get(roomID) === MAX_TURN_SKIP_COUNT) {
+            this.endGameEvent.emit('gameEnded', roomID);
             return true;
         }
         return false;
@@ -80,9 +89,9 @@ export class EndGameService {
      */
     checkWhoEmptiedHand(player1: Player, player2: Player): Player | undefined {
         let playerWhoEmptiedHand: Player | undefined = undefined;
-        if (player1.hand.length === EMPTY) {
+        if (player1.hand.length === 0) {
             playerWhoEmptiedHand = player1;
-        } else if (player2.hand.length === EMPTY) {
+        } else if (player2.hand.length === 0) {
             playerWhoEmptiedHand = player2;
         }
         return playerWhoEmptiedHand;
@@ -92,16 +101,18 @@ export class EndGameService {
      * @param playerHand the hand that the player possesses
      * @param opponentHand the hand that the opponent possesses
      */
-    showLettersLeft(roomID: string, player1: Player, player2: Player): void {
+    showLettersLeft(player1: Player, player2: Player): string[] {
+        let text: string[] = [];
         for (const it of player1.hand) {
             this.playerLettersLeft.push(it[0]);
         }
         for (const it of player2.hand) {
             this.opponentLettersLeft.push(it[0]);
         }
-        this.socketService.displayLettersLeft(roomID, MessageType.System, 'Fin de partie - lettres restantes');
-        this.socketService.displayLettersLeft(roomID, MessageType.System, player1.name + ': ' + this.playerLettersLeft.join('').toString());
-        this.socketService.displayLettersLeft(roomID, MessageType.System, player2.name + ': ' + this.opponentLettersLeft.join('').toString());
+        text.push('Fin de partie - lettres restantes');
+        text.push(player1.name + ': ' + this.playerLettersLeft.join('').toString());
+        text.push(player2.name + ': ' + this.opponentLettersLeft.join('').toString());
+        return text;
     }
 
     getWinner(player1: Player, player2: Player): string{
@@ -112,13 +123,8 @@ export class EndGameService {
     /**
      * @description Wrapper function that runs the procedures to end the game
      */
-    endGame(roomID: string, reserve: Reserve, player1: Player, player2: Player): void {
-        if (this.checkIfGameEnd(reserve, player1, player2)) {
-            this.deductPoint(player1, player2);
-            this.addPoint(this.checkWhoEmptiedHand(player1, player2));
-            this.socketService.gameEnded(roomID);
-            this.socketService.getWinner(roomID, this.getWinner(player1, player2));
-            this.showLettersLeft(roomID, player1, player2);
-        }
+    endGame(player1: Player, player2: Player): void {
+        this.deductPoint(player1, player2);
+        this.addPoint(this.checkWhoEmptiedHand(player1, player2));
     }
 }

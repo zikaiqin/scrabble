@@ -150,12 +150,12 @@ export class SocketService {
         this.sio.to(socketID).emit('updateTurn', turnState);
     }
 
-    displayLettersLeft(roomID: string, messageType: MessageType, message: string) {
-        this.sio.to(roomID).emit('receiveMessage', messageType, message);
+    displayLettersLeft(roomID: string, message: string) {
+        this.sio.to(roomID).emit('receiveMessage', MessageType.System, message);
     }
 
     gameEnded(roomId: string) {
-        this.sio.to(roomId).emit('gameEnded');
+        this.sio.to(roomId).emit('gameDone');
     }
 
     getWinner(roomId: string, winner: string) {
