@@ -1,4 +1,4 @@
-/* import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ChevaletComponent } from './chevalet.component';
 
@@ -22,4 +22,3 @@ describe('ChevaletComponent', () => {
         expect(component).toBeTruthy();
     });
 });
-*/

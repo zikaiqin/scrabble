@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
@@ -9,22 +10,18 @@ describe('LetterPlacingService', () => {
     let websocketServiceSpy: jasmine.SpyObj<WebsocketService>;
     let textboxServiceSpy: jasmine.SpyObj<WebsocketService>;
 
+    const gameTurn = new Subject<boolean>();
+    const gameBoard = new Subject<[string, string][]>();
+    const gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
+
     beforeEach(() => {
-        const gameTurn = new Subject<boolean>();
-        const gameBoard = new Subject<[string, string][]>();
-        const gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
-
-        textboxServiceSpy = jasmine.createSpyObj('TextboxService', {
-            displayMessage: (_: string, __: string) => {
-                void [_, __];
-            },
-        });
-
         websocketServiceSpy = jasmine.createSpyObj('WebsocketService', [], {
             turn: gameTurn.asObservable(),
             board: gameBoard.asObservable(),
             hands: gameHands.asObservable(),
         });
+
+        textboxServiceSpy = jasmine.createSpyObj('TextboxService', { displayMessage: (_: string, __: string) => void [_, __] });
 
         TestBed.configureTestingModule({
             providers: [

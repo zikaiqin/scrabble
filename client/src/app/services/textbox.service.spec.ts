@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
+
+import { TextboxService } from './textbox.service';
 import { Message } from '@app/classes/message';
 import { Subject } from 'rxjs';
-import { TextboxService } from './textbox.service';
 
-describe('CommandService', () => {
+describe('TextboxService', () => {
     let service: TextboxService;
     let subjectSpy: jasmine.SpyObj<Subject<Message>>;
 

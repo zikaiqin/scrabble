@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
-import { WebsocketService } from '@app/services/websocket.service';
 import { CommandService } from '@app/services/command.service';
-import { MessageType } from '@app/classes/message';
 import { TextboxService } from '@app/services/textbox.service';
+import { WebsocketService } from '@app/services/websocket.service';
+import { MessageType } from '@app/classes/message';
 
 enum PlayerType {
     Self,

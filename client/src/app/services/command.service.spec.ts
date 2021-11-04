@@ -1,28 +1,36 @@
 import { TestBed } from '@angular/core/testing';
 import { CommandService } from './command.service';
-import { TextboxService } from '@app/services/textbox.service';
+import { AlertService } from '@app/services/alert.service';
 import { LetterPlacingService } from './letter-placing.service';
 import { LetterExchangeService } from './letter-exchange.service';
-import { AlertService } from '@app/services/alert.service';
+import { TextboxService } from '@app/services/textbox.service';
+import { WebsocketService } from '@app/services/websocket.service';
+import { Subject } from 'rxjs';
 
 describe('CommandService', () => {
     let service: CommandService;
-    let textboxServiceSpy: jasmine.SpyObj<TextboxService>;
     let letterPlacingServiceSpy: jasmine.SpyObj<LetterPlacingService>;
     let letterExchangeServiceSpy: jasmine.SpyObj<LetterExchangeService>;
+    let websocketServiceSpy: jasmine.SpyObj<LetterExchangeService>;
+
     const alertServiceSpy = jasmine.createSpyObj('AlertService', ['showAlert']);
+    const textboxServiceSpy = jasmine.createSpyObj('TextBoxService', ['displayMessage']);
+
+    const gameTurn = new Subject<boolean>();
 
     beforeEach(() => {
-        textboxServiceSpy = jasmine.createSpyObj('TextBoxService', ['displayMessage']);
         letterPlacingServiceSpy = jasmine.createSpyObj('letterPlacingService', ['validateCommand']);
         letterExchangeServiceSpy = jasmine.createSpyObj('letterExchangeServiceSpy', ['validateCommand']);
-
+        websocketServiceSpy = jasmine.createSpyObj('WebsocketService', ['placeLetters', 'exchangeLetters', 'skipTurn', 'sendMessage'], {
+            turn: gameTurn.asObservable(),
+        });
         TestBed.configureTestingModule({
             providers: [
-                { provide: TextboxService, useValue: textboxServiceSpy },
+                { provide: AlertService, useValue: alertServiceSpy },
                 { provide: LetterPlacingService, useValue: letterPlacingServiceSpy },
                 { provide: LetterExchangeService, useValue: letterExchangeServiceSpy },
-                { provide: AlertService, useValue: alertServiceSpy },
+                { provide: TextboxService, useValue: textboxServiceSpy },
+                { provide: WebsocketService, useValue: websocketServiceSpy },
             ],
         });
         service = TestBed.inject(CommandService);
@@ -34,7 +42,6 @@ describe('CommandService', () => {
 
     it('should allow the command', () => {
         service.parseCommand('!aide');
-
         expect(textboxServiceSpy.displayMessage).toHaveBeenCalled();
 
         service.parseCommand('!échanger a');
@@ -54,6 +61,7 @@ describe('CommandService', () => {
         service.parseCommand('!passer');
         expect(textboxServiceSpy.displayMessage).toHaveBeenCalled();
     });
+
     it('should allow not the command', () => {
         service.parseCommand('!ass');
         expect(textboxServiceSpy.displayMessage).toHaveBeenCalled();

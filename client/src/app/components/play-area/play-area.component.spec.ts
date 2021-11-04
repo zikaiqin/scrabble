@@ -1,15 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { Vec2 } from '@app/classes/vec2';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
+import { WebsocketService } from '@app/services/websocket.service';
+import { GridService } from '@app/services/grid.service';
 
 describe('PlayAreaComponent', () => {
     let component: PlayAreaComponent;
     let fixture: ComponentFixture<PlayAreaComponent>;
     let mouseEvent: MouseEvent;
 
+    const websocketServiceSpy = jasmine.createSpyObj('WebsocketService', { giveUp: () => void 0 });
+    const gridServiceSpy = jasmine.createSpyObj('GridService', ['clearGrid', 'drawGrid', 'maxGrid']);
+
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [PlayAreaComponent],
+            providers: [
+                { provide: WebsocketService, useValue: websocketServiceSpy },
+                { provide: GridService, useValue: gridServiceSpy },
+            ],
         }).compileComponents();
     });
 

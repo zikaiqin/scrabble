@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+/* import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { JoueurVirtuelleComponent } from './joueur-virtuelle.component';
 
@@ -21,4 +21,4 @@ describe('JoueurVirtuelleComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-});
+});*/

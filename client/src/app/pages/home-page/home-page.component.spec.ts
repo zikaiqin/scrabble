@@ -1,19 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HomePageComponent } from './home-page.component';
-import { RouterTestingModule } from '@angular/router/testing';
 import { AlertService } from '@app/services/alert.service';
+import { WebsocketService } from '@app/services/websocket.service';
+import { Subject } from 'rxjs';
 
 describe('HomePageComponent', () => {
     let component: HomePageComponent;
     let fixture: ComponentFixture<HomePageComponent>;
+
+    const connectionStatus = new Subject<string>();
+    const websocketServiceSpy = jasmine.createSpyObj('WebsocketService', [], { status: connectionStatus.asObservable() });
     const alertServiceSpy = jasmine.createSpyObj('AlertService', ['showAlert']);
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [RouterTestingModule],
             declarations: [HomePageComponent],
-            providers: [{ provide: AlertService, useValue: alertServiceSpy }],
+            providers: [
+                { provide: AlertService, useValue: alertServiceSpy },
+                { provide: WebsocketService, useValue: websocketServiceSpy },
+            ],
         }).compileComponents();
     });
 

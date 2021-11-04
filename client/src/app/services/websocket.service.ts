@@ -14,7 +14,7 @@ const url = '//localhost:3000';
 export class WebsocketService {
     private socket: Socket;
 
-    private connectionEvent = new Subject<string>();
+    private connectionStatus = new Subject<string>();
     private roomList = new Subject<GameInfo[]>();
 
     private gameInit = new Subject<GameInit>();
@@ -80,7 +80,7 @@ export class WebsocketService {
             }
             this.roomList.next([]);
             this.alertService.showAlert('La connexion au serveur a été interrompue');
-            this.connectionEvent.next('connectionLost');
+            this.connectionStatus.next('connectionLost');
         });
     }
 
@@ -138,7 +138,7 @@ export class WebsocketService {
     }
 
     get status(): Observable<string> {
-        return this.connectionEvent.asObservable();
+        return this.connectionStatus.asObservable();
     }
 
     get rooms(): Observable<GameInfo[]> {

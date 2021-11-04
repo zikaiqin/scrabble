@@ -3,7 +3,6 @@ import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
 import { WebsocketService } from '@app/services/websocket.service';
 
-// import { GridChevalet } from '@app/services/chevalet.service';
 // TODO : Avoir un fichier séparé pour les constantes!
 export const DEFAULT_WIDTH_ALL = 650; // 525
 export const DEFAULT_HEIGHT_ALL = 753; // 625
@@ -29,9 +28,9 @@ export class PlayAreaComponent implements AfterViewInit {
 
     mousePosition: Vec2 = { x: 0, y: 0 };
     buttonPressed = '';
+    isVisible: boolean;
 
     private canvasSize = { x: DEFAULT_WIDTH_ALL, y: DEFAULT_HEIGHT_ALL };
-    isVisible: boolean;
 
     constructor(private readonly gridService: GridService, private webSocketService: WebsocketService) {
         this.isVisible = false;
@@ -53,7 +52,6 @@ export class PlayAreaComponent implements AfterViewInit {
     cancel(): void {
         this.isVisible = false;
     }
-
 
     maximize(): void {
         this.gridService.clearGrid();
@@ -81,13 +79,7 @@ export class PlayAreaComponent implements AfterViewInit {
     get height(): number {
         return this.canvasSize.y;
     }
-    // get Chevaletwidth(): number {
-    //     return this.ChevaletSize.ChevaletX;
-    // }
 
-    // get Chevaletheight(): number {
-    //     return this.ChevaletSize.ChevaletY;
-    // }
     // TODO : déplacer ceci dans un service de gestion de la souris!
     mouseHitDetect(event: MouseEvent) {
         if (event.button === MouseButton.Left) {

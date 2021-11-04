@@ -1,17 +1,33 @@
 import { TestBed } from '@angular/core/testing';
+
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { GridService } from '@app/services/grid.service';
+import { GameInit } from '@app/classes/game-info';
+import { Subject } from 'rxjs';
+import { LetterExchangeService } from '@app/services/letter-exchange.service';
+import { WebsocketService } from '@app/services/websocket.service';
 
 describe('GridService', () => {
     let service: GridService;
+    let websocketServiceSpy: jasmine.SpyObj<LetterExchangeService>;
     let ctxStub: CanvasRenderingContext2D;
     const pointOnMap: Map<string, string> = new Map();
     const CANVAS_WIDTH = 500;
     const CANVAS_HEIGHT = 500;
     const DEFAULT_NB_CASES = 16;
 
+    const gameInit = new Subject<GameInit>();
+    const gameBoard = new Subject<[string, string][]>();
+
     beforeEach(() => {
-        TestBed.configureTestingModule({});
+        websocketServiceSpy = jasmine.createSpyObj('WebsocketService', [], {
+            init: gameInit.asObservable(),
+            board: gameBoard.asObservable(),
+        });
+
+        TestBed.configureTestingModule({
+            providers: [{ provide: WebsocketService, useValue: websocketServiceSpy }],
+        });
         service = TestBed.inject(GridService);
         ctxStub = CanvasTestHelper.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         service.gridContext = ctxStub;

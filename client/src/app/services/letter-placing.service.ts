@@ -21,11 +21,11 @@ export class LetterPlacingService {
         this.websocketService.turn.subscribe((turn) => {
             this.turnState = turn;
         });
-        this.websocketService.board.subscribe((letters) => {
-            this.gameBoard = new Map<string, string>(letters);
-        });
         this.websocketService.hands.subscribe((hands) => {
             this.playerHand = hands.ownHand;
+        });
+        this.websocketService.board.subscribe((letters) => {
+            this.gameBoard = new Map<string, string>(letters);
         });
     }
 
