@@ -44,7 +44,13 @@ export class Server {
         this.websocketService = new SocketService(this.server);
         this.websocketService.handleSockets();
 
-        this.gameService = new GameService(this.websocketService, this.exchangeService, this.placingService, this.validationService, this.endGameService);
+        this.gameService = new GameService(
+            this.websocketService,
+            this.exchangeService,
+            this.placingService,
+            this.validationService,
+            this.endGameService,
+        );
         this.gameService.attachListeners();
 
         this.server.listen(Server.appPort);

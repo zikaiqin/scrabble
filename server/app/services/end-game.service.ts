@@ -2,7 +2,6 @@ import { DEFAULT_POINTS } from '@app/classes/game-config';
 import { Reserve } from '@app/classes/reserve';
 import { Player } from '@app/classes/player';
 import { Service } from 'typedi';
-import EventEmitter from 'events';
 
 export const START_TURN_COUNT = 1;
 export const MAX_TURN_SKIP_COUNT = 6;
@@ -10,14 +9,11 @@ export const MAX_TURN_SKIP_COUNT = 6;
 @Service()
 export class EndGameService {
     readonly turnSkipMap = new Map<string, number>();
-    readonly endGameEvent = new EventEmitter();
-
     private pointDeductedPlayer: number = 0;
     private pointDeductedOpponent: number = 0;
     private pointAdded: number = 0;
     private playerLettersLeft: string[] = [];
     private opponentLettersLeft: string[] = [];
-
     /**
      * @description Function that increments the turnSkipCounter to keep track of the number of turns skipped
      */
@@ -43,12 +39,10 @@ export class EndGameService {
     checkIfGameEnd(reserve: Reserve, player1Hand: Player, player2Hand: Player, roomID: string): boolean {
         if (reserve.size === 0) {
             if (player1Hand.size === 0 || player2Hand.size === 0) {
-                this.endGameEvent.emit('gameEnded', roomID);
                 return true;
             }
         }
         if (this.turnSkipMap.get(roomID) === MAX_TURN_SKIP_COUNT) {
-            this.endGameEvent.emit('gameEnded', roomID);
             return true;
         }
         return false;

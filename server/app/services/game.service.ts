@@ -12,6 +12,8 @@ import { PlacingService } from '@app/services/placing.service';
 import { DEFAULT_BONUSES, DEFAULT_TURN_LENGTH } from '@app/classes/game-config';
 import { EndGameService } from '@app/services/end-game.service';
 
+export const RECONNECT_DELAY = 5000;
+
 @Service()
 export class GameService {
     readonly games = new Map<string, Game>();
@@ -69,10 +71,6 @@ export class GameService {
                     this.timers.delete(roomID);
                 }
             });
-
-        this.endGameService.endGameEvent.on('gameEnded', (roomID: string) => {
-            this.socketService.gameEnded(roomID);
-        });
     }
 
     createGame(roomID: string, configs: GameInfo, players: { socketID: string; username: string }[]) {
@@ -123,7 +121,7 @@ export class GameService {
                 const gameEnd: boolean = this.endGameService.checkIfGameEnd(game.reserve, hands[0], hands[1], roomID);
                 if (gameEnd) {
                     this.endGameService.endGame(hands[0], hands[1]);
-                    this.socketService.getWinner(roomID, this.endGameService.getWinner(hands[0], hands[1]));
+                    this.socketService.gameEnded(roomID, this.endGameService.getWinner(hands[0], hands[1]));
                     for (const it of this.endGameService.showLettersLeft(hands[0], hands[1])) {
                         this.socketService.displayLettersLeft(roomID, it);
                     }

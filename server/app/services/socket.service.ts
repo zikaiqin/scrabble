@@ -97,15 +97,6 @@ export class SocketService {
                 console.log(`client on socket: "${socket.id}" has disconnected with reason: "${reason}"`);
                 this.disconnect(socket);
             });
-
-            socket.on('gaveUp', () => {
-                const room = this.activeRooms.get(socket.id);
-                if (room === undefined) {
-                    return;
-                }
-                this.sio.to(room).emit('playerGaveUp');
-                this.disconnect(socket);
-            });
         });
     }
 
@@ -153,12 +144,8 @@ export class SocketService {
         this.sio.to(roomID).emit('receiveMessage', MessageType.System, message);
     }
 
-    gameEnded(roomId: string) {
-        this.sio.to(roomId).emit('gameDone');
-    }
-
-    getWinner(roomId: string, winner: string) {
-        this.sio.to(roomId).emit('getWinner', winner);
+    gameEnded(roomId: string, winner: string) {
+        this.sio.to(roomId).emit('gameEnded', winner);
     }
 
     get roomList(): GameInfo[] {

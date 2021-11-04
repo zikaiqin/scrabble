@@ -7,44 +7,19 @@ import { WebsocketService } from '@app/services/websocket.service';
     styleUrls: ['./end-game.component.scss'],
 })
 export class EndGameComponent {
-    isVisibleWinner: boolean;
-    isVisibleGiveUp: boolean;
-    isVisibleButton: boolean;
-    playerScore = 0;
-    opponentScore = 0;
-    gameEnded: boolean;
-    gameGaveUp: boolean;
     winner: string;
 
     constructor(private webSocketService: WebsocketService) {
-        this.webSocketService.gameEnded.asObservable().subscribe((gameEnded) => {
-            this.gameEnded = gameEnded;
-        });
-        this.webSocketService.gameGaveUp.asObservable().subscribe((gameGaveUp) => {
-            this.gameGaveUp = gameGaveUp;
-        });
-        this.webSocketService.winner.asObservable().subscribe((winner) => {
+        this.webSocketService.endGame.subscribe((winner) => {
             this.winner = winner;
         });
-        this.isVisibleWinner = false;
-        this.isVisibleButton = true;
     }
 
     getWinner(): string {
-        if (this.gameEnded) {
-            this.isVisibleWinner = true;
-            return this.winner;
-        } else if (this.gameGaveUp) {
-            return 'Toi';
-        }
-        return '';
+        return this.winner === undefined ? '' : this.winner;
     }
 
     redirectTo() {
         window.location.reload();
-    }
-
-    checkIfGameEnded(): boolean {
-        return this.gameEnded;
     }
 }
