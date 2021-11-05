@@ -1,10 +1,9 @@
-import { Game } from '@app/classes/game';
-import { GameInfo } from '@app/classes/game-info';
-import { MessageType } from '@app/classes/message';
 import EventEmitter from 'events';
 import * as http from 'http';
 import * as io from 'socket.io';
 import { Service } from 'typedi';
+import { GameInfo } from '@app/classes/game-info';
+import { MessageType } from '@app/classes/message';
 
 @Service()
 export class SocketService {
@@ -66,7 +65,6 @@ export class SocketService {
                 socket.broadcast.to(room).emit('receiveMessage', MessageType.User, message);
             });
 
-            // TODO
             socket.on('place', (startCoords: string, letters: [string, string][]) => {
                 const roomID = this.activeRooms.get(socket.id);
                 if (roomID === undefined) {
@@ -75,7 +73,6 @@ export class SocketService {
                 this.socketEvents.emit('place', socket.id, roomID, startCoords, letters);
             });
 
-            // TODO
             socket.on('exchange', (letters: string) => {
                 const roomID = this.activeRooms.get(socket.id);
                 if (roomID === undefined) {
@@ -122,10 +119,6 @@ export class SocketService {
 
     sendSystemMessage(roomID: string, message: string) {
         this.sio.to(roomID).emit('receiveMessage', MessageType.System, message);
-    }
-
-    returnReserve(roomID: string, room: Game): void {
-        this.sio.to(roomID).emit('updateReserve', Array.from(room.reserve.letters));
     }
 
     setConfigs(

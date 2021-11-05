@@ -137,10 +137,6 @@ export class WebsocketService {
         this.socket.disconnect();
     }
 
-    fetchReserve(): void {
-        this.socket.emit('reserve');
-    }
-
     get status(): Observable<string> {
         return this.connectionStatus.asObservable();
     }

@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { CommandService } from './command.service';
 import { AlertService } from '@app/services/alert.service';
-import { LetterPlacingService } from './letter-placing.service';
-import { LetterExchangeService } from './letter-exchange.service';
+import { LetterPlacingService } from '@app/services/letter-placing.service';
+import { LetterExchangeService } from '@app/services/letter-exchange.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
+import { GameInit } from '@app/classes/game-info';
 import { Subject } from 'rxjs';
 
 describe('CommandService', () => {
@@ -16,13 +17,17 @@ describe('CommandService', () => {
     const alertServiceSpy = jasmine.createSpyObj('AlertService', ['showAlert']);
     const textboxServiceSpy = jasmine.createSpyObj('TextBoxService', ['displayMessage']);
 
+    const gameInit = new Subject<GameInit>();
     const gameTurn = new Subject<boolean>();
+    const gameReserve = new Subject<string[]>();
 
     beforeEach(() => {
         letterPlacingServiceSpy = jasmine.createSpyObj('letterPlacingService', ['validateCommand']);
         letterExchangeServiceSpy = jasmine.createSpyObj('letterExchangeServiceSpy', ['validateCommand']);
         websocketServiceSpy = jasmine.createSpyObj('WebsocketService', ['placeLetters', 'exchangeLetters', 'skipTurn', 'sendMessage'], {
+            init: gameInit.asObservable(),
             turn: gameTurn.asObservable(),
+            reserve: gameReserve.asObservable(),
         });
         TestBed.configureTestingModule({
             providers: [

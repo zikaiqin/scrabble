@@ -20,18 +20,6 @@ export class CommandService {
         private letterExchangeService: LetterExchangeService,
         private websocketService: WebsocketService,
     ) {
-        this.websocketService.reserve.subscribe((reserve) => {
-            this.reserve = reserve;
-            this.reserve.sort((a, b) => {
-                return a.localeCompare(b);
-            });
-            let message = 'La réserve contient ';
-            for (const letter of this.reserve) {
-                message += letter + ' ';
-            }
-            this.textboxService.displayMessage(MessageType.System, message);
-        });
-
         this.commandLookup = new Map<string, (...params: string[]) => boolean>([
             [
                 '!aide',
@@ -92,7 +80,9 @@ export class CommandService {
                 '!réserve',
                 (): boolean => {
                     if (this.debugActive) {
-                        this.websocketService.fetchReserve();
+                        let message = 'La réserve contient ';
+                        this.reserve.sort((a, b) => a.localeCompare(b)).forEach((letter) => (message += letter + ' '));
+                        this.textboxService.displayMessage(MessageType.System, message);
                         return false;
                     } else {
                         this.textboxService.displayMessage(MessageType.System, "La commande debug n'est pas activé");
@@ -102,6 +92,12 @@ export class CommandService {
             ],
         ]);
 
+        this.websocketService.init.subscribe((initPayload) => {
+            this.reserve = initPayload.reserve;
+        });
+        this.websocketService.reserve.subscribe((reserve) => {
+            this.reserve = reserve;
+        });
         this.websocketService.turn.subscribe((turnState) => {
             this.turn = turnState;
         });

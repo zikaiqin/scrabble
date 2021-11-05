@@ -103,10 +103,6 @@ export class GameService {
                     this.timers.get(roomID)?.clearTimer();
                     this.timers.delete(roomID);
                 }
-            })
-            .on('updateReserve', (roomId) => {
-                const room = this.games.get(roomId);
-                if (room !== undefined) this.socketService.returnReserve(roomId, room);
             });
     }
 
