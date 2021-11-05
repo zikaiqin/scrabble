@@ -53,8 +53,8 @@ export class GameService {
                 if (player === undefined) {
                     return;
                 }
-                this.validationService.init(startCoords, toPlace, game.board);
                 this.placingService.placeLetters(toPlace, game.board, player);
+                this.validationService.init(startCoords, toPlace, game.board);
                 this.socketService.updateBoard(socketID, game.board.letters);
                 this.socketService.updateHands(socketID, player.hand, Array.from(game.players.values()).filter((p) => p !== player)[0].hand);
 

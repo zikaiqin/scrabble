@@ -24,7 +24,7 @@ export class ValidationService {
     newWord: Map<string, string>;
     gameBoard: Board;
 
-    private dictionnary = JSON.parse(JSON.stringify(data));
+    private dictionary = JSON.parse(JSON.stringify(data));
     /**
      * @description Startup to initialize the attributes
      * @param startCoords the starting coordinates of the placed word/letter
@@ -105,7 +105,7 @@ export class ValidationService {
             if (!this.gameBoard.hasCoords(String.fromCharCode(xIndex + this.index) + yIndex)) break;
         }
         for (let j = 0; j < this.index; j++) {
-            const coordinates = String.fromCharCode(this.startCoord.x + j) + yIndex;
+            const coordinates = String.fromCharCode(xIndex + j) + yIndex;
             tempWord += this.gameBoard.getLetter(coordinates);
             stringIndexes.push(coordinates);
         }
@@ -155,19 +155,8 @@ export class ValidationService {
      * @returns true if all words are valid / false if any 1 word isn't valid
      */
     findWord(words: string[]): boolean {
-        let temp = false;
-        for (const itr of words) {
-            if (itr.length >= 2 && !(itr.includes('-') || itr.includes("'"))) {
-                for (const val of this.dictionnary.words) {
-                    if (itr === val) {
-                        temp = true;
-                        break;
-                    } else temp = false;
-                }
-                if (!temp) return false;
-            }
-        }
-        return temp;
+        const wordsToCheck = words.filter((word) => word.length >= 2 && !word.includes('-') && !word.includes("'")).map((word) => word.toLowerCase());
+        return wordsToCheck.every((word) => this.dictionary.words.includes(word));
     }
     /**
      * @description Wrapper function that calculates all the points with all the formed words
