@@ -41,6 +41,7 @@ export class GameService {
                 this.exchangeService.exchangeLetters(letters, player, game.reserve);
                 this.socketService.updateReserve(roomId, game.reserve.letters);
                 this.updateHands(game);
+                this.endGameService.resetTurnSkipCount(roomId);
                 this.changeTurn(roomId);
             })
             .on('place', (socketID: string, roomId: string, startCoords: string, letters: [string, string][]) => {
@@ -65,6 +66,7 @@ export class GameService {
                         this.placingService.replenishHand(game.reserve, player);
                         this.socketService.updateReserve(roomId, game.reserve.letters);
                         this.updateScores(game);
+                        this.endGameService.resetTurnSkipCount(roomId);
                     } else {
                         this.placingService.returnLetters(toPlace, game.board, player);
                         this.socketService.sendSystemMessage(socketID, 'Votre placement forme des mots invalides');
@@ -76,7 +78,7 @@ export class GameService {
                 this.changeTurn(roomId);
             })
             .on('skipTurn', (roomID: string) => {
-                this.endGameService.turnSkipCount(roomID);
+                this.endGameService.incrementTurnSkipCount(roomID);
                 this.changeTurn(roomID);
             })
             .on('disconnect', (socketID: string, roomID: string) => {
@@ -165,7 +167,7 @@ export class GameService {
                 }
             })
             .on('timeElapsed', () => {
-                this.endGameService.turnSkipCount(roomID);
+                this.endGameService.incrementTurnSkipCount(roomID);
             });
 
         timer.changeTurn();

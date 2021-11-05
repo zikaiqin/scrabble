@@ -1,6 +1,6 @@
 import { DEFAULT_POINTS } from '@app/classes/game-config';
-import { Reserve } from '@app/classes/reserve';
 import { Player } from '@app/classes/player';
+import { Reserve } from '@app/classes/reserve';
 import { Service } from 'typedi';
 
 export const MAX_TURN_SKIP_COUNT = 6;
@@ -11,7 +11,7 @@ export class EndGameService {
     /**
      * @description Function that increments the turnSkipCounter to keep track of the number of turns skipped
      */
-    turnSkipCount(roomID: string): void {
+    incrementTurnSkipCount(roomID: string): void {
         const roomSkipCounter = this.turnSkipMap.get(roomID);
         if (roomSkipCounter !== undefined) {
             this.turnSkipMap.set(roomID, roomSkipCounter + 1);
@@ -20,7 +20,7 @@ export class EndGameService {
     /**
      * @description Function that resets the turnSkipCounter because people aren't AFK/doing nothing
      */
-    turnSkipCountReset(roomID: string): void {
+    resetTurnSkipCount(roomID: string): void {
         const roomSkipCounter = this.turnSkipMap.get(roomID);
         if (roomSkipCounter !== undefined) {
             this.turnSkipMap.set(roomID, 0);

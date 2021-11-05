@@ -1,6 +1,6 @@
-/* import { TestBed } from '@angular/core/testing';
 import { Board } from '@app/classes/board';
 import { DEFAULT_BONUSES } from '@app/classes/game-config';
+import { expect } from 'chai';
 import { ASCII_SMALL_A, ValidationService } from './validation.service';
 
 const INDEX_TEST_VALUE = 10;
@@ -16,11 +16,10 @@ describe('ValidationService', () => {
     let singleNewWordValues: Map<string, string>;
     let validDictSearch: string[];
     let invalidDictSearch: string[];
+    let board: Board;
 
     beforeEach(() => {
-        TestBed.configureTestingModule({});
-        service = TestBed.inject(ValidationService);
-
+        service = new ValidationService();
         coords = 'a2';
         startCoord = 'a1';
         map = new Map([['h8', 'abaca']]);
@@ -38,70 +37,57 @@ describe('ValidationService', () => {
         singleNewWordValues = new Map([['a1', 'a']]);
         validDictSearch = ['abaca', 'aas', 'abacule'];
         invalidDictSearch = ['aaa', 'aasss', 'xfdjk'];
-
-        service.gameBoard = new Board(DEFAULT_BONUSES);
-    });
-
-    it('should be created', () => {
-        expect(service).toBeTruthy();
+        board = new Board(DEFAULT_BONUSES);
     });
 
     it('init should affect correct values', () => {
         const expectedCoordValue = { x: ASCII_SMALL_A, y: 2 };
-        service.init(coords, map);
+        service.init(coords, map, board);
 
-        expect(service.startCoord).toEqual(expectedCoordValue);
-        expect(service.newWord).toEqual(map);
-        expect(service.coordContainer).toBeTruthy();
+        expect(service.startCoord.x).to.equals(expectedCoordValue.x);
+        expect(service.startCoord.y).to.equals(expectedCoordValue.y);
+        expect(service.newWord).to.equals(map);
     });
 
     it('findWord should return true', () => {
-        expect(service.findWord(validDictSearch)).toBeTrue();
+        expect(service.findWord(validDictSearch)).to.equals(true);
     });
 
     it('findWord should return false', () => {
-        expect(service.findWord(invalidDictSearch)).toBeFalse();
+        expect(service.findWord(invalidDictSearch)).to.equals(false);
     });
 
     it('variableReset should affect correct value', () => {
         service.index = INDEX_TEST_VALUE;
-        expect(service.index).toEqual(INDEX_TEST_VALUE);
+        expect(service.index).to.equals(INDEX_TEST_VALUE);
         service.resetVariable();
-        expect(service.index).toEqual(1);
+        expect(service.index).to.equals(1);
     });
 
     it('fetchWord horizontal', () => {
-        for (const i of hNewWordValues) service.gameBoard.placeLetter(i[0], i[1]);
-        const spyHCheck = spyOn(service, 'checkHorizontal').and.callThrough();
-        service.init(startCoord, hNewWordValues);
+        for (const i of hNewWordValues) board.placeLetter(i[0], i[1]);
+        service.init(startCoord, hNewWordValues, board);
         const returnValue = service.fetchWords();
-        const expectedString: string = hNewWordValues.keys().next().value;
 
-        expect(spyHCheck).toHaveBeenCalledWith(expectedString);
-        expect(returnValue[0]).toEqual(expectedWord);
+        expect(returnValue[0]).to.equals(expectedWord);
     });
 
     it('fetchWord vertical', () => {
         startCoord = 'b1';
-        for (const i of vNewWordValues) service.gameBoard.placeLetter(i[0], i[1]);
-        const spyVCheck = spyOn(service, 'checkVertival').and.callThrough();
-        service.init(startCoord, vNewWordValues);
+        for (const i of vNewWordValues) board.placeLetter(i[0], i[1]);
+        service.init(startCoord, vNewWordValues, board);
         const returnValue = service.fetchWords();
-        const expectedString: string = vNewWordValues.keys().next().value;
 
-        expect(spyVCheck).toHaveBeenCalledWith(expectedString);
-        expect(returnValue[0]).toEqual(expectedWord);
+        expect(returnValue[0]).to.equals(expectedWord);
     });
 
     it('fetchWord single letter placed', () => {
-        const spyVCheck = spyOn(service, 'checkVertival').and.callThrough();
-        const spyHCheck = spyOn(service, 'checkHorizontal').and.callThrough();
-        service.init(startCoord, singleNewWordValues);
-        service.fetchWords();
-        const expectedString: string = singleNewWordValues.keys().next().value;
+        service.init(startCoord, singleNewWordValues, board);
+        const result = service.fetchWords();
+        result.push('a');
+        const expected = ['', '', 'a'];
 
-        expect(spyHCheck).toHaveBeenCalledWith(expectedString);
-        expect(spyVCheck).toHaveBeenCalledWith(expectedString);
+        expect(result[2]).to.equals(expected[2]);
     });
 
     it('calcPoints Wx2 should return correct values', () => {
@@ -112,12 +98,12 @@ describe('ValidationService', () => {
             ['h9', 'a'],
             ['h10', 's'],
         ]);
-        for (const i of word) service.gameBoard.placeLetter(i[0], i[1]);
-        service.init(startCoord, word);
+        for (const i of word) board.placeLetter(i[0], i[1]);
+        service.init(startCoord, word, board);
         service.fetchWords();
         const returnValue = service.calcPoints();
 
-        expect(returnValue).toEqual(expectedPoints);
+        expect(returnValue).to.equals(expectedPoints);
     });
 
     it('calcPoints Wx3 should return correct values', () => {
@@ -128,12 +114,12 @@ describe('ValidationService', () => {
             ['a2', 'a'],
             ['a3', 's'],
         ]);
-        for (const i of word) service.gameBoard.placeLetter(i[0], i[1]);
-        service.init(startCoord, word);
+        for (const i of word) board.placeLetter(i[0], i[1]);
+        service.init(startCoord, word, board);
         service.fetchWords();
         const returnValue = service.calcPoints();
 
-        expect(returnValue).toEqual(expectedPoints);
+        expect(returnValue).to.equals(expectedPoints);
     });
 
     it('calcPoints Lx2 should return correct values', () => {
@@ -144,12 +130,12 @@ describe('ValidationService', () => {
             ['d2', 'u'],
             ['d3', 'e'],
         ]);
-        for (const i of word) service.gameBoard.placeLetter(i[0], i[1]);
-        service.init(startCoord, word);
+        for (const i of word) board.placeLetter(i[0], i[1]);
+        service.init(startCoord, word, board);
         service.fetchWords();
         const returnValue = service.calcPoints();
 
-        expect(returnValue).toEqual(expectedPoints);
+        expect(returnValue).to.equals(expectedPoints);
     });
 
     it('calcPoints Lx3 should return correct values', () => {
@@ -160,11 +146,11 @@ describe('ValidationService', () => {
             ['g2', 'u'],
             ['h2', 'e'],
         ]);
-        for (const i of word) service.gameBoard.placeLetter(i[0], i[1]);
-        service.init(startCoord, word);
+        for (const i of word) board.placeLetter(i[0], i[1]);
+        service.init(startCoord, word, board);
         service.fetchWords();
         const returnValue = service.calcPoints();
 
-        expect(returnValue).toEqual(expectedPoints);
+        expect(returnValue).to.equals(expectedPoints);
     });
-});*/
+});

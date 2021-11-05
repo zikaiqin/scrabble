@@ -80,9 +80,14 @@ export class CommandService {
                 '!réserve',
                 (): boolean => {
                     if (this.debugActive) {
-                        let message = 'La réserve contient ';
-                        this.reserve.sort((a, b) => a.localeCompare(b)).forEach((letter) => (message += letter + ' '));
-                        this.textboxService.displayMessage(MessageType.System, message);
+                        let reserveString = '';
+                        const occMap: Map<string, number> = new Map();
+                        this.reserve.sort((a, b) => a.localeCompare(b)).forEach((letter) => (reserveString += letter + ' '));
+                        for (const letter of this.reserve) {
+                            occMap.set(letter, this.countOccurence(reserveString, letter));
+                        }
+                        this.textboxService.displayMessage(MessageType.System, 'La réserve contient ');
+                        this.textboxService.displayMapMessage(MessageType.System, occMap);
                         return false;
                     } else {
                         this.textboxService.displayMessage(MessageType.System, "La commande debug n'est pas activé");
@@ -115,5 +120,9 @@ export class CommandService {
         if (exec(...params)) {
             this.websocketService.sendMessage(message);
         }
+    }
+
+    countOccurence(arr: string, char: string): number {
+        return arr.split(char).length - 1;
     }
 }

@@ -1,9 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-
+import { GameInit } from '@app/classes/game-info';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
-import { GameInit } from '@app/classes/game-info';
 import { Subject } from 'rxjs';
 
 describe('LetterPlacingService', () => {
@@ -207,119 +206,4 @@ describe('LetterPlacingService', () => {
         ]);
         expect(service.isAdjacent(board, toPlace, Array.from(toPlace.keys())[0], Array.from(toPlace.keys())[3])).toBeFalse();
     });
-
-    /* it('should place letters from the hand onto the board', () => {
-        service = new LetterPlacingService({} as TextboxService, websocketServiceSpy as unknown as GameService, {} as ValidationService);
-
-        const actualHand = ['s', 't', 'u', 'b', 'm', 'l', 'e'];
-        const expectedHand = ['m', 'l', 'e'];
-        const actualBoard = new Map<string, string>();
-        const expectedBoard = new Map<string, string>([
-            ['a1', 's'],
-            ['a2', 't'],
-            ['a3', 'u'],
-            ['a4', 'b'],
-        ]);
-        const fakeHand = {
-            remove: (letter: string) => {
-                const index = actualHand.indexOf(letter);
-                actualHand.splice(index, 1);
-            },
-        };
-        const fakeBoard = {
-            placeLetter: (coords: string, letter: string) => {
-                actualBoard.set(coords, letter);
-            },
-        };
-        service.placeLetters(expectedBoard, fakeBoard as GameBoard, fakeHand as PlayerHand);
-
-        expect(actualHand).toEqual(expectedHand);
-        expect(actualBoard).toEqual(expectedBoard);
-    });
-
-    it('should return letters from the board into the hand', () => {
-        service = new LetterPlacingService({} as TextboxService, websocketServiceSpy as unknown as GameService, {} as ValidationService);
-
-        const actualHand = ['s', 't', 'o'];
-        const expectedHand = ['s', 't', 'o', 'm', 'a', 'c', 'h'];
-        const actualBoard = new Map<string, string>([
-            ['a1', 'm'],
-            ['a2', 'a'],
-            ['a3', 'c'],
-            ['a4', 'h'],
-        ]);
-        const expectedBoard = new Map<string, string>();
-        const fakeHand = {
-            add: (letter: string) => {
-                actualHand.push(letter);
-            },
-        };
-        const fakeBoard = {
-            removeAt: (coords: string) => {
-                actualBoard.delete(coords);
-            },
-        };
-        service.returnLetters(actualBoard, fakeBoard as GameBoard, fakeHand as PlayerHand);
-
-        expect(actualHand).toEqual(expectedHand);
-        expect(actualBoard).toEqual(expectedBoard);
-    });
-
-    it('should fully replenish the hand when letters in reserve are plentiful', () => {
-        service = new LetterPlacingService({} as TextboxService, websocketServiceSpy as unknown as GameService, {} as ValidationService);
-
-        const actualHand = ['s', 't', 'o'];
-        const expectedHand = ['s', 't', 'o', 'm', 'a', 'c', 'h'];
-        const actualReserve = ['m', 'a', 'c', 'h', 'i', 'n', 'e'];
-        const expectedReserve = ['i', 'n', 'e'];
-        const placedLetters = new Map<string, string>([
-            ['a1', 'm'],
-            ['a2', 'a'],
-            ['a3', 'c'],
-            ['a4', 'h'],
-        ]);
-        const fakeHand = {
-            add: (letter: string) => {
-                actualHand.push(letter);
-            },
-        };
-        const fakeReserve = {
-            drawOne: (): string => {
-                return actualReserve.splice(0, 1)[0];
-            },
-        };
-        service.replenishHand(placedLetters, fakeReserve as Reserve, fakeHand as PlayerHand);
-
-        expect(actualHand).toEqual(expectedHand);
-        expect(actualReserve).toEqual(expectedReserve);
-    });
-
-    it('should replenish the hand as much as possible when reserve is running low', () => {
-        service = new LetterPlacingService({} as TextboxService, websocketServiceSpy as unknown as GameService, {} as ValidationService);
-
-        const actualHand = ['s', 't', 'o'];
-        const expectedHand = ['s', 't', 'o', 'm', 'a'];
-        const actualReserve = ['m', 'a'];
-        const expectedReserve: string[] = [];
-        const placedLetters = new Map<string, string>([
-            ['a1', 'm'],
-            ['a2', 'a'],
-            ['a3', 'c'],
-            ['a4', 'h'],
-        ]);
-        const fakeHand = {
-            add: (letter: string) => {
-                actualHand.push(letter);
-            },
-        };
-        const fakeReserve = {
-            drawOne: (): string | undefined => {
-                return actualReserve.length > 0 ? actualReserve.splice(0, 1)[0] : undefined;
-            },
-        };
-        service.replenishHand(placedLetters, fakeReserve as Reserve, fakeHand as PlayerHand);
-
-        expect(actualHand).toEqual(expectedHand);
-        expect(actualReserve).toEqual(expectedReserve);
-    });*/
 });
