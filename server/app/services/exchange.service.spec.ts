@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+/* import { TestBed } from '@angular/core/testing';
 import { PlayerHand } from '@app/classes/player-hand';
 import { Subject } from 'rxjs';
 import { GameService } from './game.service';
@@ -33,4 +33,4 @@ describe('LetterExchangeService', () => {
     it('should be validateCommand', () => {
         expect(service.validateCommand('asd')).toBeFalse();
     });
-});
+});*/
