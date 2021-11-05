@@ -7,7 +7,7 @@ import { Service } from 'typedi';
 export const ASCII_SMALL_A = 97;
 const BINGO_BONUS = 50;
 const BINGO_WORD = 7;
-const BOARD_SIZE = 14;
+const BOARD_SIZE = 15;
 
 enum Bonuses {
     L2 = 'Lx2',
@@ -127,7 +127,7 @@ export class ValidationService {
         const stringIndexes: string[] = [];
 
         // Scanning through the small indexes
-        for (this.index; yIndex - this.index >= 0; this.index++) {
+        for (this.index; yIndex - this.index > 0; this.index++) {
             if (!this.gameBoard.hasCoords(xIndex + String(yIndex - this.index))) break;
         }
         for (this.index -= 1; this.index > 0; this.index--) {
@@ -173,7 +173,7 @@ export class ValidationService {
             // eslint-disable-next-line @typescript-eslint/prefer-for-of
             for (let j = 0; j < this.coordContainer[i].length; j++) {
                 const coordinates = this.coordContainer[i][j];
-                const letter = this.gameBoard.getLetter(coordinates) as string;
+                const letter = this.gameBoard.getLetter(coordinates)?.toLowerCase() as string;
                 if (this.newWord.has(coordinates) && this.gameBoard.bonuses.has(coordinates)) {
                     switch (this.gameBoard.getBonus(coordinates)) {
                         case Bonuses.L2: {

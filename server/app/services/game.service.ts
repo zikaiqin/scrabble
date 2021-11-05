@@ -1,15 +1,15 @@
-import { Service } from 'typedi';
-import { GameInfo } from '@app/classes/game-info';
-import { Game } from '@app/classes/game';
 import { Board } from '@app/classes/board';
+import { Game } from '@app/classes/game';
+import { DEFAULT_BONUSES, DEFAULT_TURN_LENGTH } from '@app/classes/game-config';
+import { GameInfo } from '@app/classes/game-info';
 import { Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer';
-import { SocketService } from '@app/services/socket.service';
-import { ValidationService } from '@app/services/validation.service';
+import { EndGameService } from '@app/services/end-game.service';
 import { ExchangeService } from '@app/services/exchange.service';
 import { PlacingService } from '@app/services/placing.service';
-import { DEFAULT_BONUSES, DEFAULT_TURN_LENGTH } from '@app/classes/game-config';
-import { EndGameService } from '@app/services/end-game.service';
+import { SocketService } from '@app/services/socket.service';
+import { ValidationService } from '@app/services/validation.service';
+import { Service } from 'typedi';
 
 @Service()
 export class GameService {
@@ -103,6 +103,10 @@ export class GameService {
                     this.timers.get(roomID)?.clearTimer();
                     this.timers.delete(roomID);
                 }
+            })
+            .on('updateReserve', (roomId) => {
+                const room = this.games.get(roomId);
+                if (room !== undefined) this.socketService.returnReserve(roomId, room);
             });
     }
 

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
+import { MessageType } from '@app/classes/message';
 import { LetterExchangeService } from '@app/services/letter-exchange.service';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
-import { MessageType } from '@app/classes/message';
 
 @Injectable({
     providedIn: 'root',
@@ -12,6 +12,7 @@ export class CommandService {
     debugActive: boolean = false;
     turn: boolean;
     readonly commandLookup: Map<string, (...params: string[]) => boolean>;
+    private reserve: string[];
 
     constructor(
         private textboxService: TextboxService,
@@ -19,6 +20,18 @@ export class CommandService {
         private letterExchangeService: LetterExchangeService,
         private websocketService: WebsocketService,
     ) {
+        this.websocketService.reserve.subscribe((reserve) => {
+            this.reserve = reserve;
+            this.reserve.sort((a, b) => {
+                return a.localeCompare(b);
+            });
+            let message = 'La réserve contient ';
+            for (const letter of this.reserve) {
+                message += letter + ' ';
+            }
+            this.textboxService.displayMessage(MessageType.System, message);
+        });
+
         this.commandLookup = new Map<string, (...params: string[]) => boolean>([
             [
                 '!aide',
@@ -73,6 +86,18 @@ export class CommandService {
                     this.textboxService.displayMessage(MessageType.System, 'Votre tour a été passé');
                     this.websocketService.skipTurn();
                     return true;
+                },
+            ],
+            [
+                '!réserve',
+                (): boolean => {
+                    if (this.debugActive) {
+                        this.websocketService.fetchReserve();
+                        return false;
+                    } else {
+                        this.textboxService.displayMessage(MessageType.System, "La commande debug n'est pas activé");
+                        return false;
+                    }
                 },
             ],
         ]);

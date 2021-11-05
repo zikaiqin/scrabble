@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, Subject } from 'rxjs';
-import { io, Socket } from 'socket.io-client';
+import { GameInfo, GameInit } from '@app/classes/game-info';
 import { AlertService } from '@app/services/alert.service';
 import { TextboxService } from '@app/services/textbox.service';
-import { GameInfo, GameInit } from '@app/classes/game-info';
+import { Observable, Subject } from 'rxjs';
+import { io, Socket } from 'socket.io-client';
 
 const url = '//localhost:3000';
 
@@ -135,6 +135,10 @@ export class WebsocketService {
 
     disconnect(): void {
         this.socket.disconnect();
+    }
+
+    fetchReserve(): void {
+        this.socket.emit('reserve');
     }
 
     get status(): Observable<string> {

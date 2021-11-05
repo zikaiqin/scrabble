@@ -1,3 +1,4 @@
+import { Game } from '@app/classes/game';
 import { GameInfo } from '@app/classes/game-info';
 import { MessageType } from '@app/classes/message';
 import EventEmitter from 'events';
@@ -95,6 +96,11 @@ export class SocketService {
                 console.log(`client on socket: "${socket.id}" has disconnected with reason: "${reason}"`);
                 this.disconnect(socket);
             });
+
+            socket.on('reserve', () => {
+                const roomId = this.activeRooms.get(socket.id);
+                if (roomId !== undefined) this.socketEvents.emit('updateReserve', roomId);
+            });
         });
     }
 
@@ -116,6 +122,10 @@ export class SocketService {
 
     sendSystemMessage(roomID: string, message: string) {
         this.sio.to(roomID).emit('receiveMessage', MessageType.System, message);
+    }
+
+    returnReserve(roomID: string, room: Game): void {
+        this.sio.to(roomID).emit('updateReserve', Array.from(room.reserve.letters));
     }
 
     setConfigs(
