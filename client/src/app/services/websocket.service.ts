@@ -88,20 +88,24 @@ export class WebsocketService {
      * @param configs configs for new game. No room ID, difficulty optional.
      * @link NewGameMenuComponent.newGame
      */
-    createRoom(configs: GameInfo): void {
-        this.socket.emit('createRoom', configs);
+    createGame(configs: GameInfo): void {
+        this.socket.emit('createGame', configs);
     }
 
     /**
      * @param info username and ID of room to join
      * @link GameBrowserComponent.joinRoom
      */
-    joinRoom(info: GameInfo): void {
-        this.socket.emit('joinRoom', info.username, info.roomID, (response: { status: string }) => {
+    joinGame(info: GameInfo): void {
+        this.socket.emit('joinGame', info.username, info.roomID, (response: { status: string }) => {
             if (response.status !== 'ok') {
                 this.alertService.showAlert("La partie que vous avez essayé de joindre n'est plus disponible");
             }
         });
+    }
+
+    convertGame(difficulty: number): void {
+        this.socket.emit('convertGame', difficulty);
     }
 
     sendMessage(message: string): void {

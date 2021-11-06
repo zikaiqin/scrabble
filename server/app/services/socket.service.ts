@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 import * as http from 'http';
 import * as io from 'socket.io';
 import { Service } from 'typedi';
-import { GameInfo } from '@app/classes/game-info';
+import { GameInfo, GameType } from '@app/classes/game-info';
 import { MessageType } from '@app/classes/message';
 
 @Service()
@@ -23,17 +23,22 @@ export class SocketService {
             console.log(`new client connected on socket: "${socket.id}"`);
             socket.emit('updateRooms', this.roomList);
 
-            socket.on('createRoom', (configs: GameInfo) => {
+            socket.on('createGame', (configs: GameInfo) => {
                 // eslint-disable-next-line no-console
                 console.log(`new room created by client on socket: "${socket.id}"`);
                 const room = `_${socket.id}`;
                 socket.join(room);
-                this.waitingRooms.set(room, configs);
                 this.activeRooms.set(socket.id, room);
-                this.sio.emit('updateRooms', this.roomList);
+
+                if (configs.gameType === GameType.Multi) {
+                    this.waitingRooms.set(room, configs);
+                    this.sio.emit('updateRooms', this.roomList);
+                } else {
+                    this.socketEvents.emit('createGame', room, configs, { socketID: socket.id, username: configs.username });
+                }
             });
 
-            socket.on('joinRoom', (username: string, room: string, response) => {
+            socket.on('joinGame', (username: string, room: string, response) => {
                 const configs = this.waitingRooms.get(room);
                 if (configs === undefined) {
                     // eslint-disable-next-line no-console
@@ -55,6 +60,24 @@ export class SocketService {
                         status: 'ok',
                     });
                 }
+            });
+
+            socket.on('convertGame', (difficulty: number) => {
+                const roomID = this.activeRooms.get(socket.id);
+                if (roomID === undefined) {
+                    return;
+                }
+                const configs = this.waitingRooms.get(roomID);
+                if (configs === undefined) {
+                    return;
+                }
+                this.waitingRooms.delete(roomID);
+
+                configs.gameType = GameType.Single;
+                configs.difficulty = difficulty;
+
+                this.socketEvents.emit('createGame', roomID, configs, { socketID: socket.id, username: configs.username });
+                this.sio.emit('updateRooms', this.roomList);
             });
 
             socket.on('sendMessage', (message: string) => {
@@ -93,11 +116,6 @@ export class SocketService {
                 console.log(`client on socket: "${socket.id}" has disconnected with reason: "${reason}"`);
                 this.disconnect(socket);
             });
-
-            socket.on('reserve', () => {
-                const roomId = this.activeRooms.get(socket.id);
-                if (roomId !== undefined) this.socketEvents.emit('updateReserve', roomId);
-            });
         });
     }
 
@@ -117,8 +135,8 @@ export class SocketService {
         this.sio.emit('updateRooms', this.roomList);
     }
 
-    sendSystemMessage(roomID: string, message: string) {
-        this.sio.to(roomID).emit('receiveMessage', MessageType.System, message);
+    sendMessage(roomID: string, type: string, message: string) {
+        this.sio.to(roomID).emit('receiveMessage', type, message);
     }
 
     setConfigs(

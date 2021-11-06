@@ -13,14 +13,13 @@
         *ngIf="showPage() === 'Browser'"
         [gameList]="roomList"
         (buttonClick)="handleClick($event)"
-        (joinRoom)="joinRoom($event)"
+        (joinRoom)="joinGame($event)"
     ></app-game-browser>
 
     <app-waiting-room
         *ngIf="showPage() === 'WaitingRoom'"
         [configs]="gameConfigs"
         (buttonClick)="handleClick($event)"
-        (newGame)="createGame($event)"
-        (leaveRoom)="leaveRoom()"
+        (convertGame)='convertGame($event)'
     ></app-waiting-room>
 </div>

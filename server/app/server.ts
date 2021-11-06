@@ -2,12 +2,13 @@ import { Application } from '@app/app';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
-import { GameService } from './services/game.service';
 import { SocketService } from '@app/services/socket.service';
+import { GameService } from './services/game.service';
+import { BotService } from '@app/services/bot.service';
+import { EndGameService } from '@app/services/end-game.service';
 import { ExchangeService } from '@app/services/exchange.service';
 import { PlacingService } from '@app/services/placing.service';
 import { ValidationService } from '@app/services/validation.service';
-import { EndGameService } from '@app/services/end-game.service';
 
 @Service()
 export class Server {
@@ -15,15 +16,16 @@ export class Server {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     private static readonly baseDix: number = 10;
     private server: http.Server;
-    private websocketService: SocketService;
+    private socketService: SocketService;
     private gameService: GameService;
 
     constructor(
         private readonly application: Application,
+        private botService: BotService,
+        private endGameService: EndGameService,
         private exchangeService: ExchangeService,
         private placingService: PlacingService,
         private validationService: ValidationService,
-        private endGameService: EndGameService,
     ) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
@@ -41,17 +43,19 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
-        this.websocketService = new SocketService(this.server);
-        this.websocketService.handleSockets();
+        this.socketService = new SocketService(this.server);
+        this.socketService.handleSockets();
 
         this.gameService = new GameService(
-            this.websocketService,
+            this.socketService,
+            this.botService,
+            this.endGameService,
             this.exchangeService,
             this.placingService,
             this.validationService,
-            this.endGameService,
         );
-        this.gameService.attachListeners();
+        this.gameService.attachSocketListeners();
+        this.gameService.attachBotListeners();
 
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));

@@ -67,25 +67,24 @@ export class HomePageComponent {
 
     createGame(configs: GameInfo): void {
         this.webSocketService.connect();
-        this.webSocketService.createRoom(configs);
+        this.webSocketService.createGame(configs);
         this.gameConfigs = configs;
         if (configs.gameType === GameType.Multi) {
             this.showWaitingRoom = true;
         }
     }
 
-    // TODO: convert to single player
-    convertGame(roomID: string): void {
-        void roomID;
-    }
-
-    joinRoom(configs: GameInfo): void {
+    joinGame(configs: GameInfo): void {
         if (configs.roomID !== undefined) {
-            this.webSocketService.joinRoom(configs);
+            this.webSocketService.joinGame(configs);
         }
     }
 
-    leaveRoom(): void {
+    convertGame(difficulty: number): void {
+        this.webSocketService.convertGame(difficulty);
+    }
+
+    disconnect(): void {
         this.webSocketService.disconnect();
     }
 
