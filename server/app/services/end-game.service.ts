@@ -10,6 +10,7 @@ export class EndGameService {
     readonly turnSkipMap = new Map<string, number>();
     /**
      * @description Function that increments the turnSkipCounter to keep track of the number of turns skipped
+     * @param roomID room where a turn has been skipped
      */
     incrementTurnSkipCount(roomID: string): void {
         const roomSkipCounter = this.turnSkipMap.get(roomID);
@@ -19,6 +20,7 @@ export class EndGameService {
     }
     /**
      * @description Function that resets the turnSkipCounter because people aren't AFK/doing nothing
+     * @param roomID room where a turn has been played
      */
     resetTurnSkipCount(roomID: string): void {
         const roomSkipCounter = this.turnSkipMap.get(roomID);
@@ -28,6 +30,9 @@ export class EndGameService {
     }
     /**
      * @description Function that verifies if the game met one of the ending conditions
+     * @param player1Hand the hand of player 1
+     * @param player2Hand the hand of player 2
+     * @param reserve container where the rest of the letters are
      * @returns boolean to indicate if the game ended
      */
     checkIfGameEnd(reserve: Reserve, player1Hand: Player, player2Hand: Player, roomID: string): boolean {
@@ -40,10 +45,13 @@ export class EndGameService {
     }
     /**
      * @description Function that subtracts the remaining letters value to the score
+     * @param player player that needs to have its score deducted
      */
     deductPoints(player: Player): void {
         player.hand.forEach((letter) => {
-            player.score -= DEFAULT_POINTS.get(letter) as number;
+            if (letter !== '*') {
+                player.score -= DEFAULT_POINTS.get(letter) as number;
+            }
         });
     }
     /**
@@ -57,8 +65,10 @@ export class EndGameService {
         });
     }
     /**
-     * @description Function that verifies who has an empty hand (bot/player)
-     * @returns a number that represents one or the other (1 --> player, 2 --> opponent)
+     * @description Function that verifies who has an empty hand
+     * @param player1 player 1
+     * @param player2 player 2
+     * @returns a the player who emptied its hand and the hand of its opponent
      */
     checkWhoEmptiedHand(player1: Player, player2: Player): [Player, string[]] | undefined {
         let playerWhoEmptiedHand: Player | undefined;
@@ -74,7 +84,10 @@ export class EndGameService {
         return playerWhoEmptiedHand && otherHand ? [playerWhoEmptiedHand, otherHand] : undefined;
     }
     /**
-     * @description Function that displays in the chat the remaining letter of both parties
+     * @description Function that displays the remaining letters of both parties
+     * @param player1 player 1
+     * @param player2 player 2
+     * @returns an array containing the letters
      */
     showLettersLeft(player1: Player, player2: Player): string[] {
         const text: string[] = [];
@@ -83,12 +96,19 @@ export class EndGameService {
         text.push(`${player2.name}:\t${player2.hand.join('')}`);
         return text;
     }
-
+    /**
+     * @description Function finds the winner by comparing their scores
+     * @param player1 player 1
+     * @param player2 player 2
+     * @returns the name(s) of the winner(s)
+     */
     getWinner(player1: Player, player2: Player): string {
         return player1.score > player2.score ? player1.name : player1.score < player2.score ? player2.name : `${player1.name} et ${player2.name}`;
     }
     /**
-     * @description Sets the final points of each player
+     * @description Sets the final score of each player
+     * @param player1 player 1
+     * @param player2 player 2
      */
     setPoints(player1: Player, player2: Player): void {
         this.deductPoints(player1);

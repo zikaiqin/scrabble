@@ -74,6 +74,7 @@ export class WebsocketService {
                 this.gameEnded.next(winner);
             });
         });
+
         this.socket.on('disconnect', (reason) => {
             if (reason === 'io client disconnect') {
                 return;
@@ -124,16 +125,8 @@ export class WebsocketService {
         this.socket.emit('skipTurn');
     }
 
-    /**
-     * @description Leave an active game
-     */
-    giveUp(): void {
-        this.socket.emit('gaveUp');
-        this.socket.disconnect();
-    }
-
-    connect(): void {
-        this.socket = io(url).connect();
+    connect(socket?: Socket): void {
+        this.socket = socket ? socket : io(url).connect();
         this.attachListeners();
     }
 

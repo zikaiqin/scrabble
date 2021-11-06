@@ -1,7 +1,7 @@
 import { Application } from '@app/app';
 import { Message } from '@app/message';
 import { DateService } from '@app/services/date.service';
-import * as chai from 'chai';
+import chai from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import supertest from 'supertest';

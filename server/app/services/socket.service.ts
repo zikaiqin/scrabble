@@ -19,13 +19,9 @@ export class SocketService {
 
     handleSockets() {
         this.sio.on('connection', (socket: io.Socket) => {
-            // eslint-disable-next-line no-console
-            console.log(`new client connected on socket: "${socket.id}"`);
             socket.emit('updateRooms', this.roomList);
 
             socket.on('createGame', (configs: GameInfo) => {
-                // eslint-disable-next-line no-console
-                console.log(`new room created by client on socket: "${socket.id}"`);
                 const room = `_${socket.id}`;
                 socket.join(room);
                 this.activeRooms.set(socket.id, room);
@@ -41,14 +37,10 @@ export class SocketService {
             socket.on('joinGame', (username: string, room: string, response) => {
                 const configs = this.waitingRooms.get(room);
                 if (configs === undefined) {
-                    // eslint-disable-next-line no-console
-                    console.log(`client on socket: "${socket.id}" attempted to join non-existent room with id: "${room}"`);
                     response({
                         status: 'fail',
                     });
                 } else {
-                    // eslint-disable-next-line no-console
-                    console.log(`client on socket: "${socket.id}" joined room with id: "${room}"`);
                     socket.join(room);
                     this.activeRooms.set(socket.id, room);
                     this.socketEvents.emit('createGame', room, configs, [
@@ -111,9 +103,7 @@ export class SocketService {
                 }
             });
 
-            socket.on('disconnect', (reason) => {
-                // eslint-disable-next-line no-console
-                console.log(`client on socket: "${socket.id}" has disconnected with reason: "${reason}"`);
+            socket.on('disconnect', () => {
                 this.disconnect(socket);
             });
         });

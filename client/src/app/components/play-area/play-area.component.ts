@@ -203,7 +203,7 @@ export class PlayAreaComponent implements AfterViewInit {
         return this.buttonPressed === this.upperCaseButtonPressed ? true : false;
     }
     redirectTo(): void {
-        this.webSocketService.giveUp();
+        this.webSocketService.disconnect();
         window.location.reload();
     }
 
