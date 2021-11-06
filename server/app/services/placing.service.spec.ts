@@ -4,6 +4,7 @@ import { Player } from '@app/classes/player';
 import { Reserve } from '@app/classes/reserve';
 import { expect } from 'chai';
 import { PlacingService } from './placing.service';
+import { Container } from 'typedi';
 
 const PLAYER_HAND_SIZE = 7;
 
@@ -15,7 +16,7 @@ describe('PlacingService', () => {
     let reserve: Reserve;
 
     beforeEach(() => {
-        service = new PlacingService();
+        service = Container.get(PlacingService);
         reserve = new Reserve();
         letters = new Map();
         board = new Board(DEFAULT_BONUSES);
@@ -30,6 +31,7 @@ describe('PlacingService', () => {
         expect(board.hasCoords('a2')).to.equals(true);
         expect(board.hasCoords('a3')).to.equals(true);
     });
+
     it('returnLetters should put the letters back into player hand', () => {
         service.placeLetters(letters, board, player);
         service.returnLetters(letters, board, player);
@@ -37,6 +39,7 @@ describe('PlacingService', () => {
         expect(player.has('a')).to.equals(true);
         expect(player.has('s')).to.equals(true);
     });
+
     it('replenishHand should refill player hand', () => {
         service.replenishHand(reserve, player);
 
