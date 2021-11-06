@@ -6,7 +6,6 @@ export class Board {
         this.letters = new Map<string, string>();
         this.bonuses = new Map<string, string>(bonuses);
     }
-
     size(): number {
         return this.letters.size;
     }

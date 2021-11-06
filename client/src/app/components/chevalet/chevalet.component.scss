@@ -1,4 +1,4 @@
-.letter {
+.letters {
     border: 3px solid black;
     border-radius: 5px;
     text-align: center;
@@ -7,4 +7,42 @@
     float: left;
     font-size: large;
     background-color: lightcoral;
+}
+.letters:hover {
+    border: 3px solid black;
+    border-radius: 5px;
+    text-align: center;
+    padding: 20px;
+    width: 50px;
+    float: left;
+    font-size: large;
+    background-color: rgb(184, 123, 123);
+}
+.btn-group button {
+    //background-color: #04AA6D; /* Green background */
+    border: 1px solid rgb(17, 17, 17); /* Black border */
+    color: rgba(0, 0, 0, 0.671); /* White text */
+    padding: 10px 24px; /* Some padding */
+    cursor: pointer; /* Pointer/hand icon */
+    width: 100%; /* Set a width if needed */
+    display: block; /* Make the buttons appear below each other */
+}
+
+.btn-group button:not(:last-child) {
+    border-bottom: none; /* Prevent double borders */
+}
+
+/* Add a background color on hover */
+
+.exchange {
+    background-color: rgb(148, 173, 37);
+}
+.exchange:hover {
+    background-color: rgb(107, 122, 40);
+}
+.cancel {
+    background-color: rgb(211, 0, 88);
+}
+.cancel:hover {
+    background-color: rgb(165, 50, 98);
 }

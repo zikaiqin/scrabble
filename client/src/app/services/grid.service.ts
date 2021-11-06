@@ -1,44 +1,117 @@
 import { Injectable } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { WebsocketService } from '@app/services/websocket.service';
+import { Subject } from 'rxjs';
+import { GridLettersService } from './grid-letter.service';
 
 const CHARCODE_SMALL_A = 97;
-
-const DEFAULT_WIDTH = 500;
-const DEFAULT_HEIGHT = 500;
-const DEFAULT_SCALE = 0.04;
+const DEFAULT_WIDTH = 600;
+const DEFAULT_HEIGHT = 600;
 
 const DEFAULT_NB_CASES = 16;
 const STROKE_RANGE = 4;
-const NB_CASE_CHEVALET = 7;
-
+const ARROW_POSITION1 = 635;
+const ARROW_POSITION2 = 400;
+const ARROW_POSITION3 = 615;
+const ARROW_POSITION4 = 625;
+const ARROW_POSITION5 = 425;
+const ARROW_POSITION6 = 225;
+const SCALE_MAX = 1.5;
+const SCALE_MIN = 0.8;
+const TEXT_DEFAULT_PX = 20;
 @Injectable({
     providedIn: 'root',
 })
 export class GridService {
     gridContext: CanvasRenderingContext2D;
     handContext: CanvasRenderingContext2D;
+    arrowDirection: boolean = false; // false = horizontal; true = vertival
+    mousePosition: Vec2 = { x: 0, y: 0 };
+    mousePositionSubject = new Subject<Vec2>();
+    private counter: number = 0;
     private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
     private startNumberPos: number = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private startLetterPos: number = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
     private tuilePosX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private tuilePosY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
-    private scale: number = DEFAULT_SCALE;
-    private scaleCounter: number = 0;
-    private counter: number = 0;
+    // private scale: number = DEFAULT_SCALE;
+    private scaleCounter: number = 1;
+    private size: string = '20';
 
     private bonuses = new Map<string, string>();
     private letters = new Map<string, string>();
-
-    constructor(private websocketService: WebsocketService) {
+    constructor(private websocketService: WebsocketService, private readonly gridLettersService: GridLettersService) {
+        this.mousePositionSubject.asObservable().subscribe((mousePos) => {
+            this.mousePosition = mousePos;
+            this.drawArrow();
+        });
         this.websocketService.init.subscribe((init) => {
             this.bonuses = new Map<string, string>(init.bonuses);
         });
         this.websocketService.board.subscribe((letters) => {
             this.letters = new Map<string, string>(letters);
-            if (this.counter > 0) this.drawGrid();
+            if (this.counter > 0) {
+                this.drawGrid();
+                this.selectSquare(this.mousePosition.x, this.mousePosition.y);
+            }
         });
+    }
+
+    drawArrow() {
+        if (this.arrowDirection) {
+            // down
+            this.gridContext.lineWidth = 20;
+            this.gridContext.beginPath();
+            this.gridContext.moveTo(ARROW_POSITION1, ARROW_POSITION2);
+            this.gridContext.lineTo(ARROW_POSITION3, ARROW_POSITION2);
+            this.gridContext.lineTo(ARROW_POSITION4, ARROW_POSITION5);
+            this.gridContext.closePath();
+            this.gridContext.stroke();
+            this.gridContext.moveTo(ARROW_POSITION4, ARROW_POSITION6);
+            this.gridContext.lineTo(ARROW_POSITION4, ARROW_POSITION2);
+            this.gridContext.stroke();
+        } else {
+            // left
+            this.gridContext.lineWidth = 20;
+            this.gridContext.beginPath();
+            this.gridContext.moveTo(ARROW_POSITION2, ARROW_POSITION1);
+            this.gridContext.lineTo(ARROW_POSITION2, ARROW_POSITION3);
+            this.gridContext.lineTo(ARROW_POSITION5, ARROW_POSITION4);
+            this.gridContext.closePath();
+            this.gridContext.stroke();
+            this.gridContext.moveTo(ARROW_POSITION6, ARROW_POSITION4);
+            this.gridContext.lineTo(ARROW_POSITION2, ARROW_POSITION4);
+            this.gridContext.stroke();
+        }
+    }
+    selectSquare(posX: number, posY: number): void {
+        if (posY < DEFAULT_NB_CASES - 1 && posX < DEFAULT_NB_CASES - 1 && posX >= 0 && posY >= 0) {
+            this.mousePositionSubject.next({ x: posX, y: posY });
+            this.drawGrid();
+            let tuileX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
+            let tuileY = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
+
+            // Deplacer sa position en X
+            for (let i = 0; i < posX; i++) {
+                tuileX += this.tuileSize;
+            }
+
+            // Deplacer sa position en Y
+            for (let y = 0; y < posY; y++) {
+                tuileY += this.tuileSize;
+            }
+            // Background de ce tuile
+            this.gridContext.lineWidth = 7;
+
+            this.gridContext.strokeStyle = 'purple';
+            this.gridContext.strokeRect(tuileX + 2, tuileY + 2, this.tuileSize - STROKE_RANGE, this.tuileSize - STROKE_RANGE);
+            this.drawArrow();
+
+            // console.log(this.samePosY);
+            // console.log(this.samePosX);
+        }
+        // return this.arrowDirection;
     }
     /**
      * @description Wrapper function to draw the entirety of the board
@@ -52,10 +125,10 @@ export class GridService {
         // tracer le border
         this.drawBorder();
         // Afficher les coordonnes
-        this.drawCoords();
+        this.gridLettersService.drawCoords(this.gridContext);
         // Contour noir pour la beaute
-        this.drawGridCol();
-        this.drawGridLine();
+        this.gridLettersService.drawGridCol(this.gridContext);
+        this.gridLettersService.drawGridLine(this.gridContext);
 
         // Dessiner les grilles(rectangles)
         for (let x = 0; x < DEFAULT_NB_CASES - 1; x++) {
@@ -71,34 +144,6 @@ export class GridService {
 
         this.drawGridLetters(this.letters);
         this.counter++;
-    }
-    /**
-     * @description Function to draw the columns for the board
-     */
-    drawGridCol() {
-        const START_GRID_POS = DEFAULT_WIDTH / DEFAULT_NB_CASES;
-        for (let i = 1; i < DEFAULT_NB_CASES + 1; i++) {
-            this.gridContext.lineWidth = 3;
-            this.gridContext.beginPath();
-            this.gridContext.moveTo(START_GRID_POS * i, START_GRID_POS);
-            this.gridContext.lineTo(START_GRID_POS * i, DEFAULT_HEIGHT);
-            this.gridContext.closePath();
-            this.gridContext.stroke();
-        }
-    }
-    /**
-     * @description Function to draw the lines for the board
-     */
-    drawGridLine() {
-        for (let i = 1; i < DEFAULT_NB_CASES + 1; i++) {
-            const START_GRID_POS = DEFAULT_WIDTH / DEFAULT_NB_CASES;
-            this.gridContext.lineWidth = 3;
-            this.gridContext.beginPath();
-            this.gridContext.moveTo(START_GRID_POS, START_GRID_POS * i);
-            this.gridContext.lineTo(DEFAULT_HEIGHT, START_GRID_POS * i);
-            this.gridContext.closePath();
-            this.gridContext.stroke();
-        }
     }
     /**
      * @description Function to draw the borders of the board
@@ -119,32 +164,6 @@ export class GridService {
     betterBorder() {
         this.gridContext.fillStyle = 'black';
         this.gridContext.fillRect(this.tuilePosX, this.tuilePosY, this.tuileSize, this.tuileSize);
-    }
-    /**
-     * @description Function that draw the coordinates listed on the side
-     */
-    drawCoords() {
-        for (let i = 1; i < DEFAULT_NB_CASES; i++) {
-            this.gridContext.font = '17px serif';
-
-            this.gridContext.fillText(
-                i.toString(),
-                this.startNumberPos + DEFAULT_WIDTH / (2 * DEFAULT_NB_CASES),
-                DEFAULT_HEIGHT / (DEFAULT_NB_CASES * 2),
-            );
-            this.startNumberPos += DEFAULT_WIDTH / DEFAULT_NB_CASES;
-        }
-        for (let i = 1; i < DEFAULT_NB_CASES; i++) {
-            const alphabet = String.fromCharCode(CHARCODE_SMALL_A - 1 + i);
-            this.gridContext.font = '17px serif';
-
-            this.gridContext.fillText(alphabet, DEFAULT_WIDTH / (DEFAULT_NB_CASES * 2), this.startLetterPos + DEFAULT_WIDTH / (2 * DEFAULT_NB_CASES));
-
-            this.startLetterPos += DEFAULT_WIDTH / DEFAULT_NB_CASES;
-        }
-        // reset les pos pour si jamais reappeler cette methode
-        this.startLetterPos = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
-        this.startNumberPos = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     }
     /**
      * @description Function to draw the bonus Motx3 on the board
@@ -242,7 +261,7 @@ export class GridService {
      * @param posY the Y position in the gameBoard container
      */
     drawLetter(letter: string, posX: number, posY: number) {
-        letter = letter.toUpperCase();
+        letter = letter.toLowerCase();
 
         if (posY < DEFAULT_NB_CASES - 1 && posX < DEFAULT_NB_CASES - 1 && posX >= 0 && posY >= 0) {
             let tuileX = DEFAULT_WIDTH / DEFAULT_NB_CASES;
@@ -264,13 +283,17 @@ export class GridService {
 
             // Ecrire la lettre sur le tuile
             this.gridContext.fillStyle = 'black';
-            this.gridContext.font = '20px serif';
-            this.gridContext.fillText(letter, tuileX + STROKE_RANGE, tuileY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2 + STROKE_RANGE);
+            // this.gridContext.font = '40px serif';
+            this.size = this.size + 'px' + ' serif';
+            this.gridContext.font = this.size;
+            this.gridContext.fillText(letter, tuileX + STROKE_RANGE * 3, tuileY + DEFAULT_HEIGHT / DEFAULT_NB_CASES / 2 + 2 * STROKE_RANGE);
         }
     }
     /**
      * @description Function the converts the string map to coordinates
      * @param positions map that contains the data to be converted
+     * b1 --> y = 2, x= 0
+     * b12  -> y = 2, x= 11
      */
     drawGridLetters(positions: Map<string, string>) {
         let postionX: string;
@@ -283,6 +306,7 @@ export class GridService {
             this.drawLetter(it[1], positionX - 1, positionY);
         }
     }
+
     /**
      * @description Function to wipe the board (nothing is left behind)
      */
@@ -293,23 +317,19 @@ export class GridService {
      * @description Function that makes the grid bigger
      */
     maxGrid() {
-        if (this.scaleCounter < NB_CASE_CHEVALET - 1) {
-            this.gridContext.scale(1 + this.scale, 1 + this.scale);
-            this.scaleCounter++;
+        if (this.scaleCounter < SCALE_MAX) {
+            this.scaleCounter += 0.1;
+            this.size = String(this.scaleCounter * TEXT_DEFAULT_PX);
         }
-        // this.indexChevalet--;
-        this.drawGrid();
     }
     /**
      * @description Function that makes the grid smaller
      */
     minGrid() {
-        if (this.scaleCounter >= 0) {
-            this.gridContext.scale(1 - this.scale, 1 - this.scale);
-            this.scaleCounter--;
+        if (this.scaleCounter > SCALE_MIN) {
+            this.scaleCounter -= 0.1;
+            this.size = String(this.scaleCounter * TEXT_DEFAULT_PX);
         }
-        // this.indexChevalet--;
-        this.drawGrid();
     }
 
     get width(): number {

@@ -1,1 +1,16 @@
-<div class="letter" *ngFor="let index of this.playerHand">{{ index }}</div>
+<div class="btn-group">
+    <button class="btn-group exchange" [ngStyle]="{ opacity: isYourTurn ? '1' : ' 0.2' }" (click)="exchange()">Échanger</button>
+    <button class="btn-group cancel" [ngStyle]="{ opacity: isContainSelectedCard ? '1' : ' 0.2' }" (click)="resetExchange()">Annuler</button>
+</div>
+
+<div
+    class="letters"
+    *ngFor="let letter of this.playerHand; index as i"
+    id="{{ 'letter' + i }}"
+    (click)="updateActiveLetter(i)"
+    (contextmenu)="onRightClick($event, letter, i)"
+    [ngStyle]="{ 'border-style': isClicked[i] ? 'dashed' : 'solid' }"
+    [ngStyle]="{ color: activeLetter[i] ? 'white' : 'black' }"
+>
+    {{ letter }}
+</div>

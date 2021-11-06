@@ -12,6 +12,7 @@ const url = '//localhost:3000';
     providedIn: 'root',
 })
 export class WebsocketService {
+    gameBoard = new Subject<[string, string][]>();
     private socket: Socket;
 
     private connectionStatus = new Subject<string>();
@@ -20,7 +21,6 @@ export class WebsocketService {
     private gameInit = new Subject<GameInit>();
     private gameTime = new Subject<number>();
     private gameTurn = new Subject<boolean>();
-    private gameBoard = new Subject<[string, string][]>();
     private gameReserve = new Subject<string[]>();
     private gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
     private gameScores = new Subject<{ ownScore: number; opponentScore: number }>();
