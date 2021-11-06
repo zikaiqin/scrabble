@@ -8,7 +8,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import EventEmitter from 'events';
 import { GameInfo } from '@app/classes/game-info';
 
-fdescribe('WebsocketService', () => {
+describe('WebsocketService', () => {
     let service: WebsocketService;
     const alertServiceSpy = jasmine.createSpyObj('AlertService', ['showAlert']);
     const textboxServiceSpy = jasmine.createSpyObj('TextboxService', ['displayMessage']);
