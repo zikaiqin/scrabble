@@ -188,13 +188,14 @@ export class GameService {
         const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== playerInfo.username);
 
         const bot = new Player(validBotNames[Math.floor(Math.random() * validBotNames.length)]);
+        const botID = `*${roomID}`
         const player = new Player(playerInfo.username);
 
         const game = new Game(
             new Board(bonuses),
             new Map([
                 [playerInfo.socketID, player],
-                [roomID, bot],
+                [botID, bot],
             ]),
         );
 
