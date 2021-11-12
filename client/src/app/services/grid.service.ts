@@ -321,6 +321,7 @@ export class GridService {
             this.scaleCounter += 0.1;
             this.size = String(this.scaleCounter * TEXT_DEFAULT_PX);
         }
+        this.drawGrid();
     }
     /**
      * @description Function that makes the grid smaller
@@ -330,6 +331,7 @@ export class GridService {
             this.scaleCounter -= 0.1;
             this.size = String(this.scaleCounter * TEXT_DEFAULT_PX);
         }
+        this.drawGrid();
     }
 
     get width(): number {

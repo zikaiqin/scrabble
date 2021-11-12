@@ -1,8 +1,10 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
-import { Vec2 } from '@app/classes/vec2';
 import { CommandService } from '@app/services/command.service';
 import { GridService } from '@app/services/grid.service';
+import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
+import { MessageType } from '@app/classes/message';
+import { Vec2 } from '@app/classes/vec2';
 
 // TODO : Avoir un fichier séparé pour les constantes!
 const DEFAULT_WIDTH_ALL = 650; // 525
@@ -51,6 +53,7 @@ export class PlayAreaComponent implements AfterViewInit {
         private commandService: CommandService,
         private eRef: ElementRef,
         private webSocketService: WebsocketService,
+        private textboxService: TextboxService,
     ) {
         this.webSocketService.init.subscribe((initPayload) => {
             this.playerHand = initPayload.hand;
@@ -102,12 +105,12 @@ export class PlayAreaComponent implements AfterViewInit {
 
                 // updating chevalet
                 this.removePlayerHand();
-                this.initHand.push(this.buttonPressed);
 
                 // updating content in board
                 if (this.buttonPressed === '*') {
                     this.buttonPressed = this.upperCaseButtonPressed;
                 }
+                this.initHand.push(this.buttonPressed);
 
                 this.placedLetters.set(this.convertPosToString(), this.buttonPressed);
                 if (!this.hasCoords(this.convertPosToString())) this.gameBoard.set(this.convertPosToString(), this.buttonPressed);
@@ -130,6 +133,7 @@ export class PlayAreaComponent implements AfterViewInit {
             this.initHand.splice(index, 1);
         }
     }
+    // remove a specified letter from playerHand
     removePlayerHand(): void {
         const index = this.playerHand.indexOf(this.buttonPressed);
         if (index >= 0) {
@@ -189,18 +193,27 @@ export class PlayAreaComponent implements AfterViewInit {
             this.webSocketService.gameBoard.next(this.temp);
 
             // update playerHand
-            this.playerHand.push(this.initHand[0]);
-            // this.removeInitHand1(this.initHand[0]);
+            if (this.initHand[0] === this.initHand[0].toUpperCase()) this.playerHand.push('*');
+            else this.playerHand.push(this.initHand[0]);
             this.initHand.splice(0, 1);
         }
         // this.gameService.gameBoard.next(this.gameBoard);
+        // console.log('playerhand');
+        // for (let i = 0; i < this.playerHand.length; i++) {
+        //     console.log(this.playerHand[i]);
+        //     // if(replaceInidHand[i] === '*'){
+        //     //     replaceInidHand[i] = this.upperCaseButtonPressed;
+        //     // }
+        // }
+        // console.log('playerhand');
+
         this.gridService.drawGrid();
         this.isPlacing = false;
     }
 
     isUpperCase(): boolean {
         this.upperCaseButtonPressed = this.buttonPressed.toUpperCase();
-        return this.buttonPressed === this.upperCaseButtonPressed ? true : false;
+        return this.buttonPressed === this.upperCaseButtonPressed;
     }
     redirectTo(): void {
         this.webSocketService.disconnect();
@@ -270,13 +283,7 @@ export class PlayAreaComponent implements AfterViewInit {
         temp += String(this.mousePosition.x + 1);
         return temp;
     }
-    convertPosToString2(): string {
-        // y et x start at 0 to 14
-        let temp = String.fromCharCode(this.initPosition.y + CHARCODE_SMALL_A); // 1 -> a
-        temp = temp + String(this.initPosition.x + 1);
 
-        return temp;
-    }
     convertMapToStringArray() {
         // convert Map to Array
         this.temp = [];
@@ -287,19 +294,19 @@ export class PlayAreaComponent implements AfterViewInit {
         }
     }
     placeLetter() {
+        // show initHand
         const replaceInidHand = [...this.initHand];
-
         // remove from the board pour placer des lettres
         this.removeAll();
-        let temp2;
-        if (!this.gridService.arrowDirection) {
-            temp2 = 'h';
-        } else {
-            temp2 = 'v';
-        }
 
-        const temp = this.convertPosToString2() + temp2;
-        this.commandService.parseCommand(`!placer ${temp} ${replaceInidHand.join('')}`);
+        const direction = this.gridService.arrowDirection ? 'v' : 'h';
+
+        // convert a string : 1 -> a, 0 -> 1
+        const coords = String.fromCharCode(this.initPosition.y + CHARCODE_SMALL_A) + String(this.initPosition.x + 1);
+
+        const command = `!placer ${coords}${direction} ${replaceInidHand.join('')}`;
+        this.commandService.parseCommand(command);
+        this.textboxService.displayMessage(MessageType.Own, command);
     }
 
     get width(): number {
