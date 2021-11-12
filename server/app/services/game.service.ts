@@ -91,12 +91,13 @@ export class GameService {
             })
             .on('disconnect', (socketID: string, roomID: string) => {
                 if (Array.from(this.socketService.activeRooms.values()).includes(roomID)) {
-                    const entries = this.games.get(roomID)?.players.entries();
+                    const game = this.games.get(roomID);
                     const timer = this.timers.get(roomID);
-                    if (entries === undefined || timer === undefined) {
+                    if (game === undefined || timer === undefined) {
                         return;
                     }
                     timer.lock();
+                    const entries = game.players.entries();
                     Array.from(entries).forEach(([id, player]) => {
                         if (id === socketID) {
                             this.socketService.sendMessage(roomID, MessageType.System, `${player.name} a quitté le jeu!`);
@@ -109,10 +110,7 @@ export class GameService {
                         }
                     });
                 } else {
-                    this.games.delete(roomID);
-                    this.timers.get(roomID)?.clearTimer();
-                    this.timers.delete(roomID);
-                    this.botService.clear(roomID);
+                    this.deleteRoom(roomID);
                 }
             });
     }
@@ -170,6 +168,10 @@ export class GameService {
             })
             .on('updateTurn', (turnState: boolean) => {
                 if (this.gameEnded(roomID, timer, game, hands[0], hands[1])) {
+                    this.games.delete(roomID);
+                    this.timers.get(roomID)?.clearTimer();
+                    this.timers.delete(roomID);
+                    this.botService.clear(roomID);
                     return;
                 }
                 this.updateTurn(players[0].socketID, turnState, timer);
@@ -262,6 +264,13 @@ export class GameService {
         } else {
             timer.changeTurn();
         }
+    }
+
+    deleteRoom(roomID: string): void {
+        this.games.delete(roomID);
+        this.timers.get(roomID)?.clearTimer();
+        this.timers.delete(roomID);
+        this.botService.clear(roomID);
     }
 
     /**
