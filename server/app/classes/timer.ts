@@ -1,7 +1,11 @@
 import { EventEmitter } from 'events';
 
-export class Timer {
-    readonly timerEvents = new EventEmitter();
+export class Timer extends EventEmitter {
+    static readonly events = {
+        updateTurn: 'updateTurn',
+        updateTime: 'updateTime',
+        timeElapsed: 'timeElapsed',
+    };
 
     // Locking mechanism to prevent modification during turn transition
     private locked = false;
@@ -11,6 +15,7 @@ export class Timer {
     private timer: NodeJS.Timeout;
 
     constructor(roomID: string, turnLength: number) {
+        super();
         this.turnLength = turnLength;
         this.turnState = Boolean(Math.floor(Math.random() * 2));
     }
@@ -19,12 +24,12 @@ export class Timer {
         this.unlock();
         let currentTime = this.turnLength;
         const callback = (): void => {
-            this.timerEvents.emit('updateTime', currentTime);
+            this.emit(Timer.events.updateTime, currentTime);
             if (currentTime > 0) {
                 currentTime--;
             } else {
+                this.emit(Timer.events.timeElapsed);
                 this.changeTurn();
-                this.timerEvents.emit('timeElapsed');
             }
         };
         callback();
@@ -33,7 +38,7 @@ export class Timer {
 
     clearTimer(): void {
         clearInterval(this.timer);
-        this.timerEvents.emit('updateTime', 0);
+        this.emit(Timer.events.updateTime, 0);
     }
 
     changeTurn(): void {
@@ -43,7 +48,7 @@ export class Timer {
         this.lock();
         this.clearTimer();
         this.turnState = !this.turnState;
-        this.timerEvents.emit('updateTurn', this.turnState);
+        this.emit(Timer.events.updateTurn, this.turnState);
     }
 
     lock(): void {

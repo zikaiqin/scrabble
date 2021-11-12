@@ -162,11 +162,11 @@ export class GameService {
         );
         this.endGameService.turnSkipMap.set(roomID, 0);
 
-        timer.timerEvents
-            .on('updateTime', (time: number) => {
+        timer
+            .on(Timer.events.updateTime, (time: number) => {
                 this.socketService.updateTime(roomID, time);
             })
-            .on('updateTurn', (turnState: boolean) => {
+            .on(Timer.events.updateTurn, (turnState: boolean) => {
                 if (this.gameEnded(roomID, timer, game, hands[0], hands[1])) {
                     this.games.delete(roomID);
                     this.timers.get(roomID)?.clearTimer();
@@ -177,7 +177,7 @@ export class GameService {
                 this.updateTurn(players[0].socketID, turnState, timer);
                 this.updateTurn(players[1].socketID, !turnState, timer);
             })
-            .on('timeElapsed', () => {
+            .on(Timer.events.timeElapsed, () => {
                 this.endGameService.incrementTurnSkipCount(roomID);
             });
         timer.changeTurn();
@@ -188,7 +188,7 @@ export class GameService {
         const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== playerInfo.username);
 
         const bot = new Player(validBotNames[Math.floor(Math.random() * validBotNames.length)]);
-        const botID = `*${roomID}`
+        const botID = `*${roomID}`;
         const player = new Player(playerInfo.username);
 
         const game = new Game(
@@ -208,11 +208,11 @@ export class GameService {
         this.botService.observe(roomID, game);
         this.endGameService.turnSkipMap.set(roomID, 0);
 
-        timer.timerEvents
-            .on('updateTime', (time: number) => {
+        timer
+            .on(Timer.events.updateTime, (time: number) => {
                 this.socketService.updateTime(roomID, time);
             })
-            .on('updateTurn', (turnState: boolean) => {
+            .on(Timer.events.updateTurn, (turnState: boolean) => {
                 if (this.gameEnded(roomID, timer, game, player, bot)) {
                     return;
                 }
@@ -224,7 +224,7 @@ export class GameService {
                 }
                 this.updateTurn(playerInfo.socketID, turnState, timer);
             })
-            .on('timeElapsed', () => {
+            .on(Timer.events.timeElapsed, () => {
                 this.endGameService.incrementTurnSkipCount(roomID);
             });
         timer.changeTurn();

@@ -5,13 +5,14 @@ import { EndGameService } from '@app/services/end-game.service';
 import { ExchangeService } from '@app/services/exchange.service';
 import { PlacingService } from '@app/services/placing.service';
 import { ValidationService } from '@app/services/validation.service';
+import { GameInfo, GameType } from '@app/classes/game-info';
+import { DEFAULT_BONUSES } from '@app/classes/game-config';
 import { Container } from 'typedi';
 import EventEmitter from 'events';
 import * as http from 'http';
 import * as sinon from 'sinon';
 import { beforeEach, describe, it } from 'mocha';
 import { expect } from 'chai';
-import { DEFAULT_BONUSES } from '@app/classes/game-config';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('GameService', () => {
@@ -23,7 +24,7 @@ describe('GameService', () => {
     let fakePlacingService: PlacingService;
     let fakeValidationService: ValidationService;
 
-    const fakeSocketEvents = new EventEmitter();
+    let fakeSocketEvents: EventEmitter;
 
     beforeEach(() => {
         fakeSocketService = new SocketService(http.createServer());
@@ -33,6 +34,8 @@ describe('GameService', () => {
         fakePlacingService = Container.get(PlacingService);
         fakeValidationService = Container.get(ValidationService);
 
+        fakeSocketEvents = new EventEmitter();
+
         service = new GameService(
             fakeSocketService,
             fakeBotService,
@@ -41,13 +44,23 @@ describe('GameService', () => {
             fakePlacingService,
             fakeValidationService,
         );
-    });
-
-    it('should listen to socket events', () => {
-        const spy = sinon.spy(fakeSocketEvents, 'on');
         sinon.replace(fakeSocketService, 'socketEvents', fakeSocketEvents);
         service.attachSocketListeners();
-        sinon.assert.callCount(spy, 5);
+    });
+
+    it('should call createGame', () => {
+        const args = (type: number) => [
+            'roomID',
+            { gameType: type } as GameInfo,
+            type === GameType.Single ? { socketID: '_', username: '_' } : Array(2).fill({ socketID: '_', username: '_' }),
+        ];
+        const spySP = sinon.spy(service, 'createGameSP');
+        const spyMP = sinon.spy(service, 'createGameMP');
+
+        fakeSocketEvents.emit('createGame', ...args(GameType.Single));
+        fakeSocketEvents.emit('createGame', ...args(GameType.Multi));
+        sinon.assert.calledWithExactly(spySP, 'roomID', { gameType: GameType.Single } as GameInfo, { socketID: '_', username: '_' });
+        sinon.assert.calledWithExactly(spyMP, 'roomID', { gameType: GameType.Multi } as GameInfo, Array(2).fill({ socketID: '_', username: '_' }));
     });
 
     it('should get random bonuses', () => {
