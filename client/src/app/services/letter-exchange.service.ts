@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MessageType } from '@app/classes/message';
 import { TextboxService } from '@app/services/textbox.service';
-import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
+import { DEFAULT_HAND_SIZE } from '@app/classes/config';
 import { WebsocketService } from '@app/services/websocket.service';
 
 @Injectable({

@@ -4,6 +4,7 @@ import { LetterExchangeService } from '@app/services/letter-exchange.service';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
+import { CHARCODE_SMALL_A } from '@app/classes/config';
 
 @Injectable({
     providedIn: 'root',
@@ -83,13 +84,13 @@ export class CommandService {
                         this.textboxService.displayMessage(MessageType.System, "La commande debug n'est pas activé");
                         return false;
                     }
-                    const countMap: Map<string, number> = new Map();
-                    this.reserve.forEach((letter) =>
-                        countMap.has(letter) ? countMap.set(letter, countMap?.get(letter) as number) : countMap.set(letter, 1),
-                    );
-                    this.textboxService.displayMessage(MessageType.System, 'La réserve contient :');
+                    const letters = ['*', ...Array.from(new Array(ALPHABET_SIZE), (_, index) => String.fromCharCode(CHARCODE_SMALL_A + index))];
+                    const countMap = new Map<string, number>();
+                    letters.forEach((letter) => countMap.set(letter, this.reserve.filter((actualLetter) => actualLetter === letter).length));
+
+                    this.textboxService.displayMessage(MessageType.System, 'La réserve contient');
                     countMap.forEach((count, letter) => {
-                        this.textboxService.displayMessage(MessageType.System, `${letter} :${count}`);
+                        this.textboxService.displayMessage(MessageType.System, `${letter.toUpperCase()} : ${count}`);
                     });
                     return false;
                 },
@@ -121,3 +122,5 @@ export class CommandService {
         }
     }
 }
+
+const ALPHABET_SIZE = 26;

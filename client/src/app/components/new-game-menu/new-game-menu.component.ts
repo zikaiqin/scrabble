@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { GameMode, GameType, GameInfo, GameDifficulty } from '@app/classes/game-info';
-import { DEFAULT_TURN_LENGTH } from '@app/classes/game-config';
+import { DEFAULT_TURN_LENGTH } from '@app/classes/config';
 
 @Component({
     selector: 'app-new-game-menu',

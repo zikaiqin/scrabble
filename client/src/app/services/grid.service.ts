@@ -3,8 +3,8 @@ import { Vec2 } from '@app/classes/vec2';
 import { WebsocketService } from '@app/services/websocket.service';
 import { Subject } from 'rxjs';
 import { GridLettersService } from './grid-letter.service';
+import { CHARCODE_SMALL_A } from '@app/classes/config';
 
-const CHARCODE_SMALL_A = 97;
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 600;
 
