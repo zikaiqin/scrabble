@@ -11,6 +11,7 @@
 
     <app-game-browser
         *ngIf="showPage() === 'Browser'"
+        [gameMode]="gameMode"
         [gameList]="roomList"
         (buttonClick)="handleClick($event)"
         (joinRoom)="joinGame($event)"

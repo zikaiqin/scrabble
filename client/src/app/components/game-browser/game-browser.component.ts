@@ -11,12 +11,13 @@ import { GameBrowserDialogComponent } from '@app/components/game-browser-dialog/
     styleUrls: ['../../pages/home-page/home-page.component.scss', './game-browser.component.scss'],
 })
 export class GameBrowserComponent implements OnInit {
+    @Input() gameMode: number;
     @Input() gameList: Observable<GameInfo[]>;
     @Output() readonly buttonClick = new EventEmitter<string>();
     @Output() readonly joinRoom = new EventEmitter<GameInfo>();
     @ViewChild(MatTable) table: MatTable<GameInfo>;
 
-    tableColumns: string[] = ['username', 'gameMode', 'turnLength', 'randomized', 'roomID'];
+    readonly tableColumns: string[] = ['username', 'turnLength', 'randomized', 'roomID'];
     tableData: MatTableDataSource<GameInfo>;
 
     constructor(public dialog: MatDialog) {}
@@ -24,7 +25,7 @@ export class GameBrowserComponent implements OnInit {
     ngOnInit(): void {
         this.tableData = new MatTableDataSource();
         this.gameList.subscribe((gameList) => {
-            this.tableData.data = gameList;
+            this.tableData.data = gameList.filter((game) => game.gameMode === this.gameMode);
         });
     }
 
@@ -45,6 +46,10 @@ export class GameBrowserComponent implements OnInit {
                 this.joinRoom.emit({ username, roomID: gameInfo.roomID });
             }
         });
+    }
+
+    getTitle(): string {
+        return this.gameMode === GameMode.Classical ? 'Mode Classique' : 'Mode LOG2990';
     }
 }
 
