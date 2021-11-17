@@ -17,13 +17,13 @@ describe('Timer', () => {
     });
 
     it('startTimer should call the right functions if-stmt', () => {
-        const spy = sandBox.spy(timer.timerEvents, 'emit');
+        const spy = sandBox.spy(timer, 'emit');
         timer.startTimer();
         expect(spy.calledWith('updateTime', turnLength));
     });
     it('startTimer should call the right function else-stmt', () => {
         const sndTimer = new Timer(roomId, 0);
-        const spy = sandBox.spy(sndTimer.timerEvents, 'emit');
+        const spy = sandBox.spy(sndTimer, 'emit');
         const spyChangeTurn = sandBox.spy(sndTimer, 'changeTurn');
         timer.startTimer();
         expect(spy.calledWith('timeElapsed'));
@@ -31,7 +31,7 @@ describe('Timer', () => {
     });
     it('clearTimer should emit right event', () => {
         timer.clearTimer();
-        const spy = sandBox.spy(timer.timerEvents, 'emit');
+        const spy = sandBox.spy(timer, 'emit');
         expect(spy.calledWith('updateTime', 0));
     });
     it('changeTurn should call the right functions', () => {
