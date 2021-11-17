@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CommandService } from '@app/services/command.service';
 import { ChevaletComponent } from './chevalet.component';
 
-fdescribe('ChevaletComponent', () => {
+describe('ChevaletComponent', () => {
     let component: ChevaletComponent;
     let fixture: ComponentFixture<ChevaletComponent>;
     let commandServiceSpy: jasmine.SpyObj<CommandService>;

@@ -1,18 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
 import { TextboxService } from './textbox.service';
-import { Message } from '@app/classes/message';
-import { Subject } from 'rxjs';
 
 describe('TextboxService', () => {
     let service: TextboxService;
-    let subjectSpy: jasmine.SpyObj<Subject<Message>>;
 
     beforeEach(() => {
-        subjectSpy = jasmine.createSpyObj('Subject<Message>', ['next', 'asObservable']);
-        TestBed.configureTestingModule({
-            providers: [{ provide: Subject, useValue: subjectSpy }],
-        });
+        TestBed.configureTestingModule({});
         service = TestBed.inject(TextboxService);
     });
 
@@ -20,14 +14,16 @@ describe('TextboxService', () => {
         expect(service).toBeTruthy();
     });
 
-    /* it(' sendMessage should call next ', () => {
-        // const spy = spyOn(subjectSpy, 'next').and.callThrough();
-        service.sendMessage(MessageType.System, 'op');
-        expect(subjectSpy.next).toHaveBeenCalled();
-    });
+    it('should emit messages', () => {
+        let type = '';
+        let text = '';
+        service.messages.subscribe((message) => {
+            type = message.type;
+            text = message.text;
+        });
+        service.displayMessage('test', 'zest');
 
-    it(' getMessage should call asObservable ', () => {
-        service.sendMessage(MessageType.System, 'op');
-        expect(service.getMessage()).toContain(MessageType.System);
-    });*/
+        expect(type).toEqual('test');
+        expect(text).toEqual('zest');
+    });
 });

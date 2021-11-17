@@ -10,13 +10,6 @@ export class TextboxService {
         this.subject.next({ type, text });
     }
 
-    displayMapMessage(type: string, map: Map<string, number>): void {
-        for (const letter of map) {
-            const text: string = letter[0] + ': ' + letter[1];
-            this.subject.next({ type, text });
-        }
-    }
-
     get messages(): Observable<Message> {
         return this.subject.asObservable();
     }
