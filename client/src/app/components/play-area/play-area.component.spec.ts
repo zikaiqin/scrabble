@@ -4,14 +4,31 @@ import { Vec2 } from '@app/classes/vec2';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
 import { WebsocketService } from '@app/services/websocket.service';
 import { GridService } from '@app/services/grid.service';
+import { Subject } from 'rxjs';
+import { GameInit } from '@app/classes/game-info';
 
 describe('PlayAreaComponent', () => {
     let component: PlayAreaComponent;
     let fixture: ComponentFixture<PlayAreaComponent>;
     let mouseEvent: MouseEvent;
 
-    const websocketServiceSpy = jasmine.createSpyObj('WebsocketService', { giveUp: () => void 0 });
-    const gridServiceSpy = jasmine.createSpyObj('GridService', ['clearGrid', 'drawGrid', 'maxGrid']);
+    const gameInit = new Subject<GameInit>();
+    const gameTurn = new Subject<boolean>();
+    const gameReserve = new Subject<string[]>();
+    const gameBoard = new Subject<[string, string][]>();
+    const gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
+    const mousePos = new Subject<Vec2>();
+
+    const websocketServiceSpy = jasmine.createSpyObj('WebsocketService', [], {
+        init: gameInit.asObservable(),
+        turn: gameTurn.asObservable(),
+        reserve: gameReserve.asObservable(),
+        board: gameBoard.asObservable(),
+        hands: gameHands.asObservable(),
+    });
+    const gridServiceSpy = jasmine.createSpyObj('GridService', ['clearGrid', 'drawGrid', 'maxGrid'], {
+        mousePositionSubject: mousePos,
+    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -31,17 +48,6 @@ describe('PlayAreaComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
-    });
-
-    it('mouseHitDetect should assign the mouse position to mousePosition variable', () => {
-        const expectedPosition: Vec2 = { x: 100, y: 200 };
-        mouseEvent = {
-            offsetX: expectedPosition.x,
-            offsetY: expectedPosition.y,
-            button: 0,
-        } as MouseEvent;
-        component.mouseHitDetect(mouseEvent);
-        expect(component.mousePosition).toEqual(expectedPosition);
     });
 
     /* eslint-disable @typescript-eslint/no-magic-numbers -- Add reason */
