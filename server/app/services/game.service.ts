@@ -161,7 +161,7 @@ export class GameService {
     }
 
     setupTimer(roomID: string, configs: GameInfo, game: Game): Timer {
-        const timer = new Timer(roomID, configs.turnLength as number);
+        const timer = new Timer(configs.turnLength as number);
         const players = Array.from(game.players.entries()).map(([socketID, player]) => {
             return { socketID, player };
         });

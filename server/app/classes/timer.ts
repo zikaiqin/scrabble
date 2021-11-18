@@ -14,7 +14,7 @@ export class Timer extends EventEmitter {
     private turnState: boolean;
     private timer: NodeJS.Timeout;
 
-    constructor(roomID: string, turnLength: number) {
+    constructor(turnLength: number) {
         super();
         this.turnLength = turnLength;
         this.turnState = Boolean(Math.floor(Math.random() * 2));
