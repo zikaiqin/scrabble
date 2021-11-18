@@ -1,4 +1,4 @@
-import { DEFAULT_RESERVE } from '@app/classes/game-config';
+import { DEFAULT_RESERVE } from '@app/classes/config';
 
 export class Reserve {
     readonly letters: string[];

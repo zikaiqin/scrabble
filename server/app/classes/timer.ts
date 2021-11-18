@@ -7,7 +7,7 @@ export class Timer extends EventEmitter {
         timeElapsed: 'timeElapsed',
     };
 
-    // Locking mechanism to prevent modification during turn transition
+    // Locking mechanism to prevent concurrent modifications
     private locked = false;
 
     private readonly turnLength: number;
@@ -20,27 +20,39 @@ export class Timer extends EventEmitter {
         this.turnState = Boolean(Math.floor(Math.random() * 2));
     }
 
+    /**
+     * @description Set time to {@link turnLength} and start counting down
+     */
     startTimer(): void {
         this.unlock();
         let currentTime = this.turnLength;
         const callback = (): void => {
+            // Update time for players
             this.emit(Timer.events.updateTime, currentTime);
             if (currentTime > 0) {
+                // If there is still time left, keep counting down
                 currentTime--;
             } else {
-                this.emit(Timer.events.timeElapsed);
-                this.changeTurn();
+                // If time has run out, trigger event
+                this.emit(Timer.events.timeElapsed, this.turnState);
             }
         };
+        // Call it once in do-while fashion
         callback();
         this.timer = setInterval(callback, SECOND);
     }
 
+    /**
+     * @description Stop the timer and reset time to zero
+     */
     clearTimer(): void {
         clearInterval(this.timer);
         this.emit(Timer.events.updateTime, 0);
     }
 
+    /**
+     * @description Change whose turn it is
+     */
     changeTurn(): void {
         if (this.locked) {
             return;
@@ -51,14 +63,23 @@ export class Timer extends EventEmitter {
         this.emit(Timer.events.updateTurn, this.turnState);
     }
 
+    /**
+     * @description Lock the timer to prevent concurrent modifications
+     */
     lock(): void {
         this.locked = true;
     }
 
+    /**
+     * @description Unlock the timer
+     */
     private unlock(): void {
         this.locked = false;
     }
 
+    /**
+     * @description Is the timer locked?
+     */
     get isLocked(): boolean {
         return this.locked;
     }

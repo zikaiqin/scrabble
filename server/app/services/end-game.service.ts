@@ -1,4 +1,4 @@
-import { DEFAULT_POINTS } from '@app/classes/game-config';
+import { DEFAULT_POINTS } from '@app/classes/config';
 import { Player } from '@app/classes/player';
 import { Reserve } from '@app/classes/reserve';
 import { Service } from 'typedi';
@@ -33,6 +33,7 @@ export class EndGameService {
      * @param player1Hand the hand of player 1
      * @param player2Hand the hand of player 2
      * @param reserve container where the rest of the letters are
+     * @param roomID room's ID
      * @returns boolean to indicate if the game ended
      */
     checkIfGameEnd(reserve: Reserve, player1Hand: Player, player2Hand: Player, roomID: string): boolean {

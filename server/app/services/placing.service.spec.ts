@@ -1,5 +1,5 @@
 import { Board } from '@app/classes/board';
-import { DEFAULT_BONUSES } from '@app/classes/game-config';
+import { DEFAULT_BONUSES } from '@app/classes/config';
 import { Player } from '@app/classes/player';
 import { Reserve } from '@app/classes/reserve';
 import { expect } from 'chai';

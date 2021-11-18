@@ -1,5 +1,5 @@
 import { Board } from '@app/classes/board';
-import { DEFAULT_BONUSES } from '@app/classes/game-config';
+import { DEFAULT_BONUSES } from '@app/classes/config';
 import { expect } from 'chai';
 import { ASCII_SMALL_A, ValidationService } from './validation.service';
 

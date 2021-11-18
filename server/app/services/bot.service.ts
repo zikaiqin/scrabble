@@ -1,25 +1,20 @@
 import EventEmitter from 'events';
-import { Game } from '@app/classes/game';
 import { Service } from 'typedi';
-import { DEFAULT_SOCKET_TIMEOUT } from '@app/classes/game-config';
+import { DEFAULT_SOCKET_TIMEOUT } from '@app/classes/config';
+import { Game } from '@app/classes/game';
 
 @Service()
 export class BotService {
     readonly botEvents = new EventEmitter();
 
-    private games = new Map<string, Game>();
+    // Key -- ID of the bot <br>
+    // Value -- ID of the room the bot plays in
+    readonly games = new Map<string, string>();
 
-    observe(roomID: string, game: Game) {
-        this.games.set(roomID, game);
-    }
-
-    activate(roomID: string) {
+    activate(botID: string, game: Game) {
         setTimeout(() => {
-            this.botEvents.emit('skipTurn', roomID);
+            this.botEvents.emit('skipTurn', this.games.get(botID));
         }, DEFAULT_SOCKET_TIMEOUT);
-    }
-
-    clear(roomID: string) {
-        this.games.delete(roomID);
+        void game;
     }
 }

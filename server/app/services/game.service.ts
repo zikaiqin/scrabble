@@ -3,8 +3,8 @@ import { Game } from '@app/classes/game';
 import { Board } from '@app/classes/board';
 import { Player } from '@app/classes/player';
 import { MessageType } from '@app/classes/message';
-import { GameInfo, GameType } from '@app/classes/game-info';
-import { DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_SOCKET_TIMEOUT, DEFAULT_TURN_LENGTH, DEFAULT_TURN_TIMEOUT } from '@app/classes/game-config';
+import { GameInfo, GameType, PlayerInfo } from '@app/classes/game-info';
+import { BOT_MARKER, DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_SOCKET_TIMEOUT, DEFAULT_TURN_TIMEOUT } from '@app/classes/config';
 import { BotService } from '@app/services/bot.service';
 import { EndGameService } from '@app/services/end-game.service';
 import { ExchangeService } from '@app/services/exchange.service';
@@ -15,7 +15,12 @@ import { Service } from 'typedi';
 
 @Service()
 export class GameService {
+    // Key -- ID of the room <br>
+    // Value -- Game being played in room
     readonly games = new Map<string, Game>();
+
+    // Key -- ID of the room <br>
+    // Value -- Timer of the room
     readonly timers = new Map<string, Timer>();
 
     constructor(
@@ -29,13 +34,8 @@ export class GameService {
 
     attachSocketListeners() {
         this.socketService.socketEvents
-            .on('createGame', (roomID: string, configs: GameInfo, players) => {
-                if (configs.gameType === GameType.Multi) {
-                    this.createGameMP(roomID, configs, players);
-                }
-                if (configs.gameType === GameType.Single) {
-                    this.createGameSP(roomID, configs, players);
-                }
+            .on('createGame', (roomID: string, configs: GameInfo, players: PlayerInfo[]) => {
+                this.createGame(roomID, configs, players);
             })
             .on('exchange', (socketID: string, roomId: string, letters: string) => {
                 const game = this.games.get(roomId);
@@ -67,6 +67,7 @@ export class GameService {
                 this.socketService.updateBoard(socketID, game.board.letters);
                 this.socketService.updateHands(socketID, player.hand, Array.from(game.players.values()).filter((p) => p !== player)[0].hand);
 
+                // TODO: Move to validation.service as game.service is getting too long
                 const isValidWord = this.validationService.findWord(this.validationService.fetchWords());
                 setTimeout(() => {
                     if (isValidWord) {
@@ -116,130 +117,123 @@ export class GameService {
     }
 
     attachBotListeners() {
-        this.botService.botEvents.on('skipTurn', (roomID) => {
-            this.socketService.sendMessage(roomID, MessageType.User, '!passer');
-            this.endGameService.incrementTurnSkipCount(roomID);
-            this.changeTurn(roomID);
-        });
+        this.botService.botEvents
+            .on('skipTurn', (roomID) => {
+                this.socketService.sendMessage(roomID, MessageType.User, '!passer');
+                this.endGameService.incrementTurnSkipCount(roomID);
+                this.changeTurn(roomID);
+            })
+            .on('place', (roomID) => {
+                /* DO SOMETHING */ void roomID;
+            })
+            .on('exchange', (roomID) => {
+                /* DO SOMETHING */ void roomID;
+            });
     }
 
-    createGameMP(roomID: string, configs: GameInfo, players: { socketID: string; username: string }[]) {
-        const bonuses = this.getBonuses(!!configs.randomized);
-        const hands: Player[] = [];
-
-        const game = new Game(
-            new Board(bonuses),
-            new Map(
-                players.map((entry) => {
-                    const player = new Player(entry.username);
-                    hands.push(player);
-                    return [entry.socketID, player];
-                }),
-            ),
-        );
-        const timer = new Timer(roomID, configs.turnLength ? configs.turnLength : DEFAULT_TURN_LENGTH);
+    createGame(roomID: string, configs: GameInfo, players: PlayerInfo[]) {
+        const game = this.setupGame(roomID, configs, players);
+        const timer = this.setupTimer(roomID, configs, game);
 
         this.games.set(roomID, game);
         this.timers.set(roomID, timer);
-
-        this.socketService.setConfigs(
-            players[0].socketID,
-            players[0].username,
-            players[1].username,
-            bonuses,
-            game.reserve.letters,
-            hands[0].hand,
-            false,
-        );
-        this.socketService.setConfigs(
-            players[1].socketID,
-            players[1].username,
-            players[0].username,
-            bonuses,
-            game.reserve.letters,
-            hands[1].hand,
-            false,
-        );
         this.endGameService.turnSkipMap.set(roomID, 0);
 
+        this.sendConfigs(configs.gameType as number, game);
+        timer.changeTurn();
+    }
+
+    setupGame(roomID: string, configs: GameInfo, playerInfos: PlayerInfo[]): Game {
+        // Generate entries for player map
+        const players: [string, Player][] = playerInfos.map((entry) => {
+            const player = new Player(entry.username);
+            return [entry.socketID, player];
+        });
+        if (configs.gameType === GameType.Single) {
+            // If single player, add a bot to the map entries
+            const bot = new Player(this.getBotName(playerInfos[0].username, configs.difficulty as number));
+            const botID = `${BOT_MARKER}${playerInfos[0].socketID}`;
+            players.push([botID, bot]);
+            this.botService.games.set(botID, roomID);
+        }
+        const bonuses = this.getBonuses(!!configs.randomized);
+        return new Game(new Board(bonuses), new Map(players));
+    }
+
+    setupTimer(roomID: string, configs: GameInfo, game: Game): Timer {
+        const timer = new Timer(roomID, configs.turnLength as number);
+        const players = Array.from(game.players.entries()).map(([socketID, player]) => {
+            return { socketID, player };
+        });
         timer
             .on(Timer.events.updateTime, (time: number) => {
                 this.socketService.updateTime(roomID, time);
             })
             .on(Timer.events.updateTurn, (turnState: boolean) => {
-                if (this.gameEnded(roomID, timer, game, hands[0], hands[1])) {
-                    this.games.delete(roomID);
-                    this.timers.get(roomID)?.clearTimer();
-                    this.timers.delete(roomID);
-                    this.botService.clear(roomID);
+                if (this.gameEnded(roomID, game, players[0].player, players[1].player)) {
+                    this.deleteRoom(roomID);
                     return;
                 }
                 this.updateTurn(players[0].socketID, turnState, timer);
                 this.updateTurn(players[1].socketID, !turnState, timer);
             })
-            .on(Timer.events.timeElapsed, () => {
+            .on(Timer.events.timeElapsed, (turnState: boolean) => {
                 this.endGameService.incrementTurnSkipCount(roomID);
+                this.socketService.sendMessage(players[0].socketID, turnState ? MessageType.Own : MessageType.User, '!passer');
+                if (configs.gameType === GameType.Multi) {
+                    this.socketService.sendMessage(players[1].socketID, turnState ? MessageType.User : MessageType.Own, '!passer');
+                }
+                timer.changeTurn();
             });
-        timer.changeTurn();
+
+        return timer;
     }
 
-    createGameSP(roomID: string, configs: GameInfo, playerInfo: { socketID: string; username: string }) {
-        const bonuses = this.getBonuses(!!configs.randomized);
-        const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== playerInfo.username);
-
-        const bot = new Player(validBotNames[Math.floor(Math.random() * validBotNames.length)]);
-        const botID = `*${roomID}`;
-        const player = new Player(playerInfo.username);
-
-        const game = new Game(
-            new Board(bonuses),
-            new Map([
-                [playerInfo.socketID, player],
-                [botID, bot],
-            ]),
+    sendConfigs(gameType: number, game: Game): void {
+        const players = Array.from(game.players.entries()).map(([socketID, player]) => {
+            return { socketID, username: player.name, hand: player.hand };
+        });
+        this.socketService.setConfigs(
+            players[0].socketID,
+            players[0].username,
+            players[1].username,
+            game.board.bonuses,
+            game.reserve.letters,
+            players[0].hand,
+            false,
         );
-
-        const timer = new Timer(roomID, configs.turnLength ? configs.turnLength : DEFAULT_TURN_LENGTH);
-
-        this.games.set(roomID, game);
-        this.timers.set(roomID, timer);
-
-        this.socketService.setConfigs(playerInfo.socketID, player.name, bot.name, bonuses, game.reserve.letters, player.hand, false);
-        this.botService.observe(roomID, game);
-        this.endGameService.turnSkipMap.set(roomID, 0);
-
-        timer
-            .on(Timer.events.updateTime, (time: number) => {
-                this.socketService.updateTime(roomID, time);
-            })
-            .on(Timer.events.updateTurn, (turnState: boolean) => {
-                if (this.gameEnded(roomID, timer, game, player, bot)) {
-                    return;
-                }
-                if (!turnState) {
-                    setTimeout(() => {
-                        timer.startTimer();
-                        this.botService.activate(roomID);
-                    }, DEFAULT_TURN_TIMEOUT);
-                }
-                this.updateTurn(playerInfo.socketID, turnState, timer);
-            })
-            .on(Timer.events.timeElapsed, () => {
-                this.endGameService.incrementTurnSkipCount(roomID);
-            });
-        timer.changeTurn();
+        if (gameType === GameType.Single) {
+            return;
+        }
+        this.socketService.setConfigs(
+            players[1].socketID,
+            players[1].username,
+            players[0].username,
+            game.board.bonuses,
+            game.reserve.letters,
+            players[1].hand,
+            false,
+        );
     }
 
     getBonuses(randomized: boolean): Map<string, string> {
         if (!randomized) {
             return DEFAULT_BONUSES;
         }
-        const keys = Array.from(DEFAULT_BONUSES.keys()).sort(() => HALF - Math.random());
-        const values = Array.from(DEFAULT_BONUSES.values());
-        return new Map(keys.map((key, index) => [key, values[index]]));
+        // Randomly sort the coords
+        const coords = Array.from(DEFAULT_BONUSES.keys()).sort(() => HALF - Math.random());
+        const multiplier = Array.from(DEFAULT_BONUSES.values());
+        return new Map(coords.map((key, index) => [key, multiplier[index]]));
     }
 
-    gameEnded(roomID: string, timer: Timer, game: Game, player1: Player, player2: Player): boolean {
+    getBotName(playerName: string, difficulty: number): string {
+        void difficulty;
+        const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== playerName);
+        return validBotNames[Math.floor(Math.random() * validBotNames.length)];
+    }
+
+    // TODO: Move to end-game.service as game.service is getting too long
+    gameEnded(roomID: string, game: Game, player1: Player, player2: Player): boolean {
         const gameEnd: boolean = this.endGameService.checkIfGameEnd(game.reserve, player1, player2, roomID);
         if (!gameEnd) {
             return false;
@@ -249,7 +243,6 @@ export class GameService {
         for (const message of this.endGameService.showLettersLeft(player1, player2)) {
             this.socketService.sendMessage(roomID, MessageType.System, message);
         }
-        timer.clearTimer();
         this.socketService.updateTurn(roomID, false);
         this.updateScores(game);
         return true;
@@ -267,13 +260,6 @@ export class GameService {
         }
     }
 
-    deleteRoom(roomID: string): void {
-        this.games.delete(roomID);
-        this.timers.get(roomID)?.clearTimer();
-        this.timers.delete(roomID);
-        this.botService.clear(roomID);
-    }
-
     /**
      * @description Sends turn updates to sockets. Ends one's turn immediately, but waits 3 seconds to start other's turn.
      * @param socketID
@@ -281,12 +267,22 @@ export class GameService {
      * @param timer
      */
     updateTurn(socketID: string, turnState: boolean, timer: Timer) {
+        // Check if the "socket" ID belongs to a bot
+        const roomID = this.botService.games.get(socketID);
         if (turnState) {
+            // If player on socketID is about to start their turn
             setTimeout(() => {
                 timer.startTimer();
-                this.socketService.updateTurn(socketID, turnState);
+                if (roomID) {
+                    // If bot, activate the service
+                    this.botService.activate(socketID, this.games.get(roomID) as Game);
+                } else {
+                    // Else send turn update to player
+                    this.socketService.updateTurn(socketID, turnState);
+                }
             }, DEFAULT_TURN_TIMEOUT);
-        } else {
+        } else if (!roomID) {
+            // If player, activate the service
             this.socketService.updateTurn(socketID, turnState);
         }
     }
@@ -301,6 +297,18 @@ export class GameService {
         const entries = Array.from(game.players.entries());
         this.socketService.updateScores(entries[0][0], entries[0][1].score, entries[1][1].score);
         this.socketService.updateScores(entries[1][0], entries[1][1].score, entries[0][1].score);
+    }
+
+    deleteRoom(roomID: string): void {
+        const players = this.games.get(roomID)?.players;
+        if (players === undefined) {
+            return;
+        }
+        // If either of the players are bots, delete them from the map
+        Array.from(players.keys()).forEach((id) => this.botService.games.delete(id));
+        this.games.delete(roomID);
+        this.timers.get(roomID)?.clearTimer();
+        this.timers.delete(roomID);
     }
 }
 
