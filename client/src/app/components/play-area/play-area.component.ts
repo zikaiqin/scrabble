@@ -8,8 +8,8 @@ import { Vec2 } from '@app/classes/vec2';
 import { CHARCODE_SMALL_A } from '@app/classes/config';
 
 // TODO : Avoir un fichier séparé pour les constantes!
-const DEFAULT_WIDTH_ALL = 600; // 525
-const DEFAULT_HEIGHT_ALL = 600; // 625
+const DEFAULT_WIDTH_ALL = 650; // 525
+const DEFAULT_HEIGHT_ALL = 650; // 625
 const HAND_MAX_SIZE = 7; // 625
 const NUMBER_MAX_COORD = 15; // 625
 const PIXEL_SIZE_GAMEBOARD = 560;
