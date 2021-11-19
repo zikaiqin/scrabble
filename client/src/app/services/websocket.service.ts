@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from '@env/environment';
 import { GameInfo, GameInit } from '@app/classes/game-info';
 import { AlertService } from '@app/services/alert.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-
-const url = '//localhost:3000';
 
 @Injectable({
     providedIn: 'root',
@@ -126,7 +125,7 @@ export class WebsocketService {
     }
 
     connect(socket?: Socket): void {
-        this.socket = socket ? socket : io(url).connect();
+        this.socket = socket ? socket : io(environment.serverUrl).connect();
         this.attachListeners();
     }
 
