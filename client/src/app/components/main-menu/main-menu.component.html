@@ -10,7 +10,6 @@
             <button
                 mat-raised-button
                 *ngIf="button.name !== 'Back'; else backButton"
-                [disabled]="button.name === 'Log2990' || button.name === 'Scoreboard'"
                 (click)="buttonClick.emit(button.name)"
             >
                 {{ button.text }}

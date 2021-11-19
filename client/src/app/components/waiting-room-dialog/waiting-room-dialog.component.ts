@@ -6,7 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 @Component({
     selector: 'app-waiting-room-dialog',
     templateUrl: './waiting-room-dialog.component.html',
-    styleUrls: ['../../pages/home-page/home-page.component.scss', './waiting-room-dialog.component.scss'],
+    styleUrls: ['../../styles.scss', './waiting-room-dialog.component.scss'],
 })
 export class WaitingRoomDialogComponent {
     readonly difficulties = GameDifficulty;

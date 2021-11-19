@@ -1,44 +1,54 @@
-/* import { TestBed } from '@angular/core/testing';
-import { Player } from '@app/classes/player';
-import { Subject } from 'rxjs';
 import { GameService } from './game.service';
-import { GridService } from './grid.service';
+import { SocketService } from '@app/services/socket.service';
+import { BotService } from '@app/services/bot.service';
+import { EndGameService } from '@app/services/end-game.service';
+import { ExchangeService } from '@app/services/exchange.service';
+import { PlacingService } from '@app/services/placing.service';
+import { ValidationService } from '@app/services/validation.service';
+import { DEFAULT_BONUSES } from '@app/classes/config';
+import { Container } from 'typedi';
+import EventEmitter from 'events';
+import * as http from 'http';
+import * as sinon from 'sinon';
+import { beforeEach, describe, it } from 'mocha';
+import { expect } from 'chai';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('GameService', () => {
     let service: GameService;
-    let username: string;
-    let gridServiceSpy: jasmine.SpyObj<GridService>;
+    let fakeSocketService: SocketService;
+    let fakeBotService: BotService;
+    let fakeEndGameService: EndGameService;
+    let fakeExchangeService: ExchangeService;
+    let fakePlacingService: PlacingService;
+    let fakeValidationService: ValidationService;
+
+    let fakeSocketEvents: EventEmitter;
 
     beforeEach(() => {
-        gridServiceSpy = jasmine.createSpyObj('GridService', ['drawPlayerHand', 'drawPlayerHandLetters', 'clearGrid', 'drawGridLetters']);
+        fakeSocketService = new SocketService(http.createServer());
+        fakeBotService = Container.get(BotService);
+        fakeEndGameService = Container.get(EndGameService);
+        fakeExchangeService = Container.get(ExchangeService);
+        fakePlacingService = Container.get(PlacingService);
+        fakeValidationService = Container.get(ValidationService);
 
-        TestBed.configureTestingModule({ providers: [{ provide: GridService, useValue: gridServiceSpy }] });
-        service = TestBed.inject(GameService);
+        fakeSocketEvents = new EventEmitter();
 
-        username = 'testName';
-        service.playerHand = new Subject<Player>();
-        service.opponentHand = new Subject<Player>();
-        service.playerScore = new Subject<number>();
-        service.opponentScore = new Subject<number>();
+        service = new GameService(
+            fakeSocketService,
+            fakeBotService,
+            fakeEndGameService,
+            fakeExchangeService,
+            fakePlacingService,
+            fakeValidationService,
+        );
+        sinon.replace(fakeSocketService, 'socketEvents', fakeSocketEvents);
+        service.attachSocketListeners();
     });
 
-    it('should be created', () => {
-        expect(service).toBeTruthy();
+    it('should get random bonuses', () => {
+        expect(service.getBonuses(false)).to.equals(DEFAULT_BONUSES);
+        expect(service.getBonuses(true)).not.to.equals(DEFAULT_BONUSES);
     });
-
-    it('init should affect values correctly', () => {
-        service.init({ username });
-        expect(service.player).toEqual(username);
-        expect(service.isInit).toBeTrue();
-        expect(service.isStarted).toBeFalse();
-        expect(service.opponent).not.toEqual(username);
-    });
-
-    it('start should affect values correctly', () => {
-        const spyNextPlayer = spyOn(service.playerScore, 'next').and.callThrough();
-        const spyNextOpponent = spyOn(service.opponentScore, 'next').and.callThrough();
-        service.start();
-        expect(spyNextPlayer).toHaveBeenCalledWith(0);
-        expect(spyNextOpponent).toHaveBeenCalledWith(0);
-    });
-});*/
+});

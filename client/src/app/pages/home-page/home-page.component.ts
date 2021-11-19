@@ -5,7 +5,7 @@ import { WebsocketService } from '@app/services/websocket.service';
 @Component({
     selector: 'app-home-page',
     templateUrl: './home-page.component.html',
-    styleUrls: ['./home-page.component.scss'],
+    styleUrls: ['../../styles.scss'],
 })
 export class HomePageComponent {
     gameMode = GameMode.None;

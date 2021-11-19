@@ -4,6 +4,7 @@ import { LetterExchangeService } from '@app/services/letter-exchange.service';
 import { LetterPlacingService } from '@app/services/letter-placing.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
+import { CHARCODE_SMALL_A } from '@app/classes/config';
 
 @Injectable({
     providedIn: 'root',
@@ -71,7 +72,6 @@ export class CommandService {
                         this.textboxService.displayMessage(MessageType.System, "Ce n'est pas votre tour");
                         return false;
                     }
-                    this.textboxService.displayMessage(MessageType.System, 'Votre tour a été passé');
                     this.websocketService.skipTurn();
                     return true;
                 },
@@ -79,20 +79,19 @@ export class CommandService {
             [
                 '!réserve',
                 (): boolean => {
-                    if (this.debugActive) {
-                        let reserveString = '';
-                        const occMap: Map<string, number> = new Map();
-                        this.reserve.sort((a, b) => a.localeCompare(b)).forEach((letter) => (reserveString += letter + ' '));
-                        for (const letter of this.reserve) {
-                            occMap.set(letter, this.countOccurence(reserveString, letter));
-                        }
-                        this.textboxService.displayMessage(MessageType.System, 'La réserve contient ');
-                        this.textboxService.displayMapMessage(MessageType.System, occMap);
-                        return false;
-                    } else {
+                    if (!this.debugActive) {
                         this.textboxService.displayMessage(MessageType.System, "La commande debug n'est pas activé");
                         return false;
                     }
+                    const letters = ['*', ...Array.from(new Array(ALPHABET_SIZE), (_, index) => String.fromCharCode(CHARCODE_SMALL_A + index))];
+                    const countMap = new Map<string, number>();
+                    letters.forEach((letter) => countMap.set(letter, this.reserve.filter((actualLetter) => actualLetter === letter).length));
+
+                    this.textboxService.displayMessage(MessageType.System, 'La réserve contient');
+                    countMap.forEach((count, letter) => {
+                        this.textboxService.displayMessage(MessageType.System, `${letter.toUpperCase()} : ${count}`);
+                    });
+                    return false;
                 },
             ],
         ]);
@@ -121,8 +120,6 @@ export class CommandService {
             this.websocketService.sendMessage(message);
         }
     }
-
-    countOccurence(arr: string, char: string): number {
-        return arr.split(char).length - 1;
-    }
 }
+
+const ALPHABET_SIZE = 26;

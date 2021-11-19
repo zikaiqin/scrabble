@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EndGameComponent } from './end-game.component';
+import { AdminPageComponent } from './admin-page.component';
 
-describe('EndGameComponent', () => {
-    let component: EndGameComponent;
-    let fixture: ComponentFixture<EndGameComponent>;
+describe('AdminPageComponent', () => {
+    let component: AdminPageComponent;
+    let fixture: ComponentFixture<AdminPageComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [EndGameComponent],
+            declarations: [AdminPageComponent],
         }).compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(EndGameComponent);
+        fixture = TestBed.createComponent(AdminPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

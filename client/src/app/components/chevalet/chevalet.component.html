@@ -9,8 +9,7 @@
     id="{{ 'letter' + i }}"
     (click)="updateActiveLetter(i)"
     (contextmenu)="onRightClick($event, letter, i)"
-    [ngStyle]="{ 'border-style': isClicked[i] ? 'dashed' : 'solid' }"
-    [ngStyle]="{ color: activeLetter[i] ? 'white' : 'black' }"
+    [ngStyle]="{ 'border-style': isClicked[i] ? 'dashed' : 'solid', color: activeLetter[i] ? 'white' : 'black' }"
 >
     {{ letter }}
 </div>

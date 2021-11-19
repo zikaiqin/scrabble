@@ -1,3 +1,6 @@
+/* eslint-disable dot-notation */
+/* eslint-disable prettier/prettier */
+// On disable quand on essaie d'acceder un attribut prive de notre service
 import { TestBed } from '@angular/core/testing';
 
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
@@ -6,27 +9,35 @@ import { GameInit } from '@app/classes/game-info';
 import { Subject } from 'rxjs';
 import { LetterExchangeService } from '@app/services/letter-exchange.service';
 import { WebsocketService } from '@app/services/websocket.service';
+import { Vec2 } from '@app/classes/vec2';
+import { GridLettersService } from './grid-letter.service';
+
 
 describe('GridService', () => {
     let service: GridService;
     let websocketServiceSpy: jasmine.SpyObj<LetterExchangeService>;
     let ctxStub: CanvasRenderingContext2D;
+    let gridLetterServiceSpy: jasmine.SpyObj<GridLettersService>;
     const pointOnMap: Map<string, string> = new Map();
-    const CANVAS_WIDTH = 500;
-    const CANVAS_HEIGHT = 500;
+    const CANVAS_WIDTH = 600;
+    const CANVAS_HEIGHT = 600;
     const DEFAULT_NB_CASES = 16;
 
     const gameInit = new Subject<GameInit>();
     const gameBoard = new Subject<[string, string][]>();
 
     beforeEach(() => {
-        websocketServiceSpy = jasmine.createSpyObj('WebsocketService', [], {
+        websocketServiceSpy = jasmine.createSpyObj('WebsocketService', [''], {
             init: gameInit.asObservable(),
             board: gameBoard.asObservable(),
         });
+        gridLetterServiceSpy = jasmine.createSpyObj('GridLettersService', ['drawCoords', 'drawGridCol', 'drawGridLine']);
 
         TestBed.configureTestingModule({
-            providers: [{ provide: WebsocketService, useValue: websocketServiceSpy }],
+            providers: [
+                { provide: WebsocketService, useValue: websocketServiceSpy },
+                { provide: GridLettersService, useValue: gridLetterServiceSpy },
+            ],
         });
         service = TestBed.inject(GridService);
         ctxStub = CanvasTestHelper.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
@@ -36,6 +47,7 @@ describe('GridService', () => {
         pointOnMap.set('b11', 'b');
         pointOnMap.set('a2', 'c');
         pointOnMap.set('e1', 'e');
+        service['scaleCounter'] = 1;
     });
 
     it('should be created', () => {
@@ -76,25 +88,12 @@ describe('GridService', () => {
 
         expect(drawGridLettersSpy).toHaveBeenCalled();
     });
-    /* it(' drawPlayerHandLetters should call fillText on the canvas', () => {
-        const stringTester: string[] = ['a', 'b', 'c'];
-        const fillTextSpy = spyOn(service.handContext, 'fillText').and.callThrough();
 
-        service.drawPlayerHandLetters(stringTester);
-
-        expect(fillTextSpy).toHaveBeenCalled();
-    });*/
     it(' clearGrid should call clearRect ', () => {
         const clearRectSpy = spyOn(service.gridContext, 'clearRect').and.callThrough();
         service.clearGrid();
         expect(clearRectSpy).toHaveBeenCalled();
     });
-    /* it(' drawGrid should reset the positions', () => {
-        const expectedPostions = CANVAS_WIDTH / DEFAULT_NB_CASES;
-        service.drawGrid();
-        expect(service.tuilePosX).toBe(expectedPostions);
-        expect(service.tuilePosY).toBe(expectedPostions);
-    });*/
 
     it(' drawGrid should color pixels on the canvas', () => {
         let imageData = service.gridContext.getImageData(0, 0, service.width, service.height).data;
@@ -104,27 +103,45 @@ describe('GridService', () => {
         const afterSize = imageData.filter((x) => x !== 0).length;
         expect(afterSize).toBeGreaterThan(beforeSize);
     });
-
-    /* it(' drawGrid should increment tuilePosY and tuilePosX', () => {
-        service.drawGrid();
-    });
     it('should increment scaleCounter when maxGrid', () => {
         service.maxGrid();
-        expect(service.scaleCounter).toBe(1);
-    });
-    it('should not increment scaleCounter when maxGrid', () => {
-        service.scaleCounter = size;
-
-        service.maxGrid();
-        expect(service.scaleCounter).toBe(size);
+        const scale = service['scaleCounter'];
+        expect(scale).toBeGreaterThan(1);
     });
     it('should decrement scaleCounter when minGrid', () => {
         service.minGrid();
-        expect(service.scaleCounter).toBe(NEGATIVE_NB);
+        const scale = service['scaleCounter'];
+        expect(scale).toBeLessThan(1);
     });
-    it('should not decrement scaleCounter when minGrid', () => {
-        service.scaleCounter = NEGATIVE_NB;
-        service.minGrid();
-        expect(service.scaleCounter).toBe(NEGATIVE_NB);
-    });*/
+    it('should call drawArrow when selectSquare', () => {
+        const mousePosition: Vec2 = { x: 1, y: 1 };
+        const drawArrowSpy = spyOn(service, 'drawArrow').and.callThrough();
+        service.selectSquare(mousePosition.x, mousePosition.y);
+        service.selectSquare(mousePosition.x + 1, mousePosition.y);
+        service.selectSquare(mousePosition.x + 1, mousePosition.y + 1);
+        service.arrowDirection = true;
+        service.selectSquare(mousePosition.x, mousePosition.y);
+ 
+        expect(drawArrowSpy).toHaveBeenCalled();
+    });
+    it('should call fillText when drawLx2', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        service.drawLx2();
+        expect(fillTextSpy).toHaveBeenCalled();
+    });
+    it('should call fillText when drawMx3', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        service.drawMx3();
+        expect(fillTextSpy).toHaveBeenCalled();
+    });
+    it('should call fillText when drawMx2', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        service.drawMx2();
+        expect(fillTextSpy).toHaveBeenCalled();
+    });
+    it('should call fillText when drawLx3', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        service.drawLx3();
+        expect(fillTextSpy).toHaveBeenCalled();
+    });
 });

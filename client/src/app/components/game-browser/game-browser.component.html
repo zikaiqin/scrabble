@@ -1,6 +1,7 @@
 <mat-card class="menu-card center">
-    <div class="title-container">
-        <h1 class="title">Parties en attente</h1>
+    <div class="title-container center">
+        <h1 class="title">{{ getTitle() }}</h1>
+        <h2 class="subtitle">Parties en attente</h2>
     </div>
 
     <div class="table-container mat-elevation-z1">
@@ -11,11 +12,11 @@
                 <td mat-cell *matCellDef="let element">{{ element.username }}</td>
             </ng-container>
 
-            <!-- Game Mode Column -->
+            <!-- Game Mode Column
             <ng-container matColumnDef="gameMode">
                 <th mat-header-cell *matHeaderCellDef>Mode de jeu</th>
                 <td mat-cell *matCellDef="let element">{{ formatMode(element.gameMode) }}</td>
-            </ng-container>
+            </ng-container> -->
 
             <!-- Turn Length Column -->
             <ng-container matColumnDef="turnLength">

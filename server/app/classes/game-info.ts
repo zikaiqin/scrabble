@@ -24,3 +24,8 @@ export enum GameDifficulty {
     Easy,
     Hard,
 }
+
+export interface PlayerInfo {
+    socketID: string;
+    username: string;
+}

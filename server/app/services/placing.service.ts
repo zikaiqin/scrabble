@@ -1,5 +1,5 @@
 import { Board } from '@app/classes/board';
-import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
+import { DEFAULT_HAND_SIZE } from '@app/classes/config';
 import { Player } from '@app/classes/player';
 import { Reserve } from '@app/classes/reserve';
 import { Service } from 'typedi';
@@ -8,6 +8,9 @@ import { Service } from 'typedi';
 export class PlacingService {
     /**
      * @description Place letters onto the board
+     * @param letters Letters to be placed on the board. Key: Coords -- Value: Letter
+     * @param board Game board on which to place the {@link letters}
+     * @param player Player who is placing the {@link letters}
      */
     placeLetters(letters: Map<string, string>, board: Board, player: Player): void {
         letters.forEach((letter, coords) => {

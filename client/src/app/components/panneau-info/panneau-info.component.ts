@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DEFAULT_HAND_SIZE } from '@app/classes/game-config';
+import { DEFAULT_HAND_SIZE } from '@app/classes/config';
 import { CommandService } from '@app/services/command.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';

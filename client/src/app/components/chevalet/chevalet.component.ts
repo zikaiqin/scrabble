@@ -1,5 +1,7 @@
 import { Component, ElementRef, HostListener, Input } from '@angular/core';
 import { CommandService } from '@app/services/command.service';
+import { TextboxService } from '@app/services/textbox.service';
+import { MessageType } from '@app/classes/message';
 
 const HAND_SIZE = 7;
 const MINUS1 = -1;
@@ -18,7 +20,7 @@ export class ChevaletComponent {
     isYourTurn: boolean = true;
     isEventReceiver: boolean = false;
 
-    constructor(private eRef: ElementRef, private commandService: CommandService) {
+    constructor(private eRef: ElementRef, private commandService: CommandService, private textboxService: TextboxService) {
         this.addWindowListener();
     }
     @HostListener('document:click', ['$event'])
@@ -52,7 +54,9 @@ export class ChevaletComponent {
         }
     }
     exchange() {
-        this.commandService.parseCommand(`!échanger ${this.currentHand.join('')}`);
+        const command = `!échanger ${this.currentHand.join('')}`;
+        this.textboxService.displayMessage(MessageType.Own, command);
+        this.commandService.parseCommand(command);
         this.resetExchange();
     }
 
@@ -84,16 +88,10 @@ export class ChevaletComponent {
                 this.currentHand = this.letterRemove(this.currentHand, letter);
             }
             this.verifySelected();
-            // for(const it of this.currentHand){
-            //     console.log(it[0]); // testing
-            // }
-            // console.log("111111111111111111111111111");
         }
     }
     verifySelected() {
-        if (this.currentHand.length !== 0) {
-            this.isContainSelectedCard = true;
-        } else this.isContainSelectedCard = false;
+        this.isContainSelectedCard = this.currentHand.length !== 0;
     }
 
     letterRemove(currentHand: string[], letter: string): string[] {
@@ -108,15 +106,16 @@ export class ChevaletComponent {
         window.addEventListener('keydown', (event) => {
             let isPresent = false;
             if (!this.isEventReceiver) return;
-            for (let i = 0; i < this.playerHand.length; i++) {
-                if (event.key === this.playerHand[i]) {
-                    isPresent = true;
-                    if (!this.activeLetter[i]) {
+            if (this.activeLetter.includes(true) && event.key === this.playerHand[this.activeLetter.indexOf(true)]) {
+                this.updateActiveLetter(this.findNextLetterIndex(this.activeLetter.indexOf(true)));
+                isPresent = true;
+            } else {
+                for (let i = 0; i < this.playerHand.length; i++) {
+                    if (event.key === this.playerHand[i]) {
+                        isPresent = true;
                         this.updateActiveLetter(i);
-                    } else {
-                        this.updateActiveLetter(this.findNextLetterIndex(i));
+                        break;
                     }
-                    break;
                 }
             }
             if (event.key === 'ArrowRight') {
@@ -156,8 +155,7 @@ export class ChevaletComponent {
         if (isSelecting) return;
         this.isEventReceiver = true;
         for (let i = 0; i < this.activeLetter.length; i++) {
-            if (i === current) this.activeLetter[i] = true;
-            else this.activeLetter[i] = false;
+            this.activeLetter[i] = i === current;
         }
     }
 

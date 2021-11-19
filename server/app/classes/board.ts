@@ -3,7 +3,12 @@ export class Board {
     readonly bonuses: Map<string, string>;
 
     constructor(bonuses: Map<string, string>) {
+        // Key -- Coords on the board <br>
+        // Value -- Letter placed at the coords
         this.letters = new Map<string, string>();
+
+        // Key -- Coords on the board <br>
+        // Value -- Letter placed at the coords
         this.bonuses = new Map<string, string>(bonuses);
     }
     size(): number {

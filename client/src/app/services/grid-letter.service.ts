@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
+import { CHARCODE_SMALL_A } from '@app/classes/config';
 
-const CHARCODE_SMALL_A = 97;
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 600;
 const DEFAULT_NB_CASES = 16;

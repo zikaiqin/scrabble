@@ -6,7 +6,7 @@ import { GameInfo } from '@app/classes/game-info';
 @Component({
     selector: 'app-waiting-room',
     templateUrl: './waiting-room.component.html',
-    styleUrls: ['../../pages/home-page/home-page.component.scss', './waiting-room.component.scss'],
+    styleUrls: ['../../styles.scss', './waiting-room.component.scss'],
 })
 export class WaitingRoomComponent {
     @Output() buttonClick = new EventEmitter<string>();

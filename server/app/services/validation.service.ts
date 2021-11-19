@@ -1,5 +1,5 @@
 import { Board } from '@app/classes/board';
-import { DEFAULT_POINTS } from '@app/classes/game-config';
+import { DEFAULT_POINTS } from '@app/classes/config';
 import { Vec2 } from '@app/classes/vec2';
 import * as data from '@app/services/dictionnary.json';
 import { Service } from 'typedi';

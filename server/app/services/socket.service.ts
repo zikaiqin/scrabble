@@ -4,6 +4,7 @@ import * as io from 'socket.io';
 import { Service } from 'typedi';
 import { GameInfo, GameType } from '@app/classes/game-info';
 import { MessageType } from '@app/classes/message';
+import { ROOM_MARKER } from '@app/classes/config';
 
 @Service()
 export class SocketService {
@@ -22,7 +23,7 @@ export class SocketService {
             socket.emit('updateRooms', this.roomList);
 
             socket.on('createGame', (configs: GameInfo) => {
-                const room = `_${socket.id}`;
+                const room = `${ROOM_MARKER}${socket.id}`;
                 socket.join(room);
                 this.activeRooms.set(socket.id, room);
 
@@ -30,7 +31,7 @@ export class SocketService {
                     this.waitingRooms.set(room, configs);
                     this.sio.emit('updateRooms', this.roomList);
                 } else {
-                    this.socketEvents.emit('createGame', room, configs, { socketID: socket.id, username: configs.username });
+                    this.socketEvents.emit('createGame', room, configs, [{ socketID: socket.id, username: configs.username }]);
                 }
             });
 
@@ -68,7 +69,7 @@ export class SocketService {
                 configs.gameType = GameType.Single;
                 configs.difficulty = difficulty;
 
-                this.socketEvents.emit('createGame', roomID, configs, { socketID: socket.id, username: configs.username });
+                this.socketEvents.emit('createGame', roomID, configs, [{ socketID: socket.id, username: configs.username }]);
                 this.sio.emit('updateRooms', this.roomList);
             });
 

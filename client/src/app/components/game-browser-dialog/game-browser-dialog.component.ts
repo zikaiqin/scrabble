@@ -6,7 +6,7 @@ import { GameInfo } from '@app/classes/game-info';
 @Component({
     selector: 'app-game-browser-dialog',
     templateUrl: './game-browser-dialog.component.html',
-    styleUrls: ['../../pages/home-page/home-page.component.scss', './game-browser-dialog.component.scss'],
+    styleUrls: ['../../styles.scss', './game-browser-dialog.component.scss'],
 })
 export class GameBrowserDialogComponent {
     readonly form: FormGroup;

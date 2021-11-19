@@ -6,24 +6,22 @@ const TURN_LENGTH = 5000;
 
 describe('Timer', () => {
     let timer: Timer;
-    let roomId: string;
     let turnLength: number;
     const sandBox = createSandbox();
 
     beforeEach(() => {
         turnLength = TURN_LENGTH;
-        roomId = 'testID';
-        timer = new Timer(roomId, turnLength);
+        timer = new Timer(turnLength);
     });
 
     it('startTimer should call the right functions if-stmt', () => {
-        const spy = sandBox.spy(timer.timerEvents, 'emit');
+        const spy = sandBox.spy(timer, 'emit');
         timer.startTimer();
         expect(spy.calledWith('updateTime', turnLength));
     });
     it('startTimer should call the right function else-stmt', () => {
-        const sndTimer = new Timer(roomId, 0);
-        const spy = sandBox.spy(sndTimer.timerEvents, 'emit');
+        const sndTimer = new Timer(0);
+        const spy = sandBox.spy(sndTimer, 'emit');
         const spyChangeTurn = sandBox.spy(sndTimer, 'changeTurn');
         timer.startTimer();
         expect(spy.calledWith('timeElapsed'));
@@ -31,7 +29,7 @@ describe('Timer', () => {
     });
     it('clearTimer should emit right event', () => {
         timer.clearTimer();
-        const spy = sandBox.spy(timer.timerEvents, 'emit');
+        const spy = sandBox.spy(timer, 'emit');
         expect(spy.calledWith('updateTime', 0));
     });
     it('changeTurn should call the right functions', () => {
