@@ -3,7 +3,7 @@ import { Game } from '@app/classes/game';
 import { Board } from '@app/classes/board';
 import { Player } from '@app/classes/player';
 import { MessageType } from '@app/classes/message';
-import { GameInfo, GameType, PlayerInfo } from '@app/classes/game-info';
+import { GameInfo, GameMode, GameType, PlayerInfo } from '@app/classes/game-info';
 import { BOT_MARKER, DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_SOCKET_TIMEOUT, DEFAULT_TURN_TIMEOUT } from '@app/classes/config';
 import { BotService } from '@app/services/bot.service';
 import { EndGameService } from '@app/services/end-game.service';
@@ -172,7 +172,7 @@ export class GameService {
         const bonuses = this.getBonuses(!!configs.randomized);
 
         const publicObj: [number, boolean][] = [];
-        if (configs.gameMode === 2) {
+        if (configs.gameMode === GameMode.Log2990) {
             // If the gameMode is LOG2990 (with objectives)
             const tempObj = this.objectvesService.getPublicObjectives();
             // eslint-disable-next-line @typescript-eslint/prefer-for-of
@@ -230,7 +230,7 @@ export class GameService {
             configs.gameMode as number,
             false,
         );
-        if (configs.gameMode === GameType.Single) {
+        if (configs.gameType === GameType.Single) {
             return;
         }
         this.socketService.setConfigs(
