@@ -139,7 +139,7 @@ export class GameService {
         this.timers.set(roomID, timer);
         this.endGameService.turnSkipMap.set(roomID, 0);
 
-        this.sendConfigs(configs.gameType as number, game);
+        this.sendConfigs(configs, game);
         timer.changeTurn();
     }
 
@@ -189,7 +189,7 @@ export class GameService {
         return timer;
     }
 
-    sendConfigs(gameType: number, game: Game): void {
+    sendConfigs(configs: GameInfo, game: Game): void {
         const players = Array.from(game.players.entries()).map(([socketID, player]) => {
             return { socketID, username: player.name, hand: player.hand };
         });
@@ -200,9 +200,10 @@ export class GameService {
             game.board.bonuses,
             game.reserve.letters,
             players[0].hand,
+            configs.gameMode as number,
             false,
         );
-        if (gameType === GameType.Single) {
+        if (configs.gameMode === GameType.Single) {
             return;
         }
         this.socketService.setConfigs(
@@ -212,6 +213,7 @@ export class GameService {
             game.board.bonuses,
             game.reserve.letters,
             players[1].hand,
+            configs.gameMode as number,
             false,
         );
     }

@@ -35,9 +35,17 @@ export class WebsocketService {
 
             this.socket.on(
                 'initGame',
-                (self: string, opponent: string, bonuses: [string, string][], reserve: string[], hand: string[], turnState: boolean | undefined) => {
+                (
+                    self: string,
+                    opponent: string,
+                    bonuses: [string, string][],
+                    reserve: string[],
+                    hand: string[],
+                    gameMode: number,
+                    turnState: boolean | undefined,
+                ) => {
                     this.router.navigateByUrl('/game').then(() => {
-                        this.gameInit.next({ self, opponent, bonuses, reserve, hand, turnState });
+                        this.gameInit.next({ self, opponent, bonuses, reserve, hand, gameMode, turnState });
                     });
                 },
             );

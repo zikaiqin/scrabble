@@ -1,1 +1,37 @@
-<p>objectives works!</p>
+<mat-accordion *ngIf='isVisible'>
+    <mat-expansion-panel id='panel-1'>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{this.content[0][0]}}
+            </mat-panel-title>
+            <mat-panel-description>
+                {{this.content[0][1]}}
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>{{this.content[0][2]}}</p>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel id='panel-2'>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{this.content[1][0]}}
+            </mat-panel-title>
+            <mat-panel-description>
+                {{this.content[1][1]}}
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>{{this.content[1][2]}}</p>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel id='panel-3'>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{this.content[2][0]}}
+            </mat-panel-title>
+            <mat-panel-description>
+                {{this.content[2][1]}}
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>{{this.content[2][2]}}</p>
+    </mat-expansion-panel>
+</mat-accordion>

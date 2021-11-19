@@ -137,9 +137,10 @@ export class SocketService {
         bonuses: Map<string, string>,
         reserve: string[],
         hand: string[],
+        gameMode: number,
         turnState?: boolean,
     ) {
-        this.sio.to(socketID).emit('initGame', self, opponent, Array.from(bonuses.entries()), reserve, hand, turnState);
+        this.sio.to(socketID).emit('initGame', self, opponent, Array.from(bonuses.entries()), reserve, hand, gameMode, turnState);
     }
 
     updateTime(roomID: string, time: number) {
