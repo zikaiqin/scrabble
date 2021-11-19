@@ -1,5 +1,9 @@
 button {
-    max-width: 300px;
+    min-width: 200px;
+}
+
+.title-container {
+    margin-bottom: 0;
 }
 
 table {
@@ -22,7 +26,7 @@ td {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    margin: 30px 0 20px 0;
+    margin: 30px 0 30px 0;
 }
 
 .table-row:hover {
@@ -37,8 +41,4 @@ td {
     text-align: center;
     font-weight: normal;
     font-style: italic;
-}
-
-.title-container {
-    margin-bottom: 0 !important;
 }

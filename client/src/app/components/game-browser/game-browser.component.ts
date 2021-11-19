@@ -8,7 +8,7 @@ import { GameBrowserDialogComponent } from '@app/components/game-browser-dialog/
 @Component({
     selector: 'app-game-browser[gameList]',
     templateUrl: './game-browser.component.html',
-    styleUrls: ['../../pages/home-page/home-page.component.scss', './game-browser.component.scss'],
+    styleUrls: ['../../styles.scss', './game-browser.component.scss'],
 })
 export class GameBrowserComponent implements OnInit {
     @Input() gameMode: number;

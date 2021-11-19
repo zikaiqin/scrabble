@@ -6,7 +6,7 @@ import { DEFAULT_TURN_LENGTH } from '@app/classes/config';
 @Component({
     selector: 'app-new-game-menu',
     templateUrl: './new-game-menu.component.html',
-    styleUrls: ['../../pages/home-page/home-page.component.scss', './new-game-menu.component.scss'],
+    styleUrls: ['../../styles.scss', './new-game-menu.component.scss'],
 })
 export class NewGameMenuComponent implements OnInit {
     @Input() gameMode: number;
