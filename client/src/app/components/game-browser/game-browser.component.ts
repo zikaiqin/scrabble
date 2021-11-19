@@ -29,10 +29,6 @@ export class GameBrowserComponent implements OnInit {
         });
     }
 
-    formatMode(gameMode: number): string {
-        return gameMode === GameMode.Classical ? 'Classique' : 'LOG2990';
-    }
-
     formatTime(time: number): string {
         return `${Math.floor(time / MINUTE)}:${time % MINUTE === 0 ? '00' : time % MINUTE}`;
     }
