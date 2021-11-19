@@ -17,6 +17,7 @@ export class WebsocketService {
     private connectionStatus = new Subject<string>();
     private roomList = new Subject<GameInfo[]>();
 
+    private objectives = new Subject<{ publicObj: [number, boolean][]; privateObj: [number, boolean] }>();
     private gameInit = new Subject<GameInit>();
     private gameTime = new Subject<number>();
     private gameTurn = new Subject<boolean>();
@@ -80,6 +81,9 @@ export class WebsocketService {
             this.socket.on('gameEnded', (winner: string) => {
                 this.gameEnded.next(winner);
             });
+            this.socket.on('updateObjectives', (publicObj: [number, boolean][], privateObj: [number, boolean]) => {
+                this.objectives.next({ publicObj, privateObj });
+            });
         });
 
         this.socket.on('disconnect', (reason) => {
@@ -141,6 +145,10 @@ export class WebsocketService {
         this.socket.disconnect();
     }
 
+    fetchObjectives(): void {
+        this.socket.emit('fetchObjectives');
+    }
+
     get status(): Observable<string> {
         return this.connectionStatus.asObservable();
     }
@@ -179,5 +187,9 @@ export class WebsocketService {
 
     get endGame(): Observable<string> {
         return this.gameEnded.asObservable();
+    }
+
+    get objective(): Observable<{ publicObj: [number, boolean][]; privateObj: [number, boolean] }> {
+        return this.objectives.asObservable();
     }
 }

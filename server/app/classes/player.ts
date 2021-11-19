@@ -1,12 +1,18 @@
 export class Player {
     readonly name: string;
     readonly hand: string[];
+    privateObj: [number, boolean];
     score: number;
 
     constructor(name: string) {
         this.name = name;
         this.hand = [];
         this.score = 0;
+        this.privateObj = [0, false];
+    }
+
+    completePrivate(): void {
+        this.privateObj[1] = true;
     }
 
     has(letter: string): boolean {

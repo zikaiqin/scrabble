@@ -107,6 +107,12 @@ export class SocketService {
             socket.on('disconnect', () => {
                 this.disconnect(socket);
             });
+
+            socket.on('fetchObjectives', () => {
+                const roomId = this.activeRooms.get(socket.id);
+                if (roomId === undefined) return;
+                this.socketEvents.emit('updateObjectives', socket.id, roomId);
+            });
         });
     }
 
@@ -119,6 +125,10 @@ export class SocketService {
         this.activeRooms.delete(socket.id);
         this.socketEvents.emit('disconnect', socket.id, roomID);
         this.deleteRoom(roomID);
+    }
+
+    updateObjectives(socketID: string, publicObj: [number, boolean][], privateObj: [number, boolean]): void {
+        this.sio.to(socketID).emit('updateObjectives', publicObj, privateObj);
     }
 
     deleteRoom(roomID: string) {

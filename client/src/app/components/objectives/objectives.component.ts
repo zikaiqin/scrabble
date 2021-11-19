@@ -9,10 +9,17 @@ import { WebsocketService } from '@app/services/websocket.service';
 export class ObjectivesComponent {
     isVisible: boolean;
     content: [string, string, string][];
+    publicObj: [number, boolean][];
+    privateObj: [number, boolean];
 
     constructor(private webSocketService: WebsocketService) {
         this.webSocketService.init.subscribe((initPayLoad) => {
             this.isVisible = initPayLoad.gameMode === 2;
+            if (this.isVisible) this.webSocketService.fetchObjectives();
+        });
+        this.webSocketService.objective.subscribe((objectives) => {
+            this.publicObj = objectives.publicObj;
+            this.privateObj = objectives.privateObj;
         });
         this.content = [
             ['Panel #1', 'Panel #1 description', 'Panel #1 content'],

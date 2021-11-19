@@ -12,6 +12,7 @@ import { PlacingService } from '@app/services/placing.service';
 import { SocketService } from '@app/services/socket.service';
 import { ValidationService } from '@app/services/validation.service';
 import { Service } from 'typedi';
+import { ObjectivesService } from '@app/services/objectives';
 
 @Service()
 export class GameService {
@@ -30,6 +31,7 @@ export class GameService {
         private exchangeService: ExchangeService,
         private placingService: PlacingService,
         private validationService: ValidationService,
+        private objectvesService: ObjectivesService,
     ) {}
 
     attachSocketListeners() {
@@ -113,6 +115,17 @@ export class GameService {
                 } else {
                     this.deleteRoom(roomID);
                 }
+            })
+            .on('updateObjectives', (socketId: string, roomId: string) => {
+                const game = this.games.get(roomId);
+                if (game === undefined) {
+                    return;
+                }
+                const player = game.players.get(socketId);
+                if (player === undefined) {
+                    return;
+                }
+                this.socketService.updateObjectives(socketId, game.publicObj, player.privateObj);
             });
     }
 
@@ -157,7 +170,18 @@ export class GameService {
             this.botService.games.set(botID, roomID);
         }
         const bonuses = this.getBonuses(!!configs.randomized);
-        return new Game(new Board(bonuses), new Map(players));
+        const publicObj: [number, boolean][] = [];
+        if (configs.gameMode === 2) {
+            const tempObj = this.objectvesService.getPublicObjectives();
+            // eslint-disable-next-line @typescript-eslint/prefer-for-of
+            for (let i = 0; i < tempObj.length; i++) {
+                publicObj.push([tempObj[i], false]);
+            }
+            Array.from(players.values()).forEach((player) => {
+                player[1].privateObj = [this.objectvesService.getPrivateObjectives(), false];
+            });
+        }
+        return new Game(new Board(bonuses), new Map(players), publicObj);
     }
 
     setupTimer(roomID: string, configs: GameInfo, game: Game): Timer {

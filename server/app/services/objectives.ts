@@ -11,12 +11,12 @@ const OBJECTIVE_TURN_CONDITION = 6;
 export class ObjectivesService {
     private turnCounter = 0;
     private verifications: Map<number, (letters: Map<string, string>, gameBoard: Board) => boolean>;
-    private objectives: number[] = [0, 1, 2, 3, 4, 5, 6, 7];
+    private objectives: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
     private objectivesPts: Map<number, number>;
     constructor(private validationService: ValidationService) {
         this.verifications = new Map<number, (letters: Map<string, string>, gameBoard: Board) => boolean>([
             [
-                0,
+                1,
                 (letters: Map<string, string>, gameBoard: Board): boolean => {
                     const bonuses: string[] = [];
                     for (const char in letters) {
@@ -26,7 +26,7 @@ export class ObjectivesService {
                 },
             ],
             [
-                1,
+                2,
                 (): boolean => {
                     const isValid = this.validationService.findWord(this.validationService.fetchWords());
                     if (isValid) this.turnCounter++;
@@ -34,14 +34,14 @@ export class ObjectivesService {
                 },
             ],
             [
-                2,
+                3,
                 (letters: Map<string, string>): boolean => {
                     const arr = Array.from(new Array(letters.size), (_, value) => String.fromCharCode(SMALL_A + value).toLowerCase());
                     return new Set(arr).size !== arr.length;
                 },
             ],
             [
-                3,
+                4,
                 (letters: Map<string, string>): boolean => {
                     let wordContainer = '';
                     // eslint-disable-next-line guard-for-in
@@ -55,7 +55,7 @@ export class ObjectivesService {
                 },
             ],
             [
-                4,
+                5,
                 (letters: Map<string, string>, gameBoard: Board): boolean => {
                     let bonusCounter = 0;
                     for (const char in letters) {
@@ -65,7 +65,7 @@ export class ObjectivesService {
                 },
             ],
             [
-                5,
+                6,
                 (): boolean => {
                     const words = this.validationService.fetchWords();
                     const arr = words
@@ -75,7 +75,7 @@ export class ObjectivesService {
                 },
             ],
             [
-                6,
+                7,
                 (letters: Map<string, string>): boolean => {
                     let wordContainer = '';
                     // eslint-disable-next-line guard-for-in
@@ -89,7 +89,7 @@ export class ObjectivesService {
                 },
             ],
             [
-                7,
+                8,
                 (letters: Map<string, string>, gameBoard: Board): boolean => {
                     let containsBonus = false;
                     for (const char in letters) {
@@ -104,14 +104,14 @@ export class ObjectivesService {
         ]);
 
         this.objectivesPts = new Map<number, number>([
-            [0, 10],
-            [1, 30],
-            [2, 10],
-            [3, 20],
-            [4, 50],
-            [5, 30],
-            [6, 50],
-            [7, 20],
+            [1, 10],
+            [2, 30],
+            [3, 10],
+            [4, 20],
+            [5, 50],
+            [6, 30],
+            [7, 50],
+            [8, 20],
         ]);
     }
 
