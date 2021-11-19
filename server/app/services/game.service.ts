@@ -170,8 +170,10 @@ export class GameService {
             this.botService.games.set(botID, roomID);
         }
         const bonuses = this.getBonuses(!!configs.randomized);
+
         const publicObj: [number, boolean][] = [];
         if (configs.gameMode === 2) {
+            // If the gameMode is LOG2990 (with objectives)
             const tempObj = this.objectvesService.getPublicObjectives();
             // eslint-disable-next-line @typescript-eslint/prefer-for-of
             for (let i = 0; i < tempObj.length; i++) {
@@ -180,6 +182,7 @@ export class GameService {
             Array.from(players.values()).forEach((player) => {
                 player[1].privateObj = [this.objectvesService.getPrivateObjectives(), false];
             });
+            this.objectvesService.resetObjArray();
         }
         return new Game(new Board(bonuses), new Map(players), publicObj);
     }

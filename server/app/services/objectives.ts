@@ -9,9 +9,10 @@ const OBJECTIVE_TURN_CONDITION = 6;
 
 @Service()
 export class ObjectivesService {
+    objectives: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
     private turnCounter = 0;
     private verifications: Map<number, (letters: Map<string, string>, gameBoard: Board) => boolean>;
-    private objectives: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
+
     private objectivesPts: Map<number, number>;
     constructor(private validationService: ValidationService) {
         this.verifications = new Map<number, (letters: Map<string, string>, gameBoard: Board) => boolean>([
@@ -117,12 +118,17 @@ export class ObjectivesService {
 
     getPublicObjectives(): number[] {
         this.objectives.sort(() => Math.random() - RANDOMIZER);
-        return this.objectives.slice(this.objectives.length - 2);
+        const element1 = this.objectives.pop();
+        const element2 = this.objectives.pop();
+        if (element1 === undefined && element2 === undefined) return [0, 0];
+        return [element1 as number, element2 as number];
     }
 
     getPrivateObjectives(): number {
         this.objectives.sort(() => Math.random() - RANDOMIZER);
-        return this.objectives[0];
+        const element = this.objectives.pop();
+        if (element === undefined) return 0;
+        return element;
     }
 
     checkObjective(objective: number, letters: Map<string, string>, gameBoard: Board): boolean {
@@ -134,5 +140,9 @@ export class ObjectivesService {
     getPoints(objective: number): number {
         if (!this.objectivesPts.has(objective)) return 0;
         return this.objectivesPts.get(objective) as number;
+    }
+
+    resetObjArray(): void {
+        this.objectives = [1, 2, 3, 4, 5, 6, 7, 8];
     }
 }

@@ -14,12 +14,14 @@ export class ObjectivesComponent {
 
     constructor(private webSocketService: WebsocketService) {
         this.webSocketService.init.subscribe((initPayLoad) => {
-            this.isVisible = initPayLoad.gameMode === 2;
-            if (this.isVisible) this.webSocketService.fetchObjectives();
+            if (initPayLoad.gameMode === 2) this.webSocketService.fetchObjectives();
         });
         this.webSocketService.objective.subscribe((objectives) => {
-            this.publicObj = objectives.publicObj;
-            this.privateObj = objectives.privateObj;
+            if (objectives.privateObj[0] !== 0) {
+                this.isVisible = true;
+                this.publicObj = objectives.publicObj;
+                this.privateObj = objectives.privateObj;
+            }
         });
         this.content = [
             ['Panel #1', 'Panel #1 description', 'Panel #1 content'],
