@@ -1,34 +1,34 @@
 <div id="grid-container">
     <mat-card>
-        <mat-card-actions align='end'>
-            <button mat-icon-button id='maximize' (click)="maximize()">
+        <mat-card-actions align="end">
+            <button mat-icon-button id="maximize" (click)="maximize()">
                 <mat-icon>add</mat-icon>
             </button>
-            <button mat-icon-button id='minimize' (click)="minimize()">
+            <button mat-icon-button id="minimize" (click)="minimize()">
                 <mat-icon>remove</mat-icon>
             </button>
         </mat-card-actions>
 
         <canvas id="canvas" #gridCanvas (click)="mouseHitDetect($event)" [attr.width]="width" [attr.height]="height"></canvas>
         <mat-card-actions>
-            <button mat-icon-button id='place' (click)="placeLetter()">
+            <button mat-icon-button id="place" (click)="placeLetter()">
                 <mat-icon>play_for_work</mat-icon>
             </button>
         </mat-card-actions>
     </mat-card>
-    <br>
+    <br />
     <app-chevalet [playerHand]="this.playerHand"></app-chevalet>
 </div>
-<br>
-<button mat-fab color='accent' id='exit' (click)="openConfirmWindow()">
+<br />
+<button mat-fab color="accent" id="exit" (click)="openConfirmWindow()">
     <mat-icon>exit_to_app</mat-icon>
 </button>
 
 <mat-card class="popup" [style.display]="isVisible ? 'block' : 'none'">
-    <div class='popup-content'>
-    <mat-card-title>Abandonner la partie et retourner à la page d'accueil?</mat-card-title>
-        <mat-card-actions align='end'>
-            <button mat-flat-button color='warn' (click)="redirectTo()">Confirmer</button>
+    <div class="popup-content">
+        <mat-card-title>Abandonner la partie et retourner à la page d'accueil?</mat-card-title>
+        <mat-card-actions align="end">
+            <button mat-flat-button color="warn" (click)="redirectTo()">Confirmer</button>
             <button mat-flat-button (click)="cancel()">Annuler</button>
         </mat-card-actions>
     </div>

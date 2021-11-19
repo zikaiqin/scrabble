@@ -21,6 +21,6 @@
         *ngIf="showPage() === 'WaitingRoom'"
         [configs]="gameConfigs"
         (buttonClick)="handleClick($event)"
-        (convertGame)='convertGame($event)'
+        (convertGame)="convertGame($event)"
     ></app-waiting-room>
 </div>
