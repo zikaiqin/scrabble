@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+// TODO remove this after refactoring game.service
 import { Timer } from '@app/classes/timer';
 import { Game } from '@app/classes/game';
 import { Board } from '@app/classes/board';
@@ -74,6 +76,17 @@ export class GameService {
                 setTimeout(() => {
                     if (isValidWord) {
                         player.score += this.validationService.calcPoints();
+                        for (const objective of game.publicObj) {
+                            const objNumber = objective[0];
+                            if (this.objectvesService.checkObjective(objNumber, toPlace, game.board)) {
+                                game.completePublic(objNumber);
+                                player.score += this.objectvesService.getPoints(objNumber);
+                            }
+                        }
+                        if (this.objectvesService.checkObjective(player.privateObj[0], toPlace, game.board)) {
+                            player.completePrivate();
+                            player.score += this.objectvesService.getPoints(player.privateObj[0]);
+                        }
                         this.placingService.replenishHand(game.reserve, player);
                         this.socketService.updateReserve(roomId, game.reserve.letters);
                         this.updateScores(game);
@@ -83,6 +96,7 @@ export class GameService {
                         this.socketService.sendMessage(socketID, MessageType.System, 'Votre placement forme des mots invalides');
                     }
                     this.socketService.updateBoard(roomId, game.board.letters);
+                    this.socketService.updateObjectives(socketID, game.publicObj, player.privateObj);
                     this.updateHands(game);
                 }, DEFAULT_TURN_TIMEOUT);
 

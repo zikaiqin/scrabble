@@ -10,31 +10,34 @@ const OBJECTIVE_TURN_CONDITION = 6;
 @Service()
 export class ObjectivesService {
     objectives: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
+
     private turnCounter = 0;
     private verifications: Map<number, (letters: Map<string, string>, gameBoard: Board) => boolean>;
-
     private objectivesPts: Map<number, number>;
+
     constructor(private validationService: ValidationService) {
         this.verifications = new Map<number, (letters: Map<string, string>, gameBoard: Board) => boolean>([
             [
+                // Faire un placement qui utilise 2 bonus différents (Lx2 et Lx3)
                 1,
                 (letters: Map<string, string>, gameBoard: Board): boolean => {
                     const bonuses: string[] = [];
-                    for (const char in letters) {
+                    for (const char of letters) {
                         if (gameBoard.bonuses.has(char[0])) bonuses.push(gameBoard.getBonus(char[0]) as string);
                     }
                     return new Set(bonuses).size >= 2;
                 },
             ],
             [
+                // Faire un placement valide pendant 6 tours de suite, sans poser une autre action (pass, exchange,...)
                 2,
                 (): boolean => {
-                    const isValid = this.validationService.findWord(this.validationService.fetchWords());
-                    if (isValid) this.turnCounter++;
+                    this.turnCounter++;
                     return this.turnCounter >= OBJECTIVE_TURN_CONDITION;
                 },
             ],
             [
+                // Faire un placement valide contenant une double lettre ("ss", "ll", "mm",... lettre blanche acceptée)
                 3,
                 (letters: Map<string, string>): boolean => {
                     const arr = Array.from(new Array(letters.size), (_, value) => String.fromCharCode(SMALL_A + value).toLowerCase());
@@ -42,11 +45,12 @@ export class ObjectivesService {
                 },
             ],
             [
+                // Faire un placement valide contenant 3 voyelles ou plus
                 4,
                 (letters: Map<string, string>): boolean => {
                     let wordContainer = '';
                     // eslint-disable-next-line guard-for-in
-                    for (const char in letters) {
+                    for (const char of letters) {
                         wordContainer += char[1];
                     }
                     const regex = /[aeiou]/gi;
@@ -56,16 +60,18 @@ export class ObjectivesService {
                 },
             ],
             [
+                // Faire un placement valide qui utilise 3 bonus sur le plateau de jeux
                 5,
                 (letters: Map<string, string>, gameBoard: Board): boolean => {
                     let bonusCounter = 0;
-                    for (const char in letters) {
+                    for (const char of letters) {
                         if (gameBoard.bonuses.has(char[0])) bonusCounter++;
                     }
                     return bonusCounter >= 3;
                 },
             ],
             [
+                // Faire un placement valide qui forme au minimum 3 nouveaux mots
                 6,
                 (): boolean => {
                     const words = this.validationService.fetchWords();
@@ -76,11 +82,12 @@ export class ObjectivesService {
                 },
             ],
             [
+                // Faire un placement qui contient au moins deux des lettres "k", "w", "x", "y", "z" (lettre blanche acceptée)
                 7,
                 (letters: Map<string, string>): boolean => {
                     let wordContainer = '';
                     // eslint-disable-next-line guard-for-in
-                    for (const char in letters) {
+                    for (const char of letters) {
                         wordContainer += char[1];
                     }
                     const regex = /kwxyz/gi;
@@ -90,10 +97,11 @@ export class ObjectivesService {
                 },
             ],
             [
+                // Faire un placement de 5 lettres minimum qui n'utilise aucun bonus
                 8,
                 (letters: Map<string, string>, gameBoard: Board): boolean => {
                     let containsBonus = false;
-                    for (const char in letters) {
+                    for (const char of letters) {
                         if (gameBoard.bonuses.has(char[0])) {
                             containsBonus = true;
                             break;

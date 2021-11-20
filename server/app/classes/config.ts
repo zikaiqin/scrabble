@@ -1,8 +1,6 @@
 // For the value of each letter sometimes they value 10 or 8
 /* eslint-disable @typescript-eslint/no-magic-numbers*/
 
-export const DEFAULT_OBJECTIVES: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
-
 export const DEFAULT_POINTS: Map<string, number> = new Map([
     ['a', 1],
     ['b', 3],

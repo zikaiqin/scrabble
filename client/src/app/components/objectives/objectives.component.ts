@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Component } from '@angular/core';
 import { WebsocketService } from '@app/services/websocket.service';
 
@@ -8,9 +9,9 @@ import { WebsocketService } from '@app/services/websocket.service';
 })
 export class ObjectivesComponent {
     isVisible: boolean;
-    content: [string, string, string][];
     publicObj: [number, boolean][];
     privateObj: [number, boolean];
+    objectivesDescription: Map<number, string[]>;
 
     constructor(private webSocketService: WebsocketService) {
         this.webSocketService.init.subscribe((initPayLoad) => {
@@ -23,10 +24,42 @@ export class ObjectivesComponent {
                 this.privateObj = objectives.privateObj;
             }
         });
-        this.content = [
-            ['Panel #1', 'Panel #1 description', 'Panel #1 content'],
-            ['Panel #2', 'Panel #2 description', 'Panel #2 content'],
-            ['Panel #3', 'Panel #3 description', 'Panel #3 content'],
-        ];
+        this.objectivesDescription = new Map<number, string[]>([
+            [1, ['Double bonus', '10pts', 'Faire un placement qui utilise 2 bonus différents (Lx2 et Lx3)']],
+            [
+                2,
+                [
+                    'Sextuple validations',
+                    '30pts',
+                    'Faire un placement valide pendant 6 tours de suite, sans poser une autre action (pass, exchange,...)',
+                ],
+            ],
+            [
+                3,
+                [
+                    'Double lettres valides',
+                    '10pts',
+                    'Faire un placement valide contenant une double lettre ("ss", "ll", "mm",... lettre blanche acceptée)',
+                ],
+            ],
+            [4, ['Triple voyelles', '20pts', 'Faire un placement valide contenant 3 voyelles ou plus']],
+            [5, ['Triple bonus', '50pts', 'Faire un placement valide qui utilise 3 bonus sur le plateau de jeux']],
+            [6, ['Formation triple mots', '30pts', 'Faire un placement valide qui forme au minimum 3 nouveaux mots']],
+            [
+                7,
+                [
+                    'Double lettres rares',
+                    '50pts',
+                    'Faire un placement qui contient au moins deux des lettres "k", "w", "x", "y", "z" (lettre blanche acceptée)',
+                ],
+            ],
+            [8, ['Quintuple placements', '20pts', "Faire un placement de 5 lettres minimum qui n'utilise aucun bonus"]],
+        ]);
+    }
+
+    obtainObjDescription(numberObj: number): string[] {
+        const description = this.objectivesDescription.get(numberObj);
+        if (description === undefined) return [];
+        return description;
     }
 }
