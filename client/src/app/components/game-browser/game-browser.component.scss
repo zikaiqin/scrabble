@@ -1,5 +1,14 @@
 button {
+    margin-top: 10px !important;
     max-width: 40%;
+}
+
+.button-row {
+    justify-content: center;
+}
+
+.menu-card {
+    padding-bottom: 50px;
 }
 
 .title-container {
@@ -41,8 +50,4 @@ td {
     text-align: center;
     font-weight: normal;
     font-style: italic;
-}
-
-.button-row {
-    justify-content: center;
 }
