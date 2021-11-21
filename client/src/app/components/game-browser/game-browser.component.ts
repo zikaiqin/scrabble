@@ -33,13 +33,17 @@ export class GameBrowserComponent implements OnInit {
         return `${Math.floor(time / MINUTE)}:${time % MINUTE === 0 ? '00' : time % MINUTE}`;
     }
 
-    selectRoom(gameInfo: GameInfo): void {
+    selectRoom(gameInfo?: GameInfo): void {
+        if (gameInfo === undefined) {
+            const games = this.tableData.data;
+            gameInfo = games[Math.floor(Math.random() * games.length)];
+        }
         const dialogRef = this.dialog.open(GameBrowserDialogComponent, {
             data: gameInfo,
         });
         dialogRef.afterClosed().subscribe((username) => {
             if (username !== undefined) {
-                this.joinRoom.emit({ username, roomID: gameInfo.roomID });
+                this.joinRoom.emit({ username, roomID: gameInfo?.roomID });
             }
         });
     }

@@ -47,5 +47,8 @@
         </table>
     </div>
 
-    <button mat-button (click)="this.buttonClick.emit('Back')">Retour</button>
+    <div class="button-row">
+        <button mat-button (click)="this.buttonClick.emit('Back')">Retour</button>
+        <button mat-raised-button *ngIf="tableData.data.length > 0" [disabled]="tableData.data.length <= 1" color="primary" (click)="selectRoom()">Placement aléatoire</button>
+    </div>
 </mat-card>
