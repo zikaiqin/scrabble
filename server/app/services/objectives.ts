@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Service } from 'typedi';
-import { Board } from '@app/classes/board';
 import { ValidationService } from '@app/services/validation.service';
+import { Game } from '@app/classes/game';
 
-const SMALL_A = 97;
 const RANDOMIZER = 0.5;
 const OBJECTIVE_TURN_CONDITION = 6;
 
@@ -11,19 +10,18 @@ const OBJECTIVE_TURN_CONDITION = 6;
 export class ObjectivesService {
     objectives: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
 
-    private turnCounter = 0;
-    private verifications: Map<number, (letters: Map<string, string>, gameBoard: Board) => boolean>;
+    private verifications: Map<number, (letters: Map<string, string>, game: Game) => boolean>;
     private objectivesPts: Map<number, number>;
 
     constructor(private validationService: ValidationService) {
-        this.verifications = new Map<number, (letters: Map<string, string>, gameBoard: Board) => boolean>([
+        this.verifications = new Map<number, (letters: Map<string, string>, game: Game) => boolean>([
             [
                 // Faire un placement qui utilise 2 bonus différents (Lx2 et Lx3)
                 1,
-                (letters: Map<string, string>, gameBoard: Board): boolean => {
+                (letters: Map<string, string>, game: Game): boolean => {
                     const bonuses: string[] = [];
                     for (const char of letters) {
-                        if (gameBoard.bonuses.has(char[0])) bonuses.push(gameBoard.getBonus(char[0]) as string);
+                        if (game.board.bonuses.has(char[0])) bonuses.push(game.board.getBonus(char[0]) as string);
                     }
                     return new Set(bonuses).size >= 2;
                 },
@@ -31,16 +29,17 @@ export class ObjectivesService {
             [
                 // Faire un placement valide pendant 6 tours de suite, sans poser une autre action (pass, exchange,...)
                 2,
-                (): boolean => {
-                    this.turnCounter++;
-                    return this.turnCounter >= OBJECTIVE_TURN_CONDITION;
+                (_, game: Game): boolean => {
+                    game.validTurnCounter++;
+                    return game.validTurnCounter >= OBJECTIVE_TURN_CONDITION;
                 },
             ],
             [
                 // Faire un placement valide contenant une double lettre ("ss", "ll", "mm",... lettre blanche acceptée)
                 3,
                 (letters: Map<string, string>): boolean => {
-                    const arr = Array.from(new Array(letters.size), (_, value) => String.fromCharCode(SMALL_A + value).toLowerCase());
+                    const arr: string[] = [];
+                    for (const char of letters) arr.push(char[1].toLowerCase());
                     return new Set(arr).size !== arr.length;
                 },
             ],
@@ -62,10 +61,10 @@ export class ObjectivesService {
             [
                 // Faire un placement valide qui utilise 3 bonus sur le plateau de jeux
                 5,
-                (letters: Map<string, string>, gameBoard: Board): boolean => {
+                (letters: Map<string, string>, game: Game): boolean => {
                     let bonusCounter = 0;
                     for (const char of letters) {
-                        if (gameBoard.bonuses.has(char[0])) bonusCounter++;
+                        if (game.board.bonuses.has(char[0])) bonusCounter++;
                     }
                     return bonusCounter >= 3;
                 },
@@ -99,10 +98,10 @@ export class ObjectivesService {
             [
                 // Faire un placement de 5 lettres minimum qui n'utilise aucun bonus
                 8,
-                (letters: Map<string, string>, gameBoard: Board): boolean => {
+                (letters: Map<string, string>, game: Game): boolean => {
                     let containsBonus = false;
                     for (const char of letters) {
-                        if (gameBoard.bonuses.has(char[0])) {
+                        if (game.board.bonuses.has(char[0])) {
                             containsBonus = true;
                             break;
                         }
@@ -139,10 +138,10 @@ export class ObjectivesService {
         return element;
     }
 
-    checkObjective(objective: number, letters: Map<string, string>, gameBoard: Board): boolean {
-        const exec: ((letters: Map<string, string>, gameBoard: Board) => boolean) | undefined = this.verifications.get(objective);
+    checkObjective(objective: number, letters: Map<string, string>, game: Game): boolean {
+        const exec: ((letters: Map<string, string>, game: Game) => boolean) | undefined = this.verifications.get(objective);
         if (!exec) return false;
-        return exec(letters, gameBoard);
+        return exec(letters, game);
     }
 
     getPoints(objective: number): number {

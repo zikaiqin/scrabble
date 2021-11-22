@@ -78,12 +78,12 @@ export class GameService {
                         player.score += this.validationService.calcPoints();
                         for (const objective of game.publicObj) {
                             const objNumber = objective[0];
-                            if (this.objectvesService.checkObjective(objNumber, toPlace, game.board)) {
+                            if (this.objectvesService.checkObjective(objNumber, toPlace, game)) {
                                 game.completePublic(objNumber);
                                 player.score += this.objectvesService.getPoints(objNumber);
                             }
                         }
-                        if (this.objectvesService.checkObjective(player.privateObj[0], toPlace, game.board)) {
+                        if (this.objectvesService.checkObjective(player.privateObj[0], toPlace, game)) {
                             player.completePrivate();
                             player.score += this.objectvesService.getPoints(player.privateObj[0]);
                         }
@@ -92,6 +92,7 @@ export class GameService {
                         this.updateScores(game);
                         this.endGameService.resetTurnSkipCount(roomId);
                     } else {
+                        game.validTurnCounter = 0;
                         this.placingService.returnLetters(toPlace, game.board, player);
                         this.socketService.sendMessage(socketID, MessageType.System, 'Votre placement forme des mots invalides');
                     }

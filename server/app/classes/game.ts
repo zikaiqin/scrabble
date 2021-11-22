@@ -9,9 +9,11 @@ export class Game {
     readonly players: Map<string, Player>;
     readonly reserve = new Reserve();
     readonly publicObj: [number, boolean][];
+    validTurnCounter: number;
 
     constructor(readonly board: Board, players: Map<string, Player>, publicObj: [number, boolean][]) {
         this.publicObj = publicObj;
+        this.validTurnCounter = 0;
         this.players = players;
         Array.from(this.players.values()).forEach((player) => {
             const hand = this.reserve.draw(DEFAULT_HAND_SIZE);
