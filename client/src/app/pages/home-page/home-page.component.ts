@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { GameInfo, GameMode, GameType } from '@app/classes/game-info';
 import { WebsocketService } from '@app/services/websocket.service';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-home-page',
     templateUrl: './home-page.component.html',
-    styleUrls: ['../../styles.scss'],
+    styleUrls: ['../../styles.scss', 'home-page.component.scss'],
 })
 export class HomePageComponent {
     gameMode = GameMode.None;
@@ -16,7 +17,7 @@ export class HomePageComponent {
     gameConfigs: GameInfo;
     scoreMode: string;
 
-    constructor(private webSocketService: WebsocketService) {
+    constructor(private router: Router, private webSocketService: WebsocketService) {
         this.webSocketService.status.subscribe((event) => {
             if (event === 'connectionLost') {
                 if (this.showWaitingRoom) {
@@ -77,6 +78,10 @@ export class HomePageComponent {
             return 'Main';
         }
         return this.showWaitingRoom ? 'WaitingRoom' : 'NewGame';
+    }
+
+    showAdmin(): void {
+        this.router.navigateByUrl('/admin');
     }
 
     createGame(configs: GameInfo): void {

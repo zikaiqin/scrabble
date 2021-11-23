@@ -1,28 +1,40 @@
-<div class="container center justify">
-    <app-main-menu *ngIf="showPage() === 'Main'" [gameMode]="gameMode" [gameType]="gameType" (buttonClick)="handleClick($event)"></app-main-menu>
+<div class="container">
+    <button mat-icon-button class="settings" [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+    <div class="content center justify">
+        <app-main-menu *ngIf="showPage() === 'Main'" [gameMode]="gameMode" [gameType]="gameType" (buttonClick)="handleClick($event)"></app-main-menu>
 
-    <app-scoreboard *ngIf="showPage() === 'Scoreboard'" (buttonClick)="handleClick($event)"> </app-scoreboard>
+        <app-new-game-menu
+            *ngIf="showPage() === 'NewGame'"
+            [gameMode]="gameMode"
+            [gameType]="gameType"
+            (buttonClick)="handleClick($event)"
+            (newGame)="createGame($event)"
+        ></app-new-game-menu>
 
-    <app-new-game-menu
-        *ngIf="showPage() === 'NewGame'"
-        [gameMode]="gameMode"
-        [gameType]="gameType"
-        (buttonClick)="handleClick($event)"
-        (newGame)="createGame($event)"
-    ></app-new-game-menu>
+        <app-scoreboard *ngIf="showPage() === 'Scoreboard'" (buttonClick)="handleClick($event)"> </app-scoreboard>
 
-    <app-game-browser
-        *ngIf="showPage() === 'Browser'"
-        [gameMode]="gameMode"
-        [gameList]="roomList"
-        (buttonClick)="handleClick($event)"
-        (joinRoom)="joinGame($event)"
-    ></app-game-browser>
+        <app-game-browser
+            *ngIf="showPage() === 'Browser'"
+            [gameMode]="gameMode"
+            [gameList]="roomList"
+            (buttonClick)="handleClick($event)"
+            (joinRoom)="joinGame($event)"
+        ></app-game-browser>
 
-    <app-waiting-room
-        *ngIf="showPage() === 'WaitingRoom'"
-        [configs]="gameConfigs"
-        (buttonClick)="handleClick($event)"
-        (convertGame)="convertGame($event)"
-    ></app-waiting-room>
+        <app-waiting-room
+            *ngIf="showPage() === 'WaitingRoom'"
+            [configs]="gameConfigs"
+            (buttonClick)="handleClick($event)"
+            (convertGame)='convertGame($event)'
+        ></app-waiting-room>
+    </div>
 </div>
+
+<mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="showAdmin()">
+        <mat-icon>settings</mat-icon>
+        <span>Préférences</span>
+    </button>
+</mat-menu>
