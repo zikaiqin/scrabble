@@ -1,1 +1,21 @@
-<p>admin-page works!</p>
+<mat-drawer-container>
+    <mat-drawer mode='side' opened>
+        <mat-action-list>
+            <mat-list-item>
+                <mat-icon mat-list-icon>spellcheck</mat-icon>
+                <h3 mat-line>Dictionnaires</h3>
+            </mat-list-item>
+            <mat-list-item>
+                <mat-icon mat-list-icon>psychology</mat-icon>
+                <h3 mat-line>Joueurs virtuels</h3>
+            </mat-list-item>
+            <mat-list-item class='reset'>
+                <mat-icon mat-list-icon>restore</mat-icon>
+                <h3 mat-line>Réinitialiser le système</h3>
+            </mat-list-item>
+        </mat-action-list>
+    </mat-drawer>
+    <mat-drawer-content>
+        <p>Hello</p>
+    </mat-drawer-content>
+</mat-drawer-container>
