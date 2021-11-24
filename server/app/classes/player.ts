@@ -11,8 +11,12 @@ export class Player {
         this.privateObj = [0, false];
     }
 
-    completePrivate(): void {
-        this.privateObj[1] = true;
+    completePrivate(): boolean {
+        if (!this.privateObj[1]) {
+            this.privateObj[1] = true;
+            return true;
+        }
+        return false;
     }
 
     has(letter: string): boolean {

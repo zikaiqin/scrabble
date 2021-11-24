@@ -79,13 +79,11 @@ export class GameService {
                         for (const objective of game.publicObj) {
                             const objNumber = objective[0];
                             if (this.objectvesService.checkObjective(objNumber, toPlace, game)) {
-                                game.completePublic(objNumber);
-                                player.score += this.objectvesService.getPoints(objNumber);
+                                if (game.completePublic(objNumber)) player.score += this.objectvesService.getPoints(objNumber);
                             }
                         }
                         if (this.objectvesService.checkObjective(player.privateObj[0], toPlace, game)) {
-                            player.completePrivate();
-                            player.score += this.objectvesService.getPoints(player.privateObj[0]);
+                            if (player.completePrivate()) player.score += this.objectvesService.getPoints(player.privateObj[0]);
                         }
                         this.placingService.replenishHand(game.reserve, player);
                         this.socketService.updateReserve(roomId, game.reserve.letters);

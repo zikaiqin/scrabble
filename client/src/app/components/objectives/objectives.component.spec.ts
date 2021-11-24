@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ObjectivesComponent } from './objectives.component';
 import { WebsocketService } from '@app/services/websocket.service';
 import { Subject } from 'rxjs';

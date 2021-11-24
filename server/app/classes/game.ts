@@ -23,9 +23,13 @@ export class Game {
         });
     }
 
-    completePublic(obj: number): void {
-        this.publicObj.forEach((value) => {
-            if (value[0] === obj) value[1] = true;
-        });
+    completePublic(obj: number): boolean {
+        for (const objective of this.publicObj) {
+            if (objective[0] === obj && !objective[1]) {
+                objective[1] = true;
+                return true;
+            }
+        }
+        return false;
     }
 }
