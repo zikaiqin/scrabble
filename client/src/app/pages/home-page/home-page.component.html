@@ -1,7 +1,8 @@
 <div class="container">
-    <button mat-icon-button class="settings" [matMenuTriggerFor]="menu">
+    <button mat-icon-button class="options" [matMenuTriggerFor]="menu">
         <mat-icon>more_vert</mat-icon>
     </button>
+
     <div class="content center justify">
         <app-main-menu *ngIf="showPage() === 'Main'" [gameMode]="gameMode" [gameType]="gameType" (buttonClick)="handleClick($event)"></app-main-menu>
 
@@ -33,8 +34,8 @@
 </div>
 
 <mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="showAdmin()">
-        <mat-icon>settings</mat-icon>
-        <span>Préférences</span>
+    <button mat-menu-item (click)="showSettings()">
+        <mat-icon>admin_panel_settings</mat-icon>
+        <span>Page d'administration</span>
     </button>
 </mat-menu>

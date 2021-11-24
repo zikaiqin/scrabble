@@ -5,7 +5,7 @@ import { MenuButton } from '@app/classes/menu-button';
 @Component({
     selector: 'app-main-menu',
     templateUrl: './main-menu.component.html',
-    styleUrls: ['../../styles.scss'],
+    styleUrls: ['../../styles.scss', './main-menu.component.scss'],
 })
 export class MainMenuComponent {
     @Input() gameMode: number;

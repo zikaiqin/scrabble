@@ -80,7 +80,7 @@ export class HomePageComponent {
         return this.showWaitingRoom ? 'WaitingRoom' : 'NewGame';
     }
 
-    showAdmin(): void {
+    showSettings(): void {
         this.router.navigateByUrl('/admin');
     }
 

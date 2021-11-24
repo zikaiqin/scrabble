@@ -1,18 +1,31 @@
-@use 'sass:map';
 @use '~@angular/material' as mat;
 
+.container {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+}
+
 mat-drawer-container {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    width: 100%;
+    height: auto;
+    flex: 1 1 auto;
+}
+
+mat-drawer {
+    min-width: 15%;
 }
 
 mat-list-item {
     margin-right: 10px;
 }
 
-.reset {
+mat-toolbar {
+    justify-content: space-between;
+}
+
+.reset > * {
     color: mat.get-color-from-palette(mat.$red-palette, 500);
 }
+
