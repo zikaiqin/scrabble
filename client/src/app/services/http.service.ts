@@ -36,18 +36,10 @@ export class HttpService {
                     );
                 }),
             ),
-            catchError((err) => this.catchAnyHttpError(err)),
-            catchError((err) => this.catchTimeoutError(err)),
+            catchError((err) => this.catchAnyHttpError(err, true)),
+            catchError((err) => this.catchTimeoutError(err, true)),
             catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
         );
-    }
-
-    catchAnyHttpError(err: Error) {
-        if (err instanceof HttpErrorResponse) {
-            this.alertService.showAlert('Le serveur est présentement inaccessible');
-            return EMPTY;
-        }
-        return throwError(err);
     }
 
     catchHttpErrorWithStatus(err: Error, status: number, callback?: (err: HttpErrorResponse) => void) {
@@ -58,20 +50,28 @@ export class HttpService {
         return EMPTY;
     }
 
-    catchTimeoutError(err: Error) {
-        if (err instanceof TimeoutError) {
-            this.alertService.showAlert('Le serveur est présentement inaccessible');
-            return EMPTY;
+    catchAnyHttpError(err: Error, propagate: boolean = false) {
+        if (!(err instanceof HttpErrorResponse)) {
+            return throwError(err);
         }
-        return throwError(err);
+        this.alertService.showAlert('Le serveur est présentement inaccessible');
+        return propagate ? throwError(err) : EMPTY;
+    }
+
+    catchTimeoutError(err: Error, propagate: boolean = false) {
+        if (!(err instanceof TimeoutError)) {
+            return throwError(err);
+        }
+        this.alertService.showAlert('Le serveur est présentement inaccessible');
+        return propagate ? throwError(err) : EMPTY;
     }
 
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     catchUnexpectedError(err: Error, ...expectedTypes: any[]) {
-        if (!expectedTypes.some((expectedType) => err instanceof expectedType)) {
-            this.alertService.showAlert("Une erreur s'est produite");
-            return EMPTY;
+        if (expectedTypes.some((expectedType) => err instanceof expectedType)) {
+            return throwError(err);
         }
-        return throwError(err);
+        this.alertService.showAlert("Une erreur s'est produite");
+        return EMPTY;
     }
 }
