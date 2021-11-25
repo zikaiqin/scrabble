@@ -25,6 +25,8 @@ import { WaitingRoomDialogComponent } from './components/waiting-room-dialog/wai
 import { ObjectivesComponent } from './components/objectives/objectives.component';
 import { ScoreboardComponent } from './components/scoreboard/scoreboard.component';
 import { DatabaseResetDialogComponent } from './components/database-reset-dialog/database-reset-dialog.component';
+import { BotConfigComponent } from './components/bot-config/bot-config.component';
+import { BotConfigSelectComponent } from './components/bot-config/bot-config-select.component';
 
 /**
  * Main module that is used in main.ts.
@@ -54,6 +56,8 @@ import { DatabaseResetDialogComponent } from './components/database-reset-dialog
         ObjectivesComponent,
         ScoreboardComponent,
         DatabaseResetDialogComponent,
+        BotConfigComponent,
+        BotConfigSelectComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
 

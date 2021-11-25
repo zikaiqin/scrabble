@@ -280,7 +280,7 @@ export class GameService {
 
     getBotName(playerName: string, difficulty: number): string {
         void difficulty;
-        const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== playerName);
+        const validBotNames = DEFAULT_BOT_NAMES.easy.filter((name) => name !== playerName);
         return validBotNames[Math.floor(Math.random() * validBotNames.length)];
     }
 

@@ -226,7 +226,10 @@ export const EMPTYSCORE: Score[] = [
     },
 ];
 
-export const DEFAULT_BOT_NAMES: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
+export const DEFAULT_BOT_NAMES = {
+    easy: ['M0NKE', 'ฅ^•ﻌ•^ฅ', 'placeholder'],
+    hard: ['Достоевский', '死神', 'not sure'],
+};
 export const DEFAULT_HAND_SIZE = 7;
 export const DEFAULT_TURN_TIMEOUT = 3000;
 export const DEFAULT_SOCKET_TIMEOUT = 5000;

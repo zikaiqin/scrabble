@@ -1,4 +1,5 @@
 import { HttpException } from '@app/classes/http.exception';
+import { BotController } from '@app/controllers/bot.controller';
 import { DateController } from '@app/controllers/date.controller';
 import { ExampleController } from '@app/controllers/example.controller';
 import cookieParser from 'cookie-parser';
@@ -16,7 +17,11 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor(private readonly exampleController: ExampleController, private readonly dateController: DateController) {
+    constructor(
+        private readonly botController: BotController,
+        private readonly exampleController: ExampleController,
+        private readonly dateController: DateController,
+    ) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -37,6 +42,7 @@ export class Application {
 
     bindRoutes(): void {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
+        this.app.use('/api/bot', this.botController.router);
         this.app.use('/api/example', this.exampleController.router);
         this.app.use('/api/date', this.dateController.router);
         this.app.use('/', (req, res) => {

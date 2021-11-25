@@ -1,12 +1,12 @@
-<div class="container">
-    <mat-toolbar>
+<div class="container stretch-col">
+    <mat-toolbar color="primary">
         <span>PAGE D'ADMINISTRATION</span>
         <button mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon>more_vert</mat-icon>
         </button>
     </mat-toolbar>
 
-    <mat-drawer-container>
+    <mat-drawer-container class="stretch-col stretch-col-content">
         <mat-drawer mode='side' opened>
             <mat-action-list>
                 <mat-list-item [disabled]="page === 'dict'" (click)="page = 'dict'">
@@ -20,7 +20,10 @@
             </mat-action-list>
         </mat-drawer>
 
-        <mat-drawer-content>
+        <mat-drawer-content class="stretch-col stretch-col-content content">
+            <mat-card class="stretch-col stretch-col-content content">
+                <app-bot-config *ngIf="page === 'bot'" class="stretch-col stretch-col-content" [data]="botData" (get)="getBots($event)" (add)="addBot($event.name, $event.difficulty)"></app-bot-config>
+            </mat-card>
         </mat-drawer-content>
     </mat-drawer-container>
 </div>

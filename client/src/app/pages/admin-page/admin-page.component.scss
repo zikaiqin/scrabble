@@ -1,16 +1,20 @@
 @use '~@angular/material' as mat;
+@use '../../styles' as styles;
+
+.button-row {
+    width: auto;
+}
 
 .container {
     width: 100vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: stretch;
+}
+
+.content {
+    padding: 36px;
 }
 
 mat-drawer-container {
     width: 100%;
-    height: auto;
-    flex: 1 1 auto;
 }
 
 mat-drawer {
@@ -29,3 +33,60 @@ mat-toolbar {
     color: mat.get-color-from-palette(mat.$red-palette, 500);
 }
 
+.stretch-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+}
+
+.stretch-col-content {
+    height: auto;
+    flex: 1 1 auto;
+}
+
+.table-actions {
+    button {
+        mat-icon {
+            margin-left: -5px;
+            margin-right: 5px;
+        }
+        font-size: 15pt;
+        margin-left: 16px;
+        padding: 4px 16px 4px 16px;
+    }
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    margin-bottom: 36px;
+}
+
+.table-container {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+th {
+    font-size: 10pt;
+}
+
+td {
+    font-size: 12pt;
+}
+
+.title {
+    font-size: 24pt;
+    font-weight: 500;
+    text-align: start;
+    margin-bottom: 0;
+}
+
+.title-container {
+    padding-top: 12px;
+    margin-bottom: 60px;
+}

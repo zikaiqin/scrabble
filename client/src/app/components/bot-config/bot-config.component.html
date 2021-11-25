@@ -1,0 +1,45 @@
+<div class="title-container">
+    <h1 class="title">
+        Liste des joueurs virtuels
+    </h1>
+</div>
+<div class="table-actions">
+    <div class="button-row">
+        <app-bot-config-select [(difficulty)]="difficulty" (difficultyChange)="getNames()"></app-bot-config-select>
+    </div>
+    <div class="button-row">
+        <button mat-raised-button (click)="getNames()">
+            <mat-icon>refresh</mat-icon>
+            <span>Rafraîchir</span>
+        </button>
+        <button mat-raised-button color="primary" (click)="addName('dud')">
+            <mat-icon>add</mat-icon>
+            <span>Ajouter</span>
+        </button>
+    </div>
+</div>
+<div class="table-container stretch-col-content">
+    <table mat-table [dataSource]="tableData">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Nom</th>
+            <td mat-cell *matCellDef="let element" [ngStyle]="{ fontWeight: element.default ? 500 : 'normal' }">{{ element.name }}</td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="default">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element"></td>
+        </ng-container>
+
+        <!-- Hidden Column -->
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef hidden></th>
+            <td mat-cell *matCellDef="let element" hidden></td>
+        </ng-container>
+
+        <!-- Row definition -->
+        <tr mat-header-row *matHeaderRowDef="tableColumns; sticky: true" class="table-header-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: tableColumns" class="table-row"></tr>
+    </table>
+</div>
