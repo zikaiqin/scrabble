@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DatabaseResetDialogComponent } from '@app/components/database-reset-dialog/database-reset-dialog.component';
 import { HttpService } from '@app/services/http.service';
-import { BotName } from '@app/classes/game-info';
+import { BotName, GameDifficulty } from '@app/classes/game-info';
 
 type Page = 'dict' | 'bot';
 
@@ -15,6 +15,7 @@ type Page = 'dict' | 'bot';
 export class AdminPageComponent {
     page: Page = 'bot';
     botData: BotName[];
+    botDifficulty = GameDifficulty.Easy;
 
     constructor(public dialog: MatDialog, private httpService: HttpService, private router: Router) {}
 
@@ -31,15 +32,15 @@ export class AdminPageComponent {
         this.router.navigateByUrl('/home');
     }
 
-    getBots(difficulty: number): void {
-        this.httpService.getBots(difficulty).subscribe((res) => {
+    getBots(): void {
+        this.httpService.getBots(this.botDifficulty).subscribe((res) => {
             this.botData = res as BotName[];
         });
     }
 
-    addBot(name: string, difficulty: number) {
-        this.httpService.addBot(name, difficulty).subscribe({
-            complete: () => this.getBots(difficulty),
+    addBot(name: string) {
+        this.httpService.addBot(name, this.botDifficulty).subscribe({
+            complete: () => this.getBots(),
         });
     }
 }

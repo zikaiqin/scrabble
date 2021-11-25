@@ -10,7 +10,7 @@
 }
 
 .content {
-    padding: 36px;
+    padding: 48px;
 }
 
 mat-drawer-container {
@@ -58,7 +58,7 @@ mat-toolbar {
     flex-direction: row;
     justify-content: space-between;
     align-items: stretch;
-    margin-bottom: 36px;
+    margin-bottom: 24px;
 }
 
 .table-container {
@@ -87,6 +87,5 @@ td {
 }
 
 .title-container {
-    padding-top: 12px;
-    margin-bottom: 60px;
+    margin-bottom: 48px;
 }

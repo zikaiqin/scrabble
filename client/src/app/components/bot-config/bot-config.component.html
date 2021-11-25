@@ -5,7 +5,7 @@
 </div>
 <div class="table-actions">
     <div class="button-row">
-        <app-bot-config-select [(difficulty)]="difficulty" (difficultyChange)="getNames()"></app-bot-config-select>
+        <app-bot-config-select [(difficulty)]="difficulty" (difficultyChange)="difficultyChange.emit($event)"></app-bot-config-select>
     </div>
     <div class="button-row">
         <button mat-raised-button (click)="getNames()">

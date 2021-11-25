@@ -22,7 +22,7 @@
 
         <mat-drawer-content class="stretch-col stretch-col-content content">
             <mat-card class="stretch-col stretch-col-content content">
-                <app-bot-config *ngIf="page === 'bot'" class="stretch-col stretch-col-content" [data]="botData" (get)="getBots($event)" (add)="addBot($event.name, $event.difficulty)"></app-bot-config>
+                <app-bot-config *ngIf="page === 'bot'" class="stretch-col stretch-col-content" [data]="botData" [(difficulty)]="botDifficulty" (difficultyChange)="getBots()" (get)="getBots()" (add)="addBot($event)"></app-bot-config>
             </mat-card>
         </mat-drawer-content>
     </mat-drawer-container>
