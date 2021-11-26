@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, Input } from '@angular/core';
+import { MessageType } from '@app/classes/message';
 import { CommandService } from '@app/services/command.service';
 import { TextboxService } from '@app/services/textbox.service';
-import { MessageType } from '@app/classes/message';
 
 const HAND_SIZE = 7;
 const MINUS1 = -1;
@@ -19,7 +19,6 @@ export class ChevaletComponent {
     activeLetter: boolean[] = [false, false, false, false, false, false, false];
     isYourTurn: boolean = true;
     isEventReceiver: boolean = false;
-
     constructor(private eRef: ElementRef, private commandService: CommandService, private textboxService: TextboxService) {
         this.addWindowListener();
     }
