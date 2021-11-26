@@ -1,15 +1,17 @@
-<div class="btn-group">
-    <button class="btn-group exchange" [ngStyle]="{ opacity: isYourTurn ? '1' : ' 0.2' }" (click)="exchange()">Échanger</button>
-    <button class="btn-group cancel" [ngStyle]="{ opacity: isContainSelectedCard ? '1' : ' 0.2' }" (click)="resetExchange()">Annuler</button>
-</div>
+<button mat-flat-button color="primary" (click)="exchange()">
+    <mat-icon>swap_horiz</mat-icon>
+</button>
+<button mat-flat-button color="warn" *ngIf="isContainSelectedCard" (click)="resetExchange()">
+    <mat-icon>clear</mat-icon>
+</button>
 
-<div
+<mat-card
     class="letters"
     *ngFor="let letter of this.playerHand; index as i"
     id="{{ 'letter' + i }}"
     (click)="updateActiveLetter(i)"
     (contextmenu)="onRightClick($event, letter, i)"
-    [ngStyle]="{ 'border-style': isClicked[i] ? 'dashed' : 'solid', color: activeLetter[i] ? 'white' : 'black' }"
+    [ngStyle]="{ 'border-style': isClicked[i] ? 'dashed' : 'solid', color: activeLetter[i] ? 'red' : 'black' }"
 >
     {{ letter }}
-</div>
+</mat-card>

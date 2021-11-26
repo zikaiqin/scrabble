@@ -1,9 +1,11 @@
+/* eslint-disable max-lines */
+// TODO remove this after refactoring game.service
 import { Timer } from '@app/classes/timer';
 import { Game } from '@app/classes/game';
 import { Board } from '@app/classes/board';
 import { Player } from '@app/classes/player';
 import { MessageType } from '@app/classes/message';
-import { GameInfo, GameType, PlayerInfo } from '@app/classes/game-info';
+import { GameInfo, GameMode, GameType, PlayerInfo } from '@app/classes/game-info';
 import { BOT_MARKER, DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_SOCKET_TIMEOUT, DEFAULT_TURN_TIMEOUT } from '@app/classes/config';
 import { BotService } from '@app/services/bot.service';
 import { EndGameService } from '@app/services/end-game.service';
@@ -12,6 +14,7 @@ import { PlacingService } from '@app/services/placing.service';
 import { SocketService } from '@app/services/socket.service';
 import { ValidationService } from '@app/services/validation.service';
 import { Service } from 'typedi';
+import { ObjectivesService } from '@app/services/objectives';
 
 @Service()
 export class GameService {
@@ -30,6 +33,7 @@ export class GameService {
         private exchangeService: ExchangeService,
         private placingService: PlacingService,
         private validationService: ValidationService,
+        private objectvesService: ObjectivesService,
     ) {}
 
     attachSocketListeners() {
@@ -72,15 +76,26 @@ export class GameService {
                 setTimeout(() => {
                     if (isValidWord) {
                         player.score += this.validationService.calcPoints();
+                        for (const objective of game.publicObj) {
+                            const objNumber = objective[0];
+                            if (this.objectvesService.checkObjective(objNumber, toPlace, game)) {
+                                if (game.completePublic(objNumber)) player.score += this.objectvesService.getPoints(objNumber);
+                            }
+                        }
+                        if (this.objectvesService.checkObjective(player.privateObj[0], toPlace, game)) {
+                            if (player.completePrivate()) player.score += this.objectvesService.getPoints(player.privateObj[0]);
+                        }
                         this.placingService.replenishHand(game.reserve, player);
                         this.socketService.updateReserve(roomId, game.reserve.letters);
                         this.updateScores(game);
                         this.endGameService.resetTurnSkipCount(roomId);
                     } else {
+                        game.validTurnCounter = 0;
                         this.placingService.returnLetters(toPlace, game.board, player);
                         this.socketService.sendMessage(socketID, MessageType.System, 'Votre placement forme des mots invalides');
                     }
                     this.socketService.updateBoard(roomId, game.board.letters);
+                    this.socketService.updateObjectives(socketID, game.publicObj, player.privateObj);
                     this.updateHands(game);
                 }, DEFAULT_TURN_TIMEOUT);
 
@@ -113,6 +128,17 @@ export class GameService {
                 } else {
                     this.deleteRoom(roomID);
                 }
+            })
+            .on('updateObjectives', (socketId: string, roomId: string) => {
+                const game = this.games.get(roomId);
+                if (game === undefined) {
+                    return;
+                }
+                const player = game.players.get(socketId);
+                if (player === undefined) {
+                    return;
+                }
+                this.socketService.updateObjectives(socketId, game.publicObj, player.privateObj);
             });
     }
 
@@ -139,7 +165,7 @@ export class GameService {
         this.timers.set(roomID, timer);
         this.endGameService.turnSkipMap.set(roomID, 0);
 
-        this.sendConfigs(configs.gameType as number, game);
+        this.sendConfigs(configs, game);
         timer.changeTurn();
     }
 
@@ -157,7 +183,21 @@ export class GameService {
             this.botService.games.set(botID, roomID);
         }
         const bonuses = this.getBonuses(!!configs.randomized);
-        return new Game(new Board(bonuses), new Map(players));
+
+        const publicObj: [number, boolean][] = [];
+        if (configs.gameMode === GameMode.Log2990) {
+            // If the gameMode is LOG2990 (with objectives)
+            const tempObj = this.objectvesService.getPublicObjectives();
+            // eslint-disable-next-line @typescript-eslint/prefer-for-of
+            for (let i = 0; i < tempObj.length; i++) {
+                publicObj.push([tempObj[i], false]);
+            }
+            Array.from(players.values()).forEach((player) => {
+                player[1].privateObj = [this.objectvesService.getPrivateObjectives(), false];
+            });
+            this.objectvesService.resetObjArray();
+        }
+        return new Game(new Board(bonuses), new Map(players), publicObj);
     }
 
     setupTimer(roomID: string, configs: GameInfo, game: Game): Timer {
@@ -189,7 +229,7 @@ export class GameService {
         return timer;
     }
 
-    sendConfigs(gameType: number, game: Game): void {
+    sendConfigs(configs: GameInfo, game: Game): void {
         const players = Array.from(game.players.entries()).map(([socketID, player]) => {
             return { socketID, username: player.name, hand: player.hand };
         });
@@ -200,9 +240,10 @@ export class GameService {
             game.board.bonuses,
             game.reserve.letters,
             players[0].hand,
+            configs.gameMode as number,
             false,
         );
-        if (gameType === GameType.Single) {
+        if (configs.gameType === GameType.Single) {
             return;
         }
         this.socketService.setConfigs(
@@ -212,6 +253,7 @@ export class GameService {
             game.board.bonuses,
             game.reserve.letters,
             players[1].hand,
+            configs.gameMode as number,
             false,
         );
     }

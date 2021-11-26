@@ -1,24 +1,35 @@
 <div id="grid-container">
-    <canvas id="canvas" #gridCanvas (click)="mouseHitDetect($event)" [attr.width]="width" [attr.height]="height"></canvas>
-    <div id="mouse-position-display">
-        <p>Cliquez sur la grille pour avoir la position de la souris</p>
-        <p>X : {{ mousePosition.x }}</p>
-        <p>Y : {{ mousePosition.y }}</p>
-        <hr />
-        <p>Appuyez sur une touche du clavier pour la détecter</p>
-        <p *ngIf="buttonPressed !== ''">Touche : {{ buttonPressed }}</p>
+    <mat-card>
+        <mat-card-actions>
+            <button mat-icon-button id="maximize" (click)="maximize()">
+                <mat-icon>add</mat-icon>
+            </button>
+            <button mat-icon-button id="minimize" (click)="minimize()">
+                <mat-icon>remove</mat-icon>
+            </button>
+        </mat-card-actions>
+
+        <canvas id="canvas" #gridCanvas (click)="mouseHitDetect($event)" [attr.width]="width" [attr.height]="height"></canvas>
+        <mat-card-actions>
+            <button mat-icon-button id="place" (click)="placeLetter()">
+                <mat-icon>play_for_work</mat-icon>
+            </button>
+        </mat-card-actions>
+    </mat-card>
+    <br />
+    <app-chevalet [playerHand]="this.playerHand"></app-chevalet>
+</div>
+<br />
+<button mat-fab color="accent" id="exit" (click)="openConfirmWindow()">
+    <mat-icon>exit_to_app</mat-icon>
+</button>
+
+<mat-card class="popup" [style.display]="isVisible ? 'block' : 'none'">
+    <div class="popup-content">
+        <mat-card-title>Abandonner la partie et retourner à la page d'accueil?</mat-card-title>
+        <mat-card-actions align="end">
+            <button mat-flat-button color="warn" (click)="redirectTo()">Confirmer</button>
+            <button mat-flat-button (click)="cancel()">Annuler</button>
+        </mat-card-actions>
     </div>
-</div>
-<button class="btn-group play" (click)="placeLetter()">Jouer</button>
-
-<button type="button" (click)="maximize()">Maximize</button>
-
-<button type="button" (click)="minimize()">Minimize</button>
-
-<button type="button" (click)="openConfirmWindow()">Abandonner</button>
-
-<div class="confirmWindow" [style.display]="isVisible ? 'block' : 'none'">
-    <h1>Abandonner la partie et retourner à la page d'accueil?</h1>
-    <button type="button" (click)="redirectTo()">Confirmer</button>
-    <button type="button" (click)="cancel()">Annuler</button>
-</div>
+</mat-card>

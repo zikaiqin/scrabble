@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from '@env/environment';
 import { GameInfo, GameInit } from '@app/classes/game-info';
 import { AlertService } from '@app/services/alert.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-
-const url = '//localhost:3000';
 
 @Injectable({
     providedIn: 'root',
@@ -18,6 +17,7 @@ export class WebsocketService {
     private connectionStatus = new Subject<string>();
     private roomList = new Subject<GameInfo[]>();
 
+    private objectives = new Subject<{ publicObj: [number, boolean][]; privateObj: [number, boolean] }>();
     private gameInit = new Subject<GameInit>();
     private gameTime = new Subject<number>();
     private gameTurn = new Subject<boolean>();
@@ -36,9 +36,17 @@ export class WebsocketService {
 
             this.socket.on(
                 'initGame',
-                (self: string, opponent: string, bonuses: [string, string][], reserve: string[], hand: string[], turnState: boolean | undefined) => {
+                (
+                    self: string,
+                    opponent: string,
+                    bonuses: [string, string][],
+                    reserve: string[],
+                    hand: string[],
+                    gameMode: number,
+                    turnState: boolean | undefined,
+                ) => {
                     this.router.navigateByUrl('/game').then(() => {
-                        this.gameInit.next({ self, opponent, bonuses, reserve, hand, turnState });
+                        this.gameInit.next({ self, opponent, bonuses, reserve, hand, gameMode, turnState });
                     });
                 },
             );
@@ -72,6 +80,9 @@ export class WebsocketService {
             });
             this.socket.on('gameEnded', (winner: string) => {
                 this.gameEnded.next(winner);
+            });
+            this.socket.on('updateObjectives', (publicObj: [number, boolean][], privateObj: [number, boolean]) => {
+                this.objectives.next({ publicObj, privateObj });
             });
         });
 
@@ -126,12 +137,16 @@ export class WebsocketService {
     }
 
     connect(socket?: Socket): void {
-        this.socket = socket ? socket : io(url).connect();
+        this.socket = socket ? socket : io(environment.serverUrl).connect();
         this.attachListeners();
     }
 
     disconnect(): void {
         this.socket.disconnect();
+    }
+
+    fetchObjectives(): void {
+        this.socket.emit('fetchObjectives');
     }
 
     get status(): Observable<string> {
@@ -172,5 +187,9 @@ export class WebsocketService {
 
     get endGame(): Observable<string> {
         return this.gameEnded.asObservable();
+    }
+
+    get objective(): Observable<{ publicObj: [number, boolean][]; privateObj: [number, boolean] }> {
+        return this.objectives.asObservable();
     }
 }

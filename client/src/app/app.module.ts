@@ -22,6 +22,8 @@ import { GameBrowserComponent } from './components/game-browser/game-browser.com
 import { GameBrowserDialogComponent } from '@app/components/game-browser-dialog/game-browser-dialog.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { WaitingRoomDialogComponent } from './components/waiting-room-dialog/waiting-room-dialog.component';
+import { ObjectivesComponent } from './components/objectives/objectives.component';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 /**
  * Main module that is used in main.ts.
@@ -48,8 +50,18 @@ import { WaitingRoomDialogComponent } from './components/waiting-room-dialog/wai
         GameBrowserDialogComponent,
         WaitingRoomComponent,
         WaitingRoomDialogComponent,
+        ObjectivesComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+        MatSidenavModule,
+    ],
 
     providers: [],
     bootstrap: [AppComponent],

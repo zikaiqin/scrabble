@@ -12,7 +12,6 @@ import { WebsocketService } from '@app/services/websocket.service';
 import { Vec2 } from '@app/classes/vec2';
 import { GridLettersService } from './grid-letter.service';
 
-
 describe('GridService', () => {
     let service: GridService;
     let websocketServiceSpy: jasmine.SpyObj<LetterExchangeService>;
@@ -121,7 +120,7 @@ describe('GridService', () => {
         service.selectSquare(mousePosition.x + 1, mousePosition.y + 1);
         service.arrowDirection = true;
         service.selectSquare(mousePosition.x, mousePosition.y);
- 
+
         expect(drawArrowSpy).toHaveBeenCalled();
     });
     it('should call fillText when drawLx2', () => {

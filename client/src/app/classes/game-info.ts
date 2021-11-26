@@ -14,6 +14,7 @@ export interface GameInit {
     bonuses: [string, string][];
     reserve: string[];
     hand: string[];
+    gameMode: number;
     turnState?: boolean;
 }
 

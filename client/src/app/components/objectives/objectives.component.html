@@ -1,0 +1,25 @@
+<div *ngIf='isVisible'>
+    <mat-expansion-panel *ngFor='let objective of this.publicObj' [expanded]='true'  [disabled]='objective[1]'>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{obtainObjDescription(objective[0])[0]}}
+            </mat-panel-title>
+            <mat-panel-description>
+                {{obtainObjDescription(objective[0])[1]}}
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        {{obtainObjDescription(objective[0])[2]}}
+    </mat-expansion-panel>
+
+    <mat-expansion-panel id='privateObj' [expanded]='true' [disabled]='this.privateObj[1]'>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{obtainObjDescription(privateObj[0])[0]}}
+            </mat-panel-title>
+            <mat-panel-description>
+                {{obtainObjDescription(privateObj[0])[1]}}
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        {{obtainObjDescription(privateObj[0])[2]}}
+    </mat-expansion-panel>
+</div>
