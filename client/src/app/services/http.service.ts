@@ -42,7 +42,7 @@ export class HttpService {
         );
     }
 
-    deleteBot(ids: string[]) {
+    deleteBots(ids: string[]) {
         return this.http.delete(`${basePath}/bot`, { body: ids, responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>

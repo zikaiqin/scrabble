@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BotName } from '@app/classes/game-info';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -12,6 +12,7 @@ export type DialogResult = { confirmation: boolean; value: string };
     selector: 'app-bot-config',
     templateUrl: './bot-config.component.html',
     styleUrls: ['../../styles.scss', '../../pages/admin-page/admin-page.component.scss', './bot-config.component.scss'],
+    encapsulation: ViewEncapsulation.Emulated,
 })
 export class BotConfigComponent implements AfterViewInit {
     @Input() set data(data: BotName[]) {

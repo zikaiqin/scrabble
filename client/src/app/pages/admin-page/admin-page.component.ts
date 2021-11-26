@@ -45,7 +45,7 @@ export class AdminPageComponent {
     }
 
     deleteBots(ids: string[]) {
-        this.httpService.deleteBot(ids).subscribe({
+        this.httpService.deleteBots(ids).subscribe({
             complete: () => this.getBots(),
         });
     }
