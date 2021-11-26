@@ -43,4 +43,16 @@ export class AdminPageComponent {
             complete: () => this.getBots(),
         });
     }
+
+    deleteBots(ids: string[]) {
+        this.httpService.deleteBot(ids).subscribe({
+            complete: () => this.getBots(),
+        });
+    }
+
+    editBot(bot: Partial<BotName>) {
+        this.httpService.editBot(bot.id as string, bot.name as string).subscribe({
+            complete: () => this.getBots(),
+        });
+    }
 }

@@ -7,7 +7,7 @@
     </mat-toolbar>
 
     <mat-drawer-container class="stretch-col stretch-col-content">
-        <mat-drawer mode='side' opened>
+        <mat-drawer opened mode='side' class="mat-elevation-z1">
             <mat-action-list>
                 <mat-list-item [disabled]="page === 'dict'" (click)="page = 'dict'">
                     <mat-icon mat-list-icon>spellcheck</mat-icon>
@@ -22,7 +22,17 @@
 
         <mat-drawer-content class="stretch-col stretch-col-content content">
             <mat-card class="stretch-col stretch-col-content content">
-                <app-bot-config *ngIf="page === 'bot'" class="stretch-col stretch-col-content" [data]="botData" [(difficulty)]="botDifficulty" (difficultyChange)="getBots()" (get)="getBots()" (add)="addBot($event)"></app-bot-config>
+                <app-bot-config
+                    class="stretch-col-content"
+                    *ngIf="page === 'bot'"
+                    [data]="botData"
+                    [(difficulty)]="botDifficulty"
+                    (difficultyChange)="getBots()"
+                    (get)="getBots()"
+                    (add)="addBot($event)"
+                    (delete)="deleteBots($event)"
+                    (edit)="editBot($event)"
+                ></app-bot-config>
             </mat-card>
         </mat-drawer-content>
     </mat-drawer-container>

@@ -17,14 +17,20 @@ export class BotController {
         this.router.get('/', (req: Request, res: Response) => {
             const names = req.query.difficulty === String(GameDifficulty.Easy) ? DEFAULT_BOT_NAMES.easy : DEFAULT_BOT_NAMES.hard;
             res.json(
-                names.map((name, id) => {
-                    return { id, name, default: true };
-                }),
+                names
+                    .map((name, id) => {
+                        return { id, name, default: true };
+                    })
+                    .concat([
+                        { id: -1, name: 'oort cloud', default: false },
+                        { id: -2, name: '1984531616486535', default: false },
+                    ]),
             );
         });
 
         /* eslint-disable @typescript-eslint/no-magic-numbers */
         this.router.post('/', (req: Request, res: Response) => {
+            console.log(req.body);
             const success = () => Boolean(Math.floor(Math.random() * 2));
             if (success()) {
                 res.sendStatus(200);
@@ -38,11 +44,13 @@ export class BotController {
         });
 
         this.router.put('/', (req: Request, res: Response) => {
+            console.log(req.body);
             const success = () => Boolean(Math.floor(Math.random() * 2));
             res.sendStatus(success() ? 200 : success() ? 404 : 502);
         });
 
         this.router.delete('/', (req: Request, res: Response) => {
+            console.log(req.body);
             const success = () => Boolean(Math.floor(Math.random() * 2));
             res.sendStatus(success() ? 200 : success() ? 404 : 502);
         });

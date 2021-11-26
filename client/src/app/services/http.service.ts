@@ -42,6 +42,36 @@ export class HttpService {
         );
     }
 
+    deleteBot(ids: string[]) {
+        return this.http.delete(`${basePath}/bot`, { body: ids, responseType: 'text' }).pipe(
+            timeout(DEFAULT_TIMEOUT),
+            catchError((err) =>
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                this.catchHttpErrorWithStatus(err, 404, () => {
+                    this.alertService.showAlert("Le joueur virtuel que vous voulez supprimer n'existe pas");
+                }),
+            ),
+            catchError((err) => this.catchAnyHttpError(err, true)),
+            catchError((err) => this.catchTimeoutError(err, true)),
+            catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
+        );
+    }
+
+    editBot(id: string, name: string) {
+        return this.http.put(`${basePath}/bot`, { id, name }, { responseType: 'text' }).pipe(
+            timeout(DEFAULT_TIMEOUT),
+            catchError((err) =>
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                this.catchHttpErrorWithStatus(err, 404, () => {
+                    this.alertService.showAlert("Le joueur virtuel que vous voulez modifier n'existe pas");
+                }),
+            ),
+            catchError((err) => this.catchAnyHttpError(err, true)),
+            catchError((err) => this.catchTimeoutError(err, true)),
+            catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
+        );
+    }
+
     catchHttpErrorWithStatus(err: Error, status: number, callback?: (err: HttpErrorResponse) => void) {
         if (!(err instanceof HttpErrorResponse) || err.status !== status) {
             return throwError(err);

@@ -40,7 +40,7 @@ import { GameDifficulty } from '@app/classes/game-info';
             }
         `,
     ],
-    styleUrls: ['../../styles.scss', '../../pages/admin-page/admin-page.component.scss', './bot-config.component.scss'],
+    styleUrls: ['../../styles.scss'],
     encapsulation: ViewEncapsulation.None,
 })
 export class BotConfigSelectComponent {

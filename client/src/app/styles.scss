@@ -93,3 +93,21 @@ mat-form-field.mat-form-field {
     display: flex;
     flex-direction: row;
 }
+
+.table-container {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+th {
+    font-size: 10pt;
+}
+
+td {
+    font-size: 12pt;
+}

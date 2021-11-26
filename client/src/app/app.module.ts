@@ -27,6 +27,7 @@ import { ScoreboardComponent } from './components/scoreboard/scoreboard.componen
 import { DatabaseResetDialogComponent } from './components/database-reset-dialog/database-reset-dialog.component';
 import { BotConfigComponent } from './components/bot-config/bot-config.component';
 import { BotConfigSelectComponent } from './components/bot-config/bot-config-select.component';
+import { BotConfigDialogComponent } from './components/bot-config-dialog/bot-config-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -58,6 +59,7 @@ import { BotConfigSelectComponent } from './components/bot-config/bot-config-sel
         DatabaseResetDialogComponent,
         BotConfigComponent,
         BotConfigSelectComponent,
+        BotConfigDialogComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
 

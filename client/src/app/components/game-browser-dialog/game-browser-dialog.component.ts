@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GameInfo } from '@app/classes/game-info';
+import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/classes/config';
 
 @Component({
     selector: 'app-game-browser-dialog',
@@ -60,6 +61,3 @@ export class GameBrowserDialogComponent {
         return this.form.controls.username;
     }
 }
-
-const MIN_NAME_LENGTH = 2;
-const MAX_NAME_LENGTH = 16;
