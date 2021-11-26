@@ -205,24 +205,24 @@ export const DEFAULT_RESERVE: string[] = [
 
 export const EMPTYSCORE: Score[] = [
     {
-        name: 'empty',
-        score: 0,
+        name: 'Legend27',
+        score: 50,
     },
     {
-        name: 'empty',
-        score: 0,
+        name: 'Joe',
+        score: 45,
     },
     {
-        name: 'empty',
-        score: 0,
+        name: 'McNugget',
+        score: 36,
     },
     {
-        name: 'empty',
-        score: 0,
+        name: 'RagingOpossum',
+        score: 23,
     },
     {
-        name: 'empty',
-        score: 0,
+        name: 'EmptyWallet',
+        score: 12,
     },
 ];
 
