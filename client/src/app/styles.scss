@@ -70,7 +70,7 @@ mat-form-field.mat-form-field {
         display: flex;
         flex-direction: column;
         align-items: stretch;
-     }
+    }
     .title {
         font-size: 24pt;
         margin-bottom: 2px;
@@ -85,7 +85,7 @@ mat-form-field.mat-form-field {
 
 .button-row {
     :first-child {
-        margin-left: 0
+        margin-left: 0;
     }
     button {
         width: auto;

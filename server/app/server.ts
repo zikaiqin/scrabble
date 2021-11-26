@@ -10,6 +10,8 @@ import { ExchangeService } from '@app/services/exchange.service';
 import { PlacingService } from '@app/services/placing.service';
 import { ValidationService } from '@app/services/validation.service';
 import { ObjectivesService } from '@app/services/objectives';
+import { DatabaseService } from '@app/services/database.service';
+import { HighscoreService } from '@app/services/highscore.service';
 
 @Service()
 export class Server {
@@ -28,6 +30,8 @@ export class Server {
         private placingService: PlacingService,
         private validationService: ValidationService,
         private objectivesService: ObjectivesService,
+        private databaseService: DatabaseService,
+        private highscoreService: HighscoreService,
     ) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
@@ -45,7 +49,7 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
-        this.socketService = new SocketService(this.server);
+        this.socketService = new SocketService(this.server, this.highscoreService);
         this.socketService.handleSockets();
 
         this.gameService = new GameService(
@@ -56,6 +60,7 @@ export class Server {
             this.placingService,
             this.validationService,
             this.objectivesService,
+            this.highscoreService,
         );
         this.gameService.attachSocketListeners();
         this.gameService.attachBotListeners();
@@ -63,6 +68,17 @@ export class Server {
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
         this.server.on('listening', () => this.onListening());
+        this.databaseService
+            .databaseConnect()
+            .then(() => {
+                // eslint-disable-next-line no-console
+                console.log('Database connection successful !');
+            })
+            .catch(() => {
+                // eslint-disable-next-line no-console
+                console.error('Database connection failed !');
+                process.exit(1);
+            });
     }
 
     private onError(error: NodeJS.ErrnoException): void {

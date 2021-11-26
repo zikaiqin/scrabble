@@ -1,4 +1,7 @@
 // For the value of each letter sometimes they value 10 or 8
+
+import { Score } from './highscore';
+
 /* eslint-disable @typescript-eslint/no-magic-numbers*/
 
 export const DEFAULT_POINTS: Map<string, number> = new Map([
@@ -198,6 +201,29 @@ export const DEFAULT_RESERVE: string[] = [
     'z',
     '*',
     '*',
+];
+
+export const EMPTYSCORE: Score[] = [
+    {
+        name: 'empty',
+        score: 0,
+    },
+    {
+        name: 'empty',
+        score: 0,
+    },
+    {
+        name: 'empty',
+        score: 0,
+    },
+    {
+        name: 'empty',
+        score: 0,
+    },
+    {
+        name: 'empty',
+        score: 0,
+    },
 ];
 
 export const DEFAULT_BOT_NAMES: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];

@@ -24,6 +24,7 @@ import { WaitingRoomComponent } from './components/waiting-room/waiting-room.com
 import { WaitingRoomDialogComponent } from './components/waiting-room-dialog/waiting-room-dialog.component';
 import { ObjectivesComponent } from './components/objectives/objectives.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { ScoreboardComponent } from './components/scoreboard/scoreboard.component';
 
 /**
  * Main module that is used in main.ts.
@@ -51,6 +52,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
         WaitingRoomComponent,
         WaitingRoomDialogComponent,
         ObjectivesComponent,
+        ScoreboardComponent,
     ],
     imports: [
         AppMaterialModule,

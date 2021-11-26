@@ -12,7 +12,9 @@ export class HomePageComponent {
     gameType = GameType.None;
     showBrowser = false;
     showWaitingRoom = false;
+    showScoreboard = false;
     gameConfigs: GameInfo;
+    scoreMode: string;
 
     constructor(private webSocketService: WebsocketService) {
         this.webSocketService.status.subscribe((event) => {
@@ -27,6 +29,11 @@ export class HomePageComponent {
     handleClick(button: string): void {
         if (button === 'Classical' || button === 'Log2990') {
             this.gameMode = GameMode[button];
+        }
+        if (button === 'Scoreboard') {
+            this.webSocketService.connect();
+            this.webSocketService.refreshHighscore();
+            this.showScoreboard = true;
         }
         if (button === 'Single' || button === 'Multi') {
             this.gameType = GameType[button];
@@ -47,6 +54,10 @@ export class HomePageComponent {
                 this.webSocketService.disconnect();
                 return;
             }
+            if (this.showScoreboard) {
+                this.showScoreboard = false;
+                return;
+            }
             if (this.gameType) {
                 this.gameType = GameType.None;
             } else {
@@ -56,6 +67,9 @@ export class HomePageComponent {
     }
 
     showPage(): string {
+        if (this.showScoreboard) {
+            return 'Scoreboard';
+        }
         if (this.showBrowser) {
             return 'Browser';
         }

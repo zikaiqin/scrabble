@@ -2,9 +2,11 @@ import EventEmitter from 'events';
 import * as http from 'http';
 import * as io from 'socket.io';
 import { Service } from 'typedi';
-import { GameInfo, GameType } from '@app/classes/game-info';
+import { GameInfo, GameMode, GameType } from '@app/classes/game-info';
 import { MessageType } from '@app/classes/message';
 import { ROOM_MARKER } from '@app/classes/config';
+import { Score } from '@app/classes/highscore';
+import { HighscoreService } from '@app/services/highscore.service';
 
 @Service()
 export class SocketService {
@@ -14,7 +16,7 @@ export class SocketService {
 
     private sio: io.Server;
 
-    constructor(server: http.Server) {
+    constructor(server: http.Server, private highscoreService: HighscoreService) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
 
@@ -113,6 +115,15 @@ export class SocketService {
                 if (roomId === undefined) return;
                 this.socketEvents.emit('updateObjectives', socket.id, roomId);
             });
+
+            socket.on('refresh', () => {
+                this.highscoreService.getHighscore(GameMode.Log2990).then((highScore) => {
+                    this.sio.emit('updateHighscoreLog2990', highScore);
+                });
+                this.highscoreService.getHighscore(GameMode.Classical).then((highScore) => {
+                    this.sio.emit('updateHighscoreClassic', highScore);
+                });
+            });
         });
     }
 
@@ -175,6 +186,14 @@ export class SocketService {
 
     updateScores(socketID: string, ownScore: number, opponentScore: number) {
         this.sio.to(socketID).emit('updateScores', ownScore, opponentScore);
+    }
+
+    updateHighscores(collection: Score[], gameMode: number) {
+        if (gameMode === GameMode.Log2990) {
+            this.sio.emit('updateHighscoreLog2990', collection);
+        } else {
+            this.sio.emit('updateHighscoreClassic', collection);
+        }
     }
 
     gameEnded(roomId: string, winner: string) {

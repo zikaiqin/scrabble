@@ -1,6 +1,8 @@
 <div class="container center justify">
     <app-main-menu *ngIf="showPage() === 'Main'" [gameMode]="gameMode" [gameType]="gameType" (buttonClick)="handleClick($event)"></app-main-menu>
 
+    <app-scoreboard *ngIf="showPage() === 'Scoreboard'" (buttonClick)="handleClick($event)"> </app-scoreboard>
+
     <app-new-game-menu
         *ngIf="showPage() === 'NewGame'"
         [gameMode]="gameMode"
