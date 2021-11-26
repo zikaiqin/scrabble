@@ -35,14 +35,10 @@ export class BotConfigDialogComponent {
 
     get title(): string {
         return this.data.action === 'delete'
-            ? `Voulez-vous supprimer ${(this.data.params?.length as number) > 1 ? 'ces noms?' : ''}`
+            ? `Supprimer ${(this.data.params?.length as number) > 1 ? 'ces noms' : (this.data.params as BotName[])[0].name}?`
             : this.data.action === 'edit'
             ? `Modifier ${this.data.target?.name}`
             : 'Ajouter un joueur virtuel';
-    }
-
-    get subtitle(): string {
-        return this.data.action === 'delete' && (this.data.params?.length as number) === 1 ? (this.data.params as BotName[])[0].name + '?' : '';
     }
 
     get action(): string {
