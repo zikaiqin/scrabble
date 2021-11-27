@@ -10,6 +10,7 @@ import { createSandbox } from 'sinon';
 import { Score } from '@app/classes/highscore';
 import { GameInfo } from '@app/classes/game-info';
 import { Server } from '@app/server';
+// eslint-disable-next-line no-restricted-imports -- we need this import in order to simulate a client connection
 import { environment } from '../../../client/src/environments/environment';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
@@ -141,5 +142,32 @@ describe('SocketService', () => {
         service.handleSockets();
         expect(emitSpy.calledWith('updateRooms', service.roomList));
         expect(onSpy.calledWith('createGame'));
+        expect(onSpy.calledWith('joinGame'));
+        expect(onSpy.calledWith('convertGame'));
+        expect(onSpy.calledWith('sendMessage'));
+        expect(onSpy.calledWith('place'));
+        expect(onSpy.calledWith('exchange'));
+        expect(onSpy.calledWith('skipTurn'));
+        expect(onSpy.calledWith('disconnect'));
+        expect(onSpy.calledWith('fetchObjectives'));
+        expect(onSpy.calledWith('refresh'));
+    });
+
+    it('createGame should call the right functions with MULTI gameType', () => {
+        socket = io(environment.serverUrl).connect();
+        const configs: GameInfo = { username: 'test', turnLength: 60, randomized: false, gameMode: 1, gameType: 2, difficulty: 1, roomID: socketID };
+        const setSpy = sandbox.spy(service['waitingRooms'], 'set');
+        const sioSpy = sandbox.spy(service['sio'], 'emit');
+        socket.emit('createGame', configs);
+        expect(setSpy.calledWith('_' + socketID, configs));
+        expect(sioSpy.calledWith('updateRooms', service.roomList));
+    });
+
+    it('createGame should call the right functions with SINGLE gameType', () => {
+        socket = io(environment.serverUrl).connect();
+        const configs: GameInfo = { username: 'test', turnLength: 60, randomized: false, gameMode: 1, gameType: 1, difficulty: 1, roomID: socketID };
+        const socketSpy = sandbox.spy(service['socketEvents'], 'emit');
+        socket.emit('createGame', configs);
+        expect(socketSpy.calledWith('_' + socketID, configs, [{ socketID: socket.id, username: configs.username }]));
     });
 });
