@@ -5,7 +5,7 @@ import { Game } from '@app/classes/game';
 import { Board } from '@app/classes/board';
 import { Player } from '@app/classes/player';
 import { MessageType } from '@app/classes/message';
-import { GameInfo, GameMode, GameType, PlayerInfo } from '@app/classes/game-info';
+import { GameDifficulty, GameInfo, GameMode, GameType, PlayerInfo } from '@app/classes/game-info';
 import { BOT_MARKER, DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_SOCKET_TIMEOUT, DEFAULT_TURN_TIMEOUT } from '@app/classes/config';
 import { BotService } from '@app/services/bot.service';
 import { EndGameService } from '@app/services/end-game.service';
@@ -279,8 +279,8 @@ export class GameService {
     }
 
     getBotName(playerName: string, difficulty: number): string {
-        void difficulty;
-        const validBotNames = DEFAULT_BOT_NAMES.easy.filter((name) => name !== playerName);
+        const names = difficulty === GameDifficulty.Easy ? DEFAULT_BOT_NAMES.easy : DEFAULT_BOT_NAMES.hard;
+        const validBotNames = names.filter((name) => name !== playerName);
         return validBotNames[Math.floor(Math.random() * validBotNames.length)];
     }
 

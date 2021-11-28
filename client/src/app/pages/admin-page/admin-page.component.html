@@ -1,7 +1,7 @@
 <div class="container stretch-col">
     <mat-toolbar color="primary">
         <span>PAGE D'ADMINISTRATION</span>
-        <button mat-icon-button [matMenuTriggerFor]="menu">
+        <button mat-icon-button class="menu-button" [matMenuTriggerFor]="menu">
             <mat-icon>more_vert</mat-icon>
         </button>
     </mat-toolbar>
@@ -23,7 +23,7 @@
         <mat-drawer-content class="stretch-col stretch-col-content content">
             <mat-card class="stretch-col stretch-col-content content">
                 <app-bot-config
-                    class="stretch-col-content"
+                    class="stretch-col stretch-col-content"
                     *ngIf="page === 'bot'"
                     [data]="botData"
                     [(difficulty)]="botDifficulty"

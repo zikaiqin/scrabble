@@ -21,6 +21,10 @@ mat-toolbar {
     justify-content: space-between;
 }
 
+.menu-button {
+    margin: 8px 0;
+}
+
 .reset > * {
     color: mat.get-color-from-palette(mat.$red-palette, 500);
 }
@@ -37,6 +41,9 @@ mat-toolbar {
 
 .table-actions {
     button {
+        &:first-child {
+            margin-left: 0;
+        }
         mat-icon {
             margin-left: -5px;
             margin-right: 5px;
@@ -48,7 +55,6 @@ mat-toolbar {
     width: 100%;
     display: inline-flex;
     justify-content: space-between;
-    margin-bottom: 24px;
 }
 
 .title {

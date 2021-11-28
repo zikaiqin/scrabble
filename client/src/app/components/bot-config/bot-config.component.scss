@@ -8,5 +8,6 @@
 }
 
 .table-container {
-    height: 560px;
+    flex-direction: column-reverse;
+    justify-content: start;
 }
