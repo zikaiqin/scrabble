@@ -71,8 +71,11 @@ export class DatabaseService {
             .toArray();
     }
 
-    async findBot(name: string, difficulty: number): Promise<Document | undefined> {
-        return this.botDB.collection(DATABASE.bot.collections[difficulty === GameDifficulty.Easy ? 'easy' : 'hard']).findOne({ name });
+    async findBot(name: string) {
+        return Promise.all([
+            this.botDB.collection(DATABASE.bot.collections.easy).findOne({ name }),
+            this.botDB.collection(DATABASE.bot.collections.hard).findOne({ name }),
+        ]);
     }
 
     async insertBot(name: string, difficulty: number) {

@@ -5,7 +5,6 @@ import { catchError, tap, timeout } from 'rxjs/operators';
 import { DEFAULT_TIMEOUT } from '@app/classes/config';
 import { EMPTY, throwError, TimeoutError } from 'rxjs';
 import { AlertService } from '@app/services/alert.service';
-import { GameDifficulty } from '@app/classes/game-info';
 
 const basePath = `${environment.serverUrl}/api`;
 
@@ -39,9 +38,7 @@ export class HttpService {
             catchError((err) =>
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 this.catchHttpErrorWithStatus(err, 409, () => {
-                    this.alertService.showAlert(
-                        `Un joueur virtuel ${difficulty === GameDifficulty.Easy ? 'novice' : 'expert'} avec le nom ${name} existe déjà`,
-                    );
+                    this.alertService.showAlert(`Un joueur virtuel avec le nom ${name} existe déjà`);
                 }),
             ),
             catchError((err) => this.catchAnyHttpError(err, true)),
@@ -70,6 +67,12 @@ export class HttpService {
     editBot(id: string, name: string, difficulty: number) {
         return this.http.put(`${basePath}/bot`, { id, name, difficulty }, { responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
+            catchError((err) =>
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                this.catchHttpErrorWithStatus(err, 409, () => {
+                    this.alertService.showAlert(`Un joueur virtuel avec le nom ${name} existe déjà`);
+                }),
+            ),
             catchError((err) =>
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 this.catchHttpErrorWithStatus(err, 404, () => {

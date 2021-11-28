@@ -47,10 +47,13 @@ export class BotController {
                 return;
             }
             this.dbService
-                .findBot(name, difficulty)
+                .findBot(name)
                 .then((found) => {
-                    if (found) {
-                        res.sendStatus(409);
+                    if (
+                        found.some((bot) => bot?.name === name) ||
+                        [...DEFAULT_BOT_NAMES.easy, ...DEFAULT_BOT_NAMES.hard].some((botName) => botName === name)
+                    ) {
+                        res.status(409).json();
                     } else {
                         this.dbService
                             .insertBot(name, difficulty)
@@ -68,9 +71,21 @@ export class BotController {
                 return;
             }
             this.dbService
-                .editBot(id, name, difficulty)
-                .then((updateResult) => {
-                    res.sendStatus(updateResult.matchedCount ? 200 : 404);
+                .findBot(name)
+                .then((found) => {
+                    if (
+                        found.some((bot) => bot?.name === name) ||
+                        [...DEFAULT_BOT_NAMES.easy, ...DEFAULT_BOT_NAMES.hard].some((botName) => botName === name)
+                    ) {
+                        res.status(409).json();
+                    } else {
+                        this.dbService
+                            .editBot(id, name, difficulty)
+                            .then((updateResult) => {
+                                res.sendStatus(updateResult.matchedCount ? 200 : 404);
+                            })
+                            .catch(() => res.sendStatus(500));
+                    }
                 })
                 .catch(() => res.sendStatus(500));
         });
