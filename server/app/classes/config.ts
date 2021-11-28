@@ -221,7 +221,7 @@ export const DEFAULT_HIGH_SCORES = {
 };
 
 export const DEFAULT_BOT_NAMES = {
-    easy: ['tyler1', '<your ad here>', 'M0NKE'],
+    easy: ['tyler1', '< your ad here >', 'M0NKE'],
     hard: ['Kevin Nguyen', '孙悟空', 'DIO'],
 };
 
@@ -241,7 +241,7 @@ export const DATABASE = {
             log2990: 'ScoreLog2990',
         },
     },
-    botNames: {
+    bot: {
         name: 'botNameDB',
         collections: {
             easy: 'easy',

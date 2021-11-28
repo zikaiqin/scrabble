@@ -45,13 +45,13 @@ export class AdminPageComponent {
     }
 
     deleteBots(ids: string[]) {
-        this.httpService.deleteBots(ids).subscribe({
+        this.httpService.deleteBots(ids, this.botDifficulty).subscribe({
             complete: () => this.getBots(),
         });
     }
 
     editBot(bot: Partial<BotName>) {
-        this.httpService.editBot(bot.id as string, bot.name as string).subscribe({
+        this.httpService.editBot(bot.id as string, bot.name as string, this.botDifficulty).subscribe({
             complete: () => this.getBots(),
         });
     }

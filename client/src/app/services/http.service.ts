@@ -38,10 +38,9 @@ export class HttpService {
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                this.catchHttpErrorWithStatus(err, 409, (e) => {
-                    const error = JSON.parse(e.error);
+                this.catchHttpErrorWithStatus(err, 409, () => {
                     this.alertService.showAlert(
-                        `Un joueur virtuel ${error.difficulty === GameDifficulty.Easy ? 'novice' : 'expert'} avec le nom ${error.name} existe déjà`,
+                        `Un joueur virtuel ${difficulty === GameDifficulty.Easy ? 'novice' : 'expert'} avec le nom ${name} existe déjà`,
                     );
                 }),
             ),
@@ -51,13 +50,15 @@ export class HttpService {
         );
     }
 
-    deleteBots(ids: string[]) {
-        return this.http.delete(`${basePath}/bot`, { body: ids, responseType: 'text' }).pipe(
+    deleteBots(ids: string[], difficulty: number) {
+        return this.http.delete(`${basePath}/bot`, { body: { ids, difficulty }, responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 this.catchHttpErrorWithStatus(err, 404, () => {
-                    this.alertService.showAlert("Le joueur virtuel que vous voulez supprimer n'existe pas");
+                    this.alertService.showAlert(
+                        `${ids.length > 1 ? 'Les joueurs virtuels' : 'Le joueur virtuel'} que vous voulez supprimer n'existe pas`,
+                    );
                 }),
             ),
             catchError((err) => this.catchAnyHttpError(err, true)),
@@ -66,8 +67,8 @@ export class HttpService {
         );
     }
 
-    editBot(id: string, name: string) {
-        return this.http.put(`${basePath}/bot`, { id, name }, { responseType: 'text' }).pipe(
+    editBot(id: string, name: string, difficulty: number) {
+        return this.http.put(`${basePath}/bot`, { id, name, difficulty }, { responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers

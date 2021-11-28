@@ -29,3 +29,8 @@ export interface PlayerInfo {
     socketID: string;
     username: string;
 }
+
+export type BotName = {
+    _id: string;
+    name: string;
+};

@@ -60,7 +60,7 @@ export class Application {
                         return;
                     }
                     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                    this.dbService.putDefaultScores().finally(() => res.sendStatus(200));
+                    this.dbService.insertDefaultScores().finally(() => res.sendStatus(200));
                 })
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 .catch(() => res.sendStatus(502));

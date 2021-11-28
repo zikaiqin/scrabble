@@ -159,8 +159,8 @@ export class GameService {
             });
     }
 
-    createGame(roomID: string, configs: GameInfo, players: PlayerInfo[]) {
-        const game = this.setupGame(roomID, configs, players);
+    async createGame(roomID: string, configs: GameInfo, players: PlayerInfo[]) {
+        const game = await this.setupGame(roomID, configs, players);
         const timer = this.setupTimer(roomID, configs, game);
 
         this.games.set(roomID, game);
@@ -171,7 +171,7 @@ export class GameService {
         timer.changeTurn();
     }
 
-    setupGame(roomID: string, configs: GameInfo, playerInfos: PlayerInfo[]): Game {
+    async setupGame(roomID: string, configs: GameInfo, playerInfos: PlayerInfo[]): Promise<Game> {
         // Generate entries for player map
         const players: [string, Player][] = playerInfos.map((entry) => {
             const player = new Player(entry.username);
@@ -179,7 +179,7 @@ export class GameService {
         });
         if (configs.gameType === GameType.Single) {
             // If single player, add a bot to the map entries
-            const bot = new Player(this.getBotName(playerInfos[0].username, configs.difficulty as number));
+            const bot = new Player(await this.getBotName(playerInfos[0].username, configs.difficulty as number));
             const botID = `${BOT_MARKER}${playerInfos[0].socketID}`;
             players.push([botID, bot]);
             this.botService.games.set(botID, roomID);
@@ -218,7 +218,7 @@ export class GameService {
                         .map((entry) => entry.player)
                         .forEach((player) => {
                             const highScore = { name: player.name, score: player.score };
-                            this.dbService.postHighScore(highScore, configs.gameMode as number);
+                            this.dbService.updateHighScore(highScore, configs.gameMode as number);
                         });
                     return;
                 }
@@ -276,8 +276,13 @@ export class GameService {
         return new Map(coords.map((key, index) => [key, multiplier[index]]));
     }
 
-    getBotName(playerName: string, difficulty: number): string {
+    async getBotName(playerName: string, difficulty: number): Promise<string> {
         const names = difficulty === GameDifficulty.Easy ? DEFAULT_BOT_NAMES.easy : DEFAULT_BOT_NAMES.hard;
+        try {
+            names.push(...(await this.dbService.getBots(difficulty)).map((bot) => bot.name));
+        } catch (e) {
+            void e;
+        }
         const validBotNames = names.filter((name) => name !== playerName);
         return validBotNames[Math.floor(Math.random() * validBotNames.length)];
     }
