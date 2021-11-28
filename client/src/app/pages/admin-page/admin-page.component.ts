@@ -23,7 +23,9 @@ export class AdminPageComponent {
         const dialogRef = this.dialog.open(DatabaseResetDialogComponent);
         dialogRef.afterClosed().subscribe((reset) => {
             if (reset) {
-                this.httpService.resetDB();
+                this.httpService.resetDB().subscribe({
+                    complete: () => this.getBots(),
+                });
             }
         });
     }

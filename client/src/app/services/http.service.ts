@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '@env/environment';
-import { catchError, timeout } from 'rxjs/operators';
+import { catchError, tap, timeout } from 'rxjs/operators';
 import { DEFAULT_TIMEOUT } from '@app/classes/config';
 import { EMPTY, throwError, TimeoutError } from 'rxjs';
 import { AlertService } from '@app/services/alert.service';
@@ -83,15 +83,13 @@ export class HttpService {
     }
 
     resetDB() {
-        this.http
-            .delete(`${basePath}`, { responseType: 'text' })
-            .pipe(
-                timeout(DEFAULT_TIMEOUT),
-                catchError((err) => this.catchAnyHttpError(err)),
-                catchError((err) => this.catchTimeoutError(err)),
-                catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
-            )
-            .subscribe({ complete: () => this.alertService.showAlert('Le système a été réinitialisé') });
+        return this.http.delete(`${basePath}`, { responseType: 'text' }).pipe(
+            timeout(DEFAULT_TIMEOUT),
+            catchError((err) => this.catchAnyHttpError(err)),
+            catchError((err) => this.catchTimeoutError(err)),
+            catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
+            tap(() => this.alertService.showAlert('Le système a été réinitialisé')),
+        );
     }
 
     catchHttpErrorWithStatus(err: Error, status: number, callback?: (err: HttpErrorResponse) => void) {

@@ -277,9 +277,9 @@ export class GameService {
     }
 
     async getBotName(playerName: string, difficulty: number): Promise<string> {
-        const names = difficulty === GameDifficulty.Easy ? DEFAULT_BOT_NAMES.easy : DEFAULT_BOT_NAMES.hard;
+        let names = difficulty === GameDifficulty.Easy ? DEFAULT_BOT_NAMES.easy : DEFAULT_BOT_NAMES.hard;
         try {
-            names.push(...(await this.dbService.getBots(difficulty)).map((bot) => bot.name));
+            names = names.concat(...(await this.dbService.getBots(difficulty)).map((bot) => bot.name));
         } catch (e) {
             void e;
         }

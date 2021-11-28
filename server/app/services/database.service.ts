@@ -20,7 +20,6 @@ export class DatabaseService {
         } catch {
             throw new Error('Database connection error');
         }
-
         return this.client;
     }
 
@@ -30,6 +29,8 @@ export class DatabaseService {
 
     async resetDB() {
         return Promise.all([
+            this.botDB.dropCollection(DATABASE.bot.collections.easy),
+            this.botDB.dropCollection(DATABASE.bot.collections.hard),
             this.highScoreDB.dropCollection(DATABASE.highScore.collections.classical),
             this.highScoreDB.dropCollection(DATABASE.highScore.collections.log2990),
         ]);

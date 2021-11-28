@@ -12,6 +12,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
 import { DatabaseService } from '@app/services/database.service';
+import { MongoServerError } from 'mongodb';
 
 @Service()
 export class Application {
@@ -50,21 +51,26 @@ export class Application {
         this.app.use('/api/score', this.scoreController.router);
         this.app.use('/api/example', this.exampleController.router);
         this.app.use('/api/date', this.dateController.router);
+        /* eslint-disable @typescript-eslint/no-magic-numbers */
         this.app.delete('/api', (req, res) => {
             this.dbService
                 .resetDB()
                 .then((collections) => {
                     if (!collections.every((dropped) => dropped)) {
-                        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                        res.sendStatus(502);
+                        res.sendStatus(500);
                         return;
                     }
-                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                     this.dbService.insertDefaultScores().finally(() => res.sendStatus(200));
                 })
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                .catch(() => res.sendStatus(502));
+                .catch((err) => {
+                    if (err instanceof MongoServerError && err.code === 26) {
+                        this.dbService.insertDefaultScores().finally(() => res.sendStatus(200));
+                        return;
+                    }
+                    res.sendStatus(500);
+                });
         });
+        /* eslint-enable @typescript-eslint/no-magic-numbers */
         this.errorHandling();
     }
 
