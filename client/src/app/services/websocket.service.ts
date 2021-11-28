@@ -6,7 +6,6 @@ import { AlertService } from '@app/services/alert.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { Score } from '@app/classes/highscore';
 
 @Injectable({
     providedIn: 'root',
@@ -26,8 +25,6 @@ export class WebsocketService {
     private gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
     private gameScores = new Subject<{ ownScore: number; opponentScore: number }>();
     private gameEnded = new Subject<string>();
-    private highscoreClassic = new Subject<Score[]>();
-    private highscoreLog2990 = new Subject<Score[]>();
 
     constructor(private router: Router, private textBox: TextboxService, private alertService: AlertService) {}
 
@@ -81,17 +78,11 @@ export class WebsocketService {
             this.socket.on('updateScores', (ownScore: number, opponentScore: number) => {
                 this.gameScores.next({ ownScore, opponentScore });
             });
-            this.socket.on('gameEnded', (winner: string) => {
-                this.gameEnded.next(winner);
-            });
             this.socket.on('updateObjectives', (publicObj: [number, boolean][], privateObj: [number, boolean]) => {
                 this.objectives.next({ publicObj, privateObj });
             });
-            this.socket.on('updateHighscoreLog2990', (highscore: Score[]) => {
-                this.highscoreLog2990.next(highscore);
-            });
-            this.socket.on('updateHighscoreClassic', (highscore: Score[]) => {
-                this.highscoreClassic.next(highscore);
+            this.socket.on('gameEnded', (winner: string) => {
+                this.gameEnded.next(winner);
             });
         });
 
@@ -145,6 +136,10 @@ export class WebsocketService {
         this.socket.emit('skipTurn');
     }
 
+    fetchObjectives(): void {
+        this.socket.emit('fetchObjectives');
+    }
+
     connect(socket?: Socket): void {
         this.socket = socket ? socket : io(environment.serverUrl).connect();
         this.attachListeners();
@@ -152,14 +147,6 @@ export class WebsocketService {
 
     disconnect(): void {
         this.socket.disconnect();
-    }
-
-    refreshHighscore(): void {
-        this.socket.emit('refresh');
-    }
-
-    fetchObjectives(): void {
-        this.socket.emit('fetchObjectives');
     }
 
     get status(): Observable<string> {
@@ -204,13 +191,5 @@ export class WebsocketService {
 
     get objective(): Observable<{ publicObj: [number, boolean][]; privateObj: [number, boolean] }> {
         return this.objectives.asObservable();
-    }
-
-    get highscoreC(): Observable<Score[]> {
-        return this.highscoreClassic.asObservable();
-    }
-
-    get highscoreL(): Observable<Score[]> {
-        return this.highscoreLog2990.asObservable();
     }
 }

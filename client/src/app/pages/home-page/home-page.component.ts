@@ -15,7 +15,6 @@ export class HomePageComponent {
     showWaitingRoom = false;
     showScoreboard = false;
     gameConfigs: GameInfo;
-    scoreMode: string;
 
     constructor(private router: Router, private webSocketService: WebsocketService) {
         this.webSocketService.status.subscribe((event) => {
@@ -32,8 +31,6 @@ export class HomePageComponent {
             this.gameMode = GameMode[button];
         }
         if (button === 'Scoreboard') {
-            this.webSocketService.connect();
-            this.webSocketService.refreshHighscore();
             this.showScoreboard = true;
         }
         if (button === 'Single' || button === 'Multi') {

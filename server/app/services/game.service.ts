@@ -13,10 +13,9 @@ import { ExchangeService } from '@app/services/exchange.service';
 import { PlacingService } from '@app/services/placing.service';
 import { SocketService } from '@app/services/socket.service';
 import { ValidationService } from '@app/services/validation.service';
-import { HighscoreService } from '@app/services/highscore.service';
-import { Score } from '@app/classes/highscore';
 import { Service } from 'typedi';
 import { ObjectivesService } from '@app/services/objectives';
+import { DatabaseService } from '@app/services/database.service';
 
 @Service()
 export class GameService {
@@ -36,7 +35,7 @@ export class GameService {
         private placingService: PlacingService,
         private validationService: ValidationService,
         private objectvesService: ObjectivesService,
-        private highscoreService: HighscoreService,
+        private dbService: DatabaseService,
     ) {}
 
     attachSocketListeners() {
@@ -215,13 +214,12 @@ export class GameService {
             .on(Timer.events.updateTurn, (turnState: boolean) => {
                 if (this.gameEnded(roomID, game, players[0].player, players[1].player)) {
                     this.deleteRoom(roomID);
-                    const player1Score = new Score(players[0].player.name, players[0].player.score);
-                    const player2Score = new Score(players[1].player.name, players[1].player.score);
-                    this.highscoreService.updateHighscore(player1Score, configs.gameMode as number);
-                    this.highscoreService.updateHighscore(player2Score, configs.gameMode as number);
-                    this.highscoreService.getHighscore(configs.gameMode as number).then((highScore) => {
-                        this.socketService.updateHighscores(highScore, configs.gameMode as number);
-                    });
+                    players
+                        .map((entry) => entry.player)
+                        .forEach((player) => {
+                            const highScore = { name: player.name, score: player.score };
+                            this.dbService.postHighScore(highScore, configs.gameMode as number);
+                        });
                     return;
                 }
                 this.updateTurn(players[0].socketID, turnState, timer);

@@ -15,6 +15,15 @@ const basePath = `${environment.serverUrl}/api`;
 export class HttpService {
     constructor(private alertService: AlertService, private http: HttpClient) {}
 
+    getHighScores(gameMode: number) {
+        return this.http.get(`${basePath}/score`, { params: { gameMode }, responseType: 'json' }).pipe(
+            timeout(DEFAULT_TIMEOUT),
+            catchError((err) => this.catchAnyHttpError(err)),
+            catchError((err) => this.catchTimeoutError(err)),
+            catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
+        );
+    }
+
     getBots(difficulty: number) {
         return this.http.get(`${basePath}/bot`, { params: { difficulty }, responseType: 'json' }).pipe(
             timeout(DEFAULT_TIMEOUT),
@@ -70,6 +79,18 @@ export class HttpService {
             catchError((err) => this.catchTimeoutError(err, true)),
             catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
         );
+    }
+
+    resetDB() {
+        this.http
+            .delete(`${basePath}`, { responseType: 'text' })
+            .pipe(
+                timeout(DEFAULT_TIMEOUT),
+                catchError((err) => this.catchAnyHttpError(err)),
+                catchError((err) => this.catchTimeoutError(err)),
+                catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
+            )
+            .subscribe({ complete: () => this.alertService.showAlert('Le système a été réinitialisé') });
     }
 
     catchHttpErrorWithStatus(err: Error, status: number, callback?: (err: HttpErrorResponse) => void) {

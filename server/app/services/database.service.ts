@@ -1,33 +1,22 @@
 import { Service } from 'typedi';
-import { MongoClient, Db, Collection } from 'mongodb';
-import { Score } from '@app/classes/highscore';
-import { EMPTYSCORE } from '@app/classes/config';
-
-const DATABASE_URL = 'mongodb+srv://equipe105:giornogiovanna@cluster0.9flzh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
-const DATABASE_NAME = 'HighScore';
-const DATABASE_COLLECTION_LOG2990 = 'ScoreLog2990';
-const DATABASE_COLLECTION_CLASSIC = 'ScoreClassic';
+import { MongoClient, Db, Document } from 'mongodb';
+import { HighScore } from '@app/classes/highscore';
+import { DATABASE, DEFAULT_HIGH_SCORES } from '@app/classes/config';
+import { GameMode } from '@app/classes/game-info';
 
 @Service()
 export class DatabaseService {
-    private highScoreDatabase: Db;
     private client: MongoClient;
+
+    private highScoreDB: Db;
 
     async databaseConnect(): Promise<MongoClient | null> {
         try {
-            const client = await MongoClient.connect(DATABASE_URL);
+            const client = await MongoClient.connect(DATABASE.url);
             this.client = client;
-            this.highScoreDatabase = client.db(DATABASE_NAME);
+            this.highScoreDB = client.db(DATABASE.highScore.name);
         } catch {
             throw new Error('Database connection error');
-        }
-
-        if ((await this.highScoreDatabase.collection(DATABASE_COLLECTION_LOG2990).countDocuments()) === 0) {
-            await this.setDefaultScoresLog2990();
-        }
-
-        if ((await this.highScoreDatabase.collection(DATABASE_COLLECTION_CLASSIC).countDocuments()) === 0) {
-            await this.setDefaultScoresClassic();
         }
 
         return this.client;
@@ -37,23 +26,38 @@ export class DatabaseService {
         return this.client.close();
     }
 
-    async setDefaultScoresLog2990(): Promise<void> {
-        for (const score of EMPTYSCORE) {
-            await this.highScoreDatabase.collection(DATABASE_COLLECTION_LOG2990).insertOne(score);
+    async resetDB() {
+        return Promise.all([
+            this.highScoreDB.dropCollection(DATABASE.highScore.collections.classical),
+            this.highScoreDB.dropCollection(DATABASE.highScore.collections.log2990),
+        ]);
+    }
+
+    async putDefaultScores(): Promise<void> {
+        await Promise.all([
+            this.highScoreDB.collection(DATABASE.highScore.collections.classical).insertMany(DEFAULT_HIGH_SCORES.classical),
+            this.highScoreDB.collection(DATABASE.highScore.collections.log2990).insertMany(DEFAULT_HIGH_SCORES.log2990),
+        ]);
+    }
+
+    async postHighScore(highScore: HighScore, gameMode: number): Promise<void> {
+        const collection = DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'];
+        const lowestScore = await this.highScoreDB.collection(collection).find({}).sort({ score: 1 }).limit(1).toArray();
+        if (highScore.score > lowestScore[0].score) {
+            this.highScoreDB.collection(collection).insertOne(highScore);
+            // eslint-disable-next-line no-underscore-dangle
+            this.highScoreDB.collection(collection).deleteOne({ _id: (lowestScore[0] as Document)._id });
         }
     }
 
-    async setDefaultScoresClassic(): Promise<void> {
-        for (const score of EMPTYSCORE) {
-            await this.highScoreDatabase.collection(DATABASE_COLLECTION_CLASSIC).insertOne(score);
-        }
-    }
-
-    get collectionClassic(): Collection<Score> {
-        return this.highScoreDatabase.collection(DATABASE_COLLECTION_CLASSIC);
-    }
-
-    get collectionLog2990(): Collection<Score> {
-        return this.highScoreDatabase.collection(DATABASE_COLLECTION_LOG2990);
+    async getHighScores(gameMode: number): Promise<HighScore[]> {
+        return this.highScoreDB
+            .collection(DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'])
+            .find({})
+            .sort({ score: -1 })
+            .toArray()
+            .then((score: HighScore[]) => {
+                return score;
+            });
     }
 }

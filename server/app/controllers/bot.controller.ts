@@ -15,17 +15,10 @@ export class BotController {
         this.router = Router();
 
         this.router.get('/', (req: Request, res: Response) => {
-            const names = req.query.difficulty === String(GameDifficulty.Easy) ? DEFAULT_BOT_NAMES.easy : DEFAULT_BOT_NAMES.hard;
-            res.json(
-                names
-                    .map((name, id) => {
-                        return { id, name, default: true };
-                    })
-                    .concat([
-                        { id: -1, name: 'oort cloud', default: false },
-                        { id: -2, name: '1984531616486535', default: false },
-                    ]),
-            );
+            const names = (req.query.difficulty === String(GameDifficulty.Easy) ? DEFAULT_BOT_NAMES.easy : DEFAULT_BOT_NAMES.hard).map((name, id) => {
+                return { id, name, default: true };
+            });
+            res.json(names);
         });
 
         /* eslint-disable @typescript-eslint/no-magic-numbers */

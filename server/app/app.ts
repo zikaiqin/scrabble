@@ -1,5 +1,6 @@
 import { HttpException } from '@app/classes/http.exception';
 import { BotController } from '@app/controllers/bot.controller';
+import { ScoreController } from '@app/controllers/score.controller';
 import { DateController } from '@app/controllers/date.controller';
 import { ExampleController } from '@app/controllers/example.controller';
 import cookieParser from 'cookie-parser';
@@ -10,6 +11,7 @@ import logger from 'morgan';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
+import { DatabaseService } from '@app/services/database.service';
 
 @Service()
 export class Application {
@@ -18,7 +20,9 @@ export class Application {
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
     constructor(
+        private readonly dbService: DatabaseService,
         private readonly botController: BotController,
+        private readonly scoreController: ScoreController,
         private readonly exampleController: ExampleController,
         private readonly dateController: DateController,
     ) {
@@ -43,10 +47,23 @@ export class Application {
     bindRoutes(): void {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/api/bot', this.botController.router);
+        this.app.use('/api/score', this.scoreController.router);
         this.app.use('/api/example', this.exampleController.router);
         this.app.use('/api/date', this.dateController.router);
-        this.app.use('/', (req, res) => {
-            res.redirect('/api/docs');
+        this.app.delete('/api', (req, res) => {
+            this.dbService
+                .resetDB()
+                .then((collections) => {
+                    if (!collections.every((dropped) => dropped)) {
+                        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                        res.sendStatus(502);
+                        return;
+                    }
+                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                    this.dbService.putDefaultScores().finally(() => res.sendStatus(200));
+                })
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                .catch(() => res.sendStatus(502));
         });
         this.errorHandling();
     }

@@ -14,7 +14,7 @@
             (newGame)="createGame($event)"
         ></app-new-game-menu>
 
-        <app-scoreboard *ngIf="showPage() === 'Scoreboard'" (buttonClick)="handleClick($event)"> </app-scoreboard>
+        <app-scoreboard *ngIf="showPage() === 'Scoreboard'" (buttonClick)="handleClick($event)"></app-scoreboard>
 
         <app-game-browser
             *ngIf="showPage() === 'Browser'"
