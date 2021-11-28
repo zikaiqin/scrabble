@@ -221,7 +221,7 @@ export const DEFAULT_HIGH_SCORES = {
 };
 
 export const DEFAULT_BOT_NAMES = {
-    easy: ['tyler1', '< your ad here >', 'M0NKE'],
+    easy: ['tyler1', '< your ad here >', 'Kirikou'],
     hard: ['Kevin Nguyen', '孙悟空', 'DIO'],
 };
 
