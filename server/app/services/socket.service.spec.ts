@@ -1,4 +1,4 @@
-/* eslint-disable dot-notation */
+/* eslint-disable dot-notation,max-lines */
 import { SocketService } from '@app/services/socket.service';
 import { Container } from 'typedi';
 import * as http from 'http';
@@ -6,32 +6,36 @@ import { io, Socket } from 'socket.io-client';
 import { beforeEach, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { HighscoreService } from '@app/services/highscore.service';
-import { createSandbox } from 'sinon';
+import Sinon, { createSandbox } from 'sinon';
 import { Score } from '@app/classes/highscore';
 import { GameInfo } from '@app/classes/game-info';
 import { Server } from '@app/server';
 // eslint-disable-next-line no-restricted-imports -- we need this import in order to simulate a client connection
 import { environment } from '../../../client/src/environments/environment';
 
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('SocketService', () => {
     let service: SocketService;
     let fakeHighScoreService: HighscoreService;
     let socketID: string;
     let socket: Socket;
     let server: Server;
+    let activeRoomGetSpy: Sinon.SinonSpy<[key: string], string | undefined>;
     const sandbox = createSandbox();
 
     beforeEach(() => {
         socketID = 'abcd';
         fakeHighScoreService = Container.get(HighscoreService);
-
         service = new SocketService(http.createServer(), fakeHighScoreService);
+        activeRoomGetSpy = sandbox.spy(service['activeRooms'], 'get');
     });
 
     before(() => {
         server = Container.get(Server);
         server.init();
+    });
+
+    after(() => {
+        socket.close();
     });
 
     it('updateObjectives should call the right function', () => {
@@ -169,5 +173,174 @@ describe('SocketService', () => {
         const socketSpy = sandbox.spy(service['socketEvents'], 'emit');
         socket.emit('createGame', configs);
         expect(socketSpy.calledWith('_' + socketID, configs, [{ socketID: socket.id, username: configs.username }]));
+    });
+
+    // 50-50 to make tests in validationService crash because of response
+    /*    it('joinGame should call the right function with configs', () => {
+        socket = io(environment.serverUrl).connect();
+        const getSpy = sandbox.spy(service['waitingRooms'], 'get');
+        const setSpy = sandbox.spy(service['activeRooms'], 'set');
+        const emitSpy = sandbox.spy(service['socketEvents'], 'emit');
+        const deleteSpy = sandbox.spy(service, 'deleteRoom');
+        socket.emit('joinGame', socketID, socketID, socketID);
+        expect(getSpy.calledWith(socketID));
+        expect(setSpy.notCalled);
+        expect(emitSpy.notCalled);
+        expect(deleteSpy.notCalled);
+
+        const configs: GameInfo = { username: 'test', turnLength: 60, randomized: false, gameMode: 1, gameType: 1, difficulty: 1, roomID: socketID };
+        service['waitingRooms'].set(socketID, configs);
+        socket.emit('joinGame', socketID, socketID, socketID);
+        expect(getSpy.calledWith(socketID));
+        expect(setSpy.calledWith(socket.id, socketID));
+        expect(
+            emitSpy.calledWith('createGame', socketID, configs, [
+                { socketID: socketID.slice(1), username: configs.username },
+                { socketID: socket.id, username: socketID },
+            ]),
+        );
+        expect(deleteSpy.calledWith(socketID));
+    });*/
+
+    it('convertGame should call the right functions', () => {
+        socket = io(environment.serverUrl).connect();
+        const waitingRoomGetSpy = sandbox.spy(service['waitingRooms'], 'get');
+        const waitingRoomDeleteSpy = sandbox.spy(service['waitingRooms'], 'delete');
+        const emitSpy = sandbox.spy(service['socketEvents'], 'emit');
+        const sioEmitSpy = sandbox.spy(service['sio'], 'emit');
+
+        service['activeRooms'].set(socket.id, socketID);
+        const configs: GameInfo = { username: 'test', turnLength: 60, randomized: false, gameMode: 1, gameType: 1, difficulty: 1, roomID: socketID };
+        service['waitingRooms'].set(socketID, configs);
+        socket.emit('convertGame', 1);
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(socketID));
+        expect(waitingRoomGetSpy.calledWith(socketID));
+        expect(waitingRoomGetSpy.returned(configs));
+        expect(waitingRoomDeleteSpy.calledWith(socketID));
+        expect(waitingRoomDeleteSpy.returned(true));
+        expect(emitSpy.calledWith('createGame', socketID, configs, [{ socketID: socket.id, username: configs.username }]));
+        expect(sioEmitSpy.calledWith('updateRooms', service.roomList));
+    });
+
+    it('convertGame should return part 1 nothing good', () => {
+        socket = io(environment.serverUrl).connect();
+        const waitingRoomGetSpy = sandbox.spy(service['waitingRooms'], 'get');
+        const waitingRoomDeleteSpy = sandbox.spy(service['waitingRooms'], 'delete');
+        const emitSpy = sandbox.spy(service['socketEvents'], 'emit');
+        const sioEmitSpy = sandbox.spy(service['sio'], 'emit');
+
+        service['waitingRooms'].clear();
+        socket.emit('convertGame', 1);
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(undefined));
+        expect(waitingRoomGetSpy.notCalled);
+        expect(waitingRoomDeleteSpy.notCalled);
+        expect(emitSpy.notCalled);
+        expect(sioEmitSpy.notCalled);
+    });
+
+    it('convertGame should return part 2 first statement good', () => {
+        socket = io(environment.serverUrl).connect();
+        const waitingRoomGetSpy = sandbox.spy(service['waitingRooms'], 'get');
+        const waitingRoomDeleteSpy = sandbox.spy(service['waitingRooms'], 'delete');
+        const emitSpy = sandbox.spy(service['socketEvents'], 'emit');
+        const sioEmitSpy = sandbox.spy(service['sio'], 'emit');
+
+        service['activeRooms'].set(socket.id, socketID);
+        service['waitingRooms'].clear();
+        socket.emit('convertGame', 1);
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(socketID));
+        expect(waitingRoomGetSpy.calledWith(socketID));
+        expect(waitingRoomGetSpy.returned(undefined));
+        expect(waitingRoomDeleteSpy.notCalled);
+        expect(emitSpy.notCalled);
+        expect(sioEmitSpy.notCalled);
+    });
+
+    it('sendMessage should call the right functions', () => {
+        socket = io(environment.serverUrl).connect();
+        const socketEmitSpy = sandbox.spy(socket, 'emit');
+
+        service['activeRooms'].set(socket.id, socketID);
+        socket.emit('sendMessage', 'Hello');
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(socketID));
+        expect(socketEmitSpy.calledWith('receiveMessage', 'user-message', 'Hello'));
+    });
+
+    it('sendMessage should return', () => {
+        socket = io(environment.serverUrl).connect();
+        const socketEmitSpy = sandbox.spy(socket, 'emit');
+
+        socket.emit('sendMessage', 'Hello');
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(undefined));
+        expect(socketEmitSpy.notCalled);
+    });
+
+    it('place should call the right functions', () => {
+        socket = io(environment.serverUrl).connect();
+        const socketEmitSpy = sandbox.spy(service['socketEvents'], 'emit');
+
+        service['activeRooms'].set(socket.id, socketID);
+        socket.emit('place', 'a1', ['a1', 'b']);
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(socketID));
+        expect(socketEmitSpy.calledWith('place', socket.id, socketID, 'a1', ['a1', 'b']));
+        expect(socketEmitSpy.returned(true));
+    });
+
+    it('place should return', () => {
+        socket = io(environment.serverUrl).connect();
+        const socketEmitSpy = sandbox.spy(service['socketEvents'], 'emit');
+
+        socket.emit('place', 'a1', ['a1', 'b']);
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(undefined));
+        expect(socketEmitSpy.notCalled);
+    });
+
+    it('exchange should call the right functions', () => {
+        socket = io(environment.serverUrl).connect();
+        const socketEmitSpy = sandbox.spy(service['socketEvents'], 'emit');
+
+        service['activeRooms'].set(socket.id, socketID);
+        socket.emit('exchange', 'a1');
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(socketID));
+        expect(socketEmitSpy.calledWith('exchange', socket.id, socketID, 'a1'));
+    });
+
+    it('exchange should return', () => {
+        socket = io(environment.serverUrl).connect();
+        const socketEmitSpy = sandbox.spy(service['socketEvents'], 'emit');
+
+        socket.emit('exchange', 'a1');
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(undefined));
+        expect(socketEmitSpy.notCalled);
+    });
+
+    it('skipTurn should call the right functions', () => {
+        socket = io(environment.serverUrl).connect();
+        const socketEmitSpy = sandbox.spy(service['socketEvents'], 'emit');
+
+        service['activeRooms'].set(socket.id, socketID);
+        socket.emit('skipTurn');
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(socketID));
+        expect(socketEmitSpy.calledWith('skipTurn', socketID));
+    });
+
+    it('skipTurn should return', () => {
+        socket = io(environment.serverUrl).connect();
+        const socketEmitSpy = sandbox.spy(service['socketEvents'], 'emit');
+
+        socket.emit('skipTurn');
+        expect(activeRoomGetSpy.calledWith(socket.id));
+        expect(activeRoomGetSpy.returned(undefined));
+        expect(socketEmitSpy.notCalled);
     });
 });
