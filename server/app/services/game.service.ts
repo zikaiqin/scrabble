@@ -117,12 +117,12 @@ export class GameService {
                     const quitter = game.players.get(socketID);
                     const skip = Array.from(game.players.values()).indexOf(quitter as Player) === 0 ? timer.turn : !timer.turn;
                     setTimeout(() => {
-                       this.socketService.sendMessage(roomID, MessageType.System, `${quitter} a quitté le jeu!`);
+                        this.socketService.sendMessage(roomID, MessageType.System, `${quitter} a quitté le jeu!`);
                         this.socketService.sendMessage(roomID, MessageType.System, `${quitter} a été remplacé par un joueur virtuel`);
                         this.botService.games.set(socketID, roomID);
                         if (skip) {
                             this.changeTurn(roomID);
-                        } 
+                        }
                     }, DEFAULT_SOCKET_TIMEOUT);
                 } else {
                     this.deleteRoom(roomID);
@@ -211,13 +211,12 @@ export class GameService {
             .on(Timer.events.updateTurn, (turnState: boolean) => {
                 if (this.gameEnded(roomID, game, players[0].player, players[1].player)) {
                     this.deleteRoom(roomID);
-                    players
-                        .forEach(({ socketID, player }) => {
-                            if (!this.botService.games.delete(socketID)) {
-                                const highScore = { name: player.name, score: player.score };
-                                this.dbService.updateHighScore(highScore, configs.gameMode as number);
-                            }
-                        });
+                    players.forEach(({ socketID, player }) => {
+                        if (!this.botService.games.delete(socketID)) {
+                            const highScore = { name: player.name, score: player.score };
+                            this.dbService.updateHighScore(highScore, configs.gameMode as number);
+                        }
+                    });
                     return;
                 }
                 this.updateTurn(players[0].socketID, turnState, timer);

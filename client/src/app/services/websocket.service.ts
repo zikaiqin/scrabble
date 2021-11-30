@@ -95,8 +95,8 @@ export class WebsocketService {
             this.alertService.showAlert('La connexion au serveur a été interrompue');
             this.connectionStatus.next('connectionLost');
         });
-        this.socket.io.on("reconnect_failed", () => {
-            this.alertService.showAlert("Le serveur est inaccessible");
+        this.socket.io.on('reconnect_failed', () => {
+            this.alertService.showAlert('Le serveur est inaccessible');
         });
     }
 
@@ -152,12 +152,14 @@ export class WebsocketService {
     }
 
     connect(socket?: Socket): void {
-        this.socket = socket ? socket : io(environment.serverUrl, {
-            reconnection: true,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax : 3000,
-            reconnectionAttempts: 2
-        }).connect();
+        this.socket = socket
+            ? socket
+            : io(environment.serverUrl, {
+                  reconnection: true,
+                  reconnectionDelay: 1000,
+                  reconnectionDelayMax: 3000,
+                  reconnectionAttempts: 2,
+              }).connect();
         this.attachListeners();
     }
 

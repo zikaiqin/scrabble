@@ -7,7 +7,7 @@
     </mat-toolbar>
 
     <mat-drawer-container class="stretch-col stretch-col-content">
-        <mat-drawer opened mode='side' class="mat-elevation-z1">
+        <mat-drawer opened mode="side" class="mat-elevation-z1">
             <mat-action-list>
                 <mat-list-item [disabled]="page === 'dict'" (click)="page = 'dict'">
                     <mat-icon mat-list-icon>spellcheck</mat-icon>
@@ -49,7 +49,7 @@
 </div>
 
 <mat-menu #menu="matMenu">
-    <button mat-menu-item class='reset' (click)="openResetDialog()">
+    <button mat-menu-item class="reset" (click)="openResetDialog()">
         <mat-icon mat-list-icon>restore</mat-icon>
         <span>Réinitialiser le système</span>
     </button>
