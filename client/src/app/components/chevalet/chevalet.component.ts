@@ -1,8 +1,8 @@
 import { Component, ElementRef, HostListener, Input } from '@angular/core';
 import { MessageType } from '@app/classes/message';
 import { CommandService } from '@app/services/command.service';
+import { GridService } from '@app/services/grid.service';
 import { TextboxService } from '@app/services/textbox.service';
-
 const HAND_SIZE = 7;
 const MINUS1 = -1;
 @Component({
@@ -19,7 +19,7 @@ export class ChevaletComponent {
     activeLetter: boolean[] = [false, false, false, false, false, false, false];
     isYourTurn: boolean = true;
     isEventReceiver: boolean = false;
-    constructor(private eRef: ElementRef, private commandService: CommandService, private textboxService: TextboxService) {
+    constructor(private eRef: ElementRef, private commandService: CommandService, private textboxService: TextboxService, private gridService: GridService) {
         this.addWindowListener();
     }
     @HostListener('document:click', ['$event'])
@@ -78,7 +78,7 @@ export class ChevaletComponent {
             isManipulating = true;
         }
 
-        if (!isManipulating) {
+        if (!isManipulating && !this.gridService.isPlacing) {
             event.preventDefault();
             this.isClicked[index] = !this.isClicked[index];
             if (this.isClicked[index]) {
