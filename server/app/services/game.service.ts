@@ -114,19 +114,16 @@ export class GameService {
                     if (game === undefined || timer === undefined) {
                         return;
                     }
-                    timer.lock();
-                    const entries = game.players.entries();
-                    Array.from(entries).forEach(([id, player]) => {
-                        if (id === socketID) {
-                            this.socketService.sendMessage(roomID, MessageType.System, `${player.name} a quitté le jeu!`);
-                        } else {
-                            setTimeout(() => {
-                                this.socketService.updateTurn(roomID, false);
-                                this.socketService.gameEnded(roomID, player.name);
-                                timer.clearTimer();
-                            }, DEFAULT_SOCKET_TIMEOUT);
-                        }
-                    });
+                    const quitter = game.players.get(socketID);
+                    const skip = Array.from(game.players.values()).indexOf(quitter as Player) === 0 ? timer.turn : !timer.turn;
+                    setTimeout(() => {
+                       this.socketService.sendMessage(roomID, MessageType.System, `${quitter} a quitté le jeu!`);
+                        this.socketService.sendMessage(roomID, MessageType.System, `${quitter} a été remplacé par un joueur virtuel`);
+                        this.botService.games.set(socketID, roomID);
+                        if (skip) {
+                            this.changeTurn(roomID);
+                        } 
+                    }, DEFAULT_SOCKET_TIMEOUT);
                 } else {
                     this.deleteRoom(roomID);
                 }
@@ -215,10 +212,11 @@ export class GameService {
                 if (this.gameEnded(roomID, game, players[0].player, players[1].player)) {
                     this.deleteRoom(roomID);
                     players
-                        .map((entry) => entry.player)
-                        .forEach((player) => {
-                            const highScore = { name: player.name, score: player.score };
-                            this.dbService.updateHighScore(highScore, configs.gameMode as number);
+                        .forEach(({ socketID, player }) => {
+                            if (!this.botService.games.delete(socketID)) {
+                                const highScore = { name: player.name, score: player.score };
+                                this.dbService.updateHighScore(highScore, configs.gameMode as number);
+                            }
                         });
                     return;
                 }
