@@ -5,7 +5,7 @@ import { Game } from '@app/classes/game';
 import { Board } from '@app/classes/board';
 import { Player } from '@app/classes/player';
 import { MessageType } from '@app/classes/message';
-import { GameInfo, GameMode, GameType, PlayerInfo } from '@app/classes/game-info';
+import { GameDifficulty, GameInfo, GameMode, GameType, PlayerInfo } from '@app/classes/game-info';
 import { BOT_MARKER, DEFAULT_BONUSES, DEFAULT_BOT_NAMES, DEFAULT_SOCKET_TIMEOUT, DEFAULT_TURN_TIMEOUT } from '@app/classes/config';
 import { BotService } from '@app/services/bot.service';
 import { EndGameService } from '@app/services/end-game.service';
@@ -15,6 +15,7 @@ import { SocketService } from '@app/services/socket.service';
 import { ValidationService } from '@app/services/validation.service';
 import { Service } from 'typedi';
 import { ObjectivesService } from '@app/services/objectives';
+import { DatabaseService } from '@app/services/database.service';
 
 @Service()
 export class GameService {
@@ -34,6 +35,7 @@ export class GameService {
         private placingService: PlacingService,
         private validationService: ValidationService,
         private objectvesService: ObjectivesService,
+        private dbService: DatabaseService,
     ) {}
 
     attachSocketListeners() {
@@ -157,8 +159,8 @@ export class GameService {
             });
     }
 
-    createGame(roomID: string, configs: GameInfo, players: PlayerInfo[]) {
-        const game = this.setupGame(roomID, configs, players);
+    async createGame(roomID: string, configs: GameInfo, players: PlayerInfo[]) {
+        const game = await this.setupGame(roomID, configs, players);
         const timer = this.setupTimer(roomID, configs, game);
 
         this.games.set(roomID, game);
@@ -169,7 +171,7 @@ export class GameService {
         timer.changeTurn();
     }
 
-    setupGame(roomID: string, configs: GameInfo, playerInfos: PlayerInfo[]): Game {
+    async setupGame(roomID: string, configs: GameInfo, playerInfos: PlayerInfo[]): Promise<Game> {
         // Generate entries for player map
         const players: [string, Player][] = playerInfos.map((entry) => {
             const player = new Player(entry.username);
@@ -177,7 +179,7 @@ export class GameService {
         });
         if (configs.gameType === GameType.Single) {
             // If single player, add a bot to the map entries
-            const bot = new Player(this.getBotName(playerInfos[0].username, configs.difficulty as number));
+            const bot = new Player(await this.getBotName(playerInfos[0].username, configs.difficulty as number));
             const botID = `${BOT_MARKER}${playerInfos[0].socketID}`;
             players.push([botID, bot]);
             this.botService.games.set(botID, roomID);
@@ -212,6 +214,12 @@ export class GameService {
             .on(Timer.events.updateTurn, (turnState: boolean) => {
                 if (this.gameEnded(roomID, game, players[0].player, players[1].player)) {
                     this.deleteRoom(roomID);
+                    players
+                        .map((entry) => entry.player)
+                        .forEach((player) => {
+                            const highScore = { name: player.name, score: player.score };
+                            this.dbService.updateHighScore(highScore, configs.gameMode as number);
+                        });
                     return;
                 }
                 this.updateTurn(players[0].socketID, turnState, timer);
@@ -268,9 +276,14 @@ export class GameService {
         return new Map(coords.map((key, index) => [key, multiplier[index]]));
     }
 
-    getBotName(playerName: string, difficulty: number): string {
-        void difficulty;
-        const validBotNames = DEFAULT_BOT_NAMES.filter((name) => name !== playerName);
+    async getBotName(playerName: string, difficulty: number): Promise<string> {
+        let names = difficulty === GameDifficulty.Easy ? DEFAULT_BOT_NAMES.easy : DEFAULT_BOT_NAMES.hard;
+        try {
+            names = names.concat(...(await this.dbService.getBots(difficulty)).map((bot) => bot.name));
+        } catch (e) {
+            void e;
+        }
+        const validBotNames = names.filter((name) => name !== playerName);
         return validBotNames[Math.floor(Math.random() * validBotNames.length)];
     }
 

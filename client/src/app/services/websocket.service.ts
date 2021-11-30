@@ -78,11 +78,11 @@ export class WebsocketService {
             this.socket.on('updateScores', (ownScore: number, opponentScore: number) => {
                 this.gameScores.next({ ownScore, opponentScore });
             });
-            this.socket.on('gameEnded', (winner: string) => {
-                this.gameEnded.next(winner);
-            });
             this.socket.on('updateObjectives', (publicObj: [number, boolean][], privateObj: [number, boolean]) => {
                 this.objectives.next({ publicObj, privateObj });
+            });
+            this.socket.on('gameEnded', (winner: string) => {
+                this.gameEnded.next(winner);
             });
         });
 
@@ -136,6 +136,10 @@ export class WebsocketService {
         this.socket.emit('skipTurn');
     }
 
+    fetchObjectives(): void {
+        this.socket.emit('fetchObjectives');
+    }
+
     connect(socket?: Socket): void {
         this.socket = socket ? socket : io(environment.serverUrl).connect();
         this.attachListeners();
@@ -143,10 +147,6 @@ export class WebsocketService {
 
     disconnect(): void {
         this.socket.disconnect();
-    }
-
-    fetchObjectives(): void {
-        this.socket.emit('fetchObjectives');
     }
 
     get status(): Observable<string> {

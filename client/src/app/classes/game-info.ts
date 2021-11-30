@@ -34,3 +34,9 @@ export enum GameDifficulty {
     Easy,
     Hard,
 }
+
+export type BotName = {
+    id: string;
+    name: string;
+    default: boolean;
+};

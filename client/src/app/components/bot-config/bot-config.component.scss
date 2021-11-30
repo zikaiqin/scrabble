@@ -1,0 +1,13 @@
+.container {
+    align-items: end;
+}
+
+.mat-cell.mat-column-details {
+    font-weight: 400;
+    font-style: italic;
+}
+
+.table-container {
+    flex-direction: column-reverse;
+    justify-content: start;
+}

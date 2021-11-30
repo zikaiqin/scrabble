@@ -1,10 +1,12 @@
 import { GameService } from './game.service';
+import { DatabaseService } from '@app/services/database.service';
 import { SocketService } from '@app/services/socket.service';
 import { BotService } from '@app/services/bot.service';
 import { EndGameService } from '@app/services/end-game.service';
 import { ExchangeService } from '@app/services/exchange.service';
 import { PlacingService } from '@app/services/placing.service';
 import { ValidationService } from '@app/services/validation.service';
+import { ObjectivesService } from '@app/services/objectives';
 import { DEFAULT_BONUSES } from '@app/classes/config';
 import { Container } from 'typedi';
 import EventEmitter from 'events';
@@ -22,16 +24,20 @@ describe('GameService', () => {
     let fakeExchangeService: ExchangeService;
     let fakePlacingService: PlacingService;
     let fakeValidationService: ValidationService;
+    let fakeObjectivesService: ObjectivesService;
+    let fakeDatabaseService: DatabaseService;
 
     let fakeSocketEvents: EventEmitter;
 
     beforeEach(() => {
+        fakeDatabaseService = Container.get(DatabaseService);
         fakeSocketService = new SocketService(http.createServer());
         fakeBotService = Container.get(BotService);
         fakeEndGameService = Container.get(EndGameService);
         fakeExchangeService = Container.get(ExchangeService);
         fakePlacingService = Container.get(PlacingService);
         fakeValidationService = Container.get(ValidationService);
+        fakeObjectivesService = Container.get(ObjectivesService);
 
         fakeSocketEvents = new EventEmitter();
 
@@ -42,6 +48,8 @@ describe('GameService', () => {
             fakeExchangeService,
             fakePlacingService,
             fakeValidationService,
+            fakeObjectivesService,
+            fakeDatabaseService,
         );
         sinon.replace(fakeSocketService, 'socketEvents', fakeSocketEvents);
         service.attachSocketListeners();

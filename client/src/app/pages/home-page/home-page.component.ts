@@ -1,20 +1,22 @@
 import { Component } from '@angular/core';
 import { GameInfo, GameMode, GameType } from '@app/classes/game-info';
 import { WebsocketService } from '@app/services/websocket.service';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-home-page',
     templateUrl: './home-page.component.html',
-    styleUrls: ['../../styles.scss'],
+    styleUrls: ['../../styles.scss', 'home-page.component.scss'],
 })
 export class HomePageComponent {
     gameMode = GameMode.None;
     gameType = GameType.None;
     showBrowser = false;
     showWaitingRoom = false;
+    showScoreboard = false;
     gameConfigs: GameInfo;
 
-    constructor(private webSocketService: WebsocketService) {
+    constructor(private router: Router, private webSocketService: WebsocketService) {
         this.webSocketService.status.subscribe((event) => {
             if (event === 'connectionLost') {
                 if (this.showWaitingRoom) {
@@ -27,6 +29,9 @@ export class HomePageComponent {
     handleClick(button: string): void {
         if (button === 'Classical' || button === 'Log2990') {
             this.gameMode = GameMode[button];
+        }
+        if (button === 'Scoreboard') {
+            this.showScoreboard = true;
         }
         if (button === 'Single' || button === 'Multi') {
             this.gameType = GameType[button];
@@ -47,6 +52,10 @@ export class HomePageComponent {
                 this.webSocketService.disconnect();
                 return;
             }
+            if (this.showScoreboard) {
+                this.showScoreboard = false;
+                return;
+            }
             if (this.gameType) {
                 this.gameType = GameType.None;
             } else {
@@ -56,6 +65,9 @@ export class HomePageComponent {
     }
 
     showPage(): string {
+        if (this.showScoreboard) {
+            return 'Scoreboard';
+        }
         if (this.showBrowser) {
             return 'Browser';
         }
@@ -63,6 +75,10 @@ export class HomePageComponent {
             return 'Main';
         }
         return this.showWaitingRoom ? 'WaitingRoom' : 'NewGame';
+    }
+
+    showSettings(): void {
+        this.router.navigateByUrl('/admin');
     }
 
     createGame(configs: GameInfo): void {
