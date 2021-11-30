@@ -1,4 +1,6 @@
 import { HttpException } from '@app/classes/http.exception';
+import { BotController } from '@app/controllers/bot.controller';
+import { ScoreController } from '@app/controllers/score.controller';
 import { DateController } from '@app/controllers/date.controller';
 import { ExampleController } from '@app/controllers/example.controller';
 import cookieParser from 'cookie-parser';
@@ -9,6 +11,8 @@ import logger from 'morgan';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
+import { DatabaseService } from '@app/services/database.service';
+import { MongoServerError } from 'mongodb';
 
 @Service()
 export class Application {
@@ -16,7 +20,13 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor(private readonly exampleController: ExampleController, private readonly dateController: DateController) {
+    constructor(
+        private readonly dbService: DatabaseService,
+        private readonly botController: BotController,
+        private readonly scoreController: ScoreController,
+        private readonly exampleController: ExampleController,
+        private readonly dateController: DateController,
+    ) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -37,11 +47,30 @@ export class Application {
 
     bindRoutes(): void {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
+        this.app.use('/api/bot', this.botController.router);
+        this.app.use('/api/score', this.scoreController.router);
         this.app.use('/api/example', this.exampleController.router);
         this.app.use('/api/date', this.dateController.router);
-        this.app.use('/', (req, res) => {
-            res.redirect('/api/docs');
+        /* eslint-disable @typescript-eslint/no-magic-numbers */
+        this.app.delete('/api', (req, res) => {
+            this.dbService
+                .resetDB()
+                .then((collections) => {
+                    if (!collections.every((dropped) => dropped)) {
+                        res.sendStatus(500);
+                        return;
+                    }
+                    this.dbService.insertDefaultScores().finally(() => res.sendStatus(200));
+                })
+                .catch((err) => {
+                    if (err instanceof MongoServerError && err.code === 26) {
+                        this.dbService.insertDefaultScores().finally(() => res.sendStatus(200));
+                        return;
+                    }
+                    res.sendStatus(500);
+                });
         });
+        /* eslint-enable @typescript-eslint/no-magic-numbers */
         this.errorHandling();
     }
 

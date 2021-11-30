@@ -23,8 +23,11 @@ import { GameBrowserDialogComponent } from '@app/components/game-browser-dialog/
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { WaitingRoomDialogComponent } from './components/waiting-room-dialog/waiting-room-dialog.component';
 import { ObjectivesComponent } from './components/objectives/objectives.component';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { ScoreboardComponent } from './components/scoreboard/scoreboard.component';
+import { DatabaseResetDialogComponent } from './components/database-reset-dialog/database-reset-dialog.component';
+import { BotConfigComponent } from './components/bot-config/bot-config.component';
+import { BotConfigSelectComponent } from './components/bot-config/bot-config-select.component';
+import { BotConfigDialogComponent } from './components/bot-config-dialog/bot-config-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -53,17 +56,12 @@ import { ScoreboardComponent } from './components/scoreboard/scoreboard.componen
         WaitingRoomDialogComponent,
         ObjectivesComponent,
         ScoreboardComponent,
+        DatabaseResetDialogComponent,
+        BotConfigComponent,
+        BotConfigSelectComponent,
+        BotConfigDialogComponent,
     ],
-    imports: [
-        AppMaterialModule,
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        BrowserModule,
-        FormsModule,
-        HttpClientModule,
-        ReactiveFormsModule,
-        MatSidenavModule,
-    ],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
 
     providers: [],
     bootstrap: [AppComponent],

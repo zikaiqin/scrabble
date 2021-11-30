@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { GameMode, GameType, GameInfo, GameDifficulty } from '@app/classes/game-info';
-import { DEFAULT_TURN_LENGTH } from '@app/classes/config';
+import { DEFAULT_TURN_LENGTH, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/classes/config';
 
 @Component({
     selector: 'app-new-game-menu',
@@ -85,6 +85,3 @@ export class NewGameMenuComponent implements OnInit {
         return this.form.controls.difficulty;
     }
 }
-
-const MIN_NAME_LENGTH = 2;
-const MAX_NAME_LENGTH = 16;

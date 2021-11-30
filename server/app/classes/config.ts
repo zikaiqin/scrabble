@@ -1,6 +1,6 @@
 // For the value of each letter sometimes they value 10 or 8
 
-import { Score } from './highscore';
+import { HighScore } from './highscore';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers*/
 
@@ -203,33 +203,49 @@ export const DEFAULT_RESERVE: string[] = [
     '*',
 ];
 
-export const EMPTYSCORE: Score[] = [
-    {
-        name: 'Legend27',
-        score: 50,
-    },
-    {
-        name: 'Joe',
-        score: 45,
-    },
-    {
-        name: 'McNugget',
-        score: 36,
-    },
-    {
-        name: 'RagingOpossum',
-        score: 23,
-    },
-    {
-        name: 'EmptyWallet',
-        score: 12,
-    },
-];
+export const DEFAULT_HIGH_SCORES = {
+    classical: [
+        { name: 'TheLegend27', score: 50 },
+        { name: 'Kevin Nguyen', score: 48 },
+        { name: '105mm APFSDS rnd', score: 42 },
+        { name: 'ฅ^•ﻌ•^ฅ', score: 35 },
+        { name: 'Иосиф Сталин', score: 27 },
+    ] as HighScore[],
+    log2990: [
+        { name: '孙悟空', score: 64 },
+        { name: 'MoistCr1TiKaL', score: 60 },
+        { name: 'ショタコン', score: 53 },
+        { name: 'Nigerian Prince', score: 39 },
+        { name: 'tyler1', score: 8 },
+    ] as HighScore[],
+};
 
-export const DEFAULT_BOT_NAMES: string[] = ['M0NKE', '死神', 'ฅ^•ﻌ•^ฅ'];
+export const DEFAULT_BOT_NAMES = {
+    easy: ['tyler1', '< your ad here >', 'Kirikou'],
+    hard: ['Kevin Nguyen', '孙悟空', 'DIO'],
+};
+
 export const DEFAULT_HAND_SIZE = 7;
 export const DEFAULT_TURN_TIMEOUT = 3000;
 export const DEFAULT_SOCKET_TIMEOUT = 5000;
 
 export const BOT_MARKER = '*';
 export const ROOM_MARKER = '_';
+
+export const DATABASE = {
+    url: 'mongodb+srv://equipe105:giornogiovanna@cluster0.9flzh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+    highScore: {
+        name: 'HighScore',
+        collections: {
+            classical: 'ScoreClassic',
+            log2990: 'ScoreLog2990',
+        },
+    },
+    bot: {
+        name: 'botNameDB',
+        collections: {
+            easy: 'easy',
+            hard: 'hard',
+        },
+    },
+};
