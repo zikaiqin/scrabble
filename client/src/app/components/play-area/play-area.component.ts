@@ -119,14 +119,6 @@ export class PlayAreaComponent implements AfterViewInit {
             // to the next position
             this.jumpLetter();
 
-            // check if there are othere lettre existed after this letter
-            // if yes, add it into initHand
-
-            // counter --;
-            // for(let i = 0; i<counter;i++){
-            //     this.stepBack();
-            // }
-
             // convert Map to Array
             // passing the board to service
             this.convertMapToStringArray();
@@ -138,6 +130,10 @@ export class PlayAreaComponent implements AfterViewInit {
         while (this.initHand.length > 0) {
             // back to the removing position
             this.stepBack();
+
+            // exemple: you see on the board: eTEe
+            // TE already existed on the board so not from hand
+            // we need to remove TE from initHand
             while (!this.placedLetters.has(this.positionStr())) {
                 this.initHand.splice(0, 1);
                 this.stepBack();
@@ -200,6 +196,10 @@ export class PlayAreaComponent implements AfterViewInit {
         if (this.initHand.length > 0) {
             // back to the removing position
             this.stepBack();
+
+            // exemple: you see on the board: eTEe
+            // TE already existed on the board so not from hand
+            // we need to remove TE from initHand
             while (!this.placedLetters.has(this.positionStr())) {
                 this.initHand.splice(0, 1);
                 this.stepBack();
