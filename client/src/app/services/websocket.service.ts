@@ -7,6 +7,8 @@ import { TextboxService } from '@app/services/textbox.service';
 import { Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 
+type SocketStatus = 'ok' | 'fail';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -98,19 +100,26 @@ export class WebsocketService {
 
     /**
      * @param configs configs for new game. No room ID, difficulty optional.
+     * @param onSuccess function to execute upon successful acknowledgement
      * @link NewGameMenuComponent.newGame
      */
-    createGame(configs: GameInfo): void {
-        this.socket.emit('createGame', configs);
+    createGame(configs: Partial<GameInfo>, onSuccess: () => void): void {
+        this.socket.emit('createGame', configs, (response: { status: SocketStatus }) => {
+            if (response.status === 'ok') {
+                onSuccess();
+                return;
+            }
+            this.alertService.showAlert("Le dictionnaire sélectionné n'existe pas");
+        });
     }
 
     /**
      * @param info username and ID of room to join
      * @link GameBrowserComponent.joinRoom
      */
-    joinGame(info: GameInfo): void {
-        this.socket.emit('joinGame', info.username, info.roomID, (response: { status: string }) => {
-            if (response.status !== 'ok') {
+    joinGame(info: Partial<GameInfo>): void {
+        this.socket.emit('joinGame', info.username, info.roomID, (response: { status: SocketStatus }) => {
+            if (response.status === 'fail') {
                 this.alertService.showAlert("La partie que vous avez essayé de joindre n'est plus disponible");
             }
         });

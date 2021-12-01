@@ -1,23 +1,3 @@
-export interface GameInfo {
-    username: string;
-    turnLength?: number;
-    randomized?: boolean;
-    gameMode?: number;
-    gameType?: number;
-    difficulty?: number;
-    roomID?: string;
-}
-
-export interface GameInit {
-    self: string;
-    opponent: string;
-    bonuses: [string, string][];
-    reserve: string[];
-    hand: string[];
-    gameMode: number;
-    turnState?: boolean;
-}
-
 export enum GameMode {
     None,
     Classical,
@@ -34,6 +14,27 @@ export enum GameDifficulty {
     Easy,
     Hard,
 }
+
+export type GameInfo = {
+    username: string;
+    turnLength: number;
+    randomized: boolean;
+    gameMode: number;
+    gameType: number;
+    difficulty: number;
+    roomID: string;
+    dictID: string;
+};
+
+export type GameInit = {
+    self: string;
+    opponent: string;
+    bonuses: [string, string][];
+    reserve: string[];
+    hand: string[];
+    gameMode: number;
+    turnState?: boolean;
+};
 
 export type BotName = {
     id: string;

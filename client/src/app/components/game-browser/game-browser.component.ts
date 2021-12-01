@@ -14,7 +14,7 @@ export class GameBrowserComponent implements OnInit {
     @Input() gameMode: number;
     @Input() gameList: Observable<GameInfo[]>;
     @Output() readonly buttonClick = new EventEmitter<string>();
-    @Output() readonly joinRoom = new EventEmitter<GameInfo>();
+    @Output() readonly joinRoom = new EventEmitter<Partial<GameInfo>>();
     @ViewChild(MatTable) table: MatTable<GameInfo>;
 
     readonly tableColumns: string[] = ['username', 'turnLength', 'randomized', 'roomID'];

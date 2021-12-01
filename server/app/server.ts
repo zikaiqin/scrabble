@@ -47,7 +47,19 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
-        this.socketService = new SocketService(this.server);
+        this.databaseService
+            .databaseConnect()
+            .then(() => {
+                // eslint-disable-next-line no-console
+                console.log('Database connection successful !');
+            })
+            .catch(() => {
+                // eslint-disable-next-line no-console
+                console.error('Database connection failed !');
+                process.exit(1);
+            });
+
+        this.socketService = new SocketService(this.server, this.databaseService, this.validationService);
         this.socketService.handleSockets();
 
         this.gameService = new GameService(
@@ -66,17 +78,6 @@ export class Server {
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
         this.server.on('listening', () => this.onListening());
-        this.databaseService
-            .databaseConnect()
-            .then(() => {
-                // eslint-disable-next-line no-console
-                console.log('Database connection successful !');
-            })
-            .catch(() => {
-                // eslint-disable-next-line no-console
-                console.error('Database connection failed !');
-                process.exit(1);
-            });
     }
 
     private onError(error: NodeJS.ErrnoException): void {

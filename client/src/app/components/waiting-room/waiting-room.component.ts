@@ -11,7 +11,7 @@ import { GameInfo } from '@app/classes/game-info';
 export class WaitingRoomComponent {
     @Output() buttonClick = new EventEmitter<string>();
     @Output() convertGame = new EventEmitter<number>();
-    @Input() configs: GameInfo;
+    @Input() configs: Partial<GameInfo>;
 
     constructor(public dialog: MatDialog) {}
 

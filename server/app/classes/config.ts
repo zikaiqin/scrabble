@@ -1,6 +1,8 @@
 // For the value of each letter sometimes they value 10 or 8
 
 import { HighScore } from './highscore';
+import { Dictionary } from '@app/classes/game-info';
+import * as data from '@app/config/dictionary.json';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers*/
 
@@ -248,4 +250,10 @@ export const DATABASE = {
             hard: 'hard',
         },
     },
+    dict: {
+        name: 'dictionaryDB',
+        collection: 'custom',
+    },
 };
+
+export const DEFAULT_DICTIONARY = { _id: '-1', ...JSON.parse(JSON.stringify(data)) } as Dictionary;

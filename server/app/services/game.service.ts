@@ -13,9 +13,9 @@ import { ExchangeService } from '@app/services/exchange.service';
 import { PlacingService } from '@app/services/placing.service';
 import { SocketService } from '@app/services/socket.service';
 import { ValidationService } from '@app/services/validation.service';
-import { Service } from 'typedi';
 import { ObjectivesService } from '@app/services/objectives';
 import { DatabaseService } from '@app/services/database.service';
+import { Service } from 'typedi';
 
 @Service()
 export class GameService {
@@ -34,7 +34,7 @@ export class GameService {
         private exchangeService: ExchangeService,
         private placingService: PlacingService,
         private validationService: ValidationService,
-        private objectvesService: ObjectivesService,
+        private objectivesService: ObjectivesService,
         private dbService: DatabaseService,
     ) {}
 
@@ -58,9 +58,9 @@ export class GameService {
                 this.endGameService.resetTurnSkipCount(roomId);
                 this.changeTurn(roomId);
             })
-            .on('place', (socketID: string, roomId: string, startCoords: string, letters: [string, string][]) => {
+            .on('place', (socketID: string, roomID: string, startCoords: string, letters: [string, string][]) => {
                 const toPlace = new Map<string, string>(letters);
-                const game = this.games.get(roomId);
+                const game = this.games.get(roomID);
                 if (game === undefined) {
                     return;
                 }
@@ -74,34 +74,34 @@ export class GameService {
                 this.socketService.updateHands(socketID, player.hand, Array.from(game.players.values()).filter((p) => p !== player)[0].hand);
 
                 // TODO: Move to validation.service as game.service is getting too long
-                const isValidWord = this.validationService.findWord(this.validationService.fetchWords());
+                const isValidWord = this.validationService.findWord(roomID, this.validationService.fetchWords());
                 setTimeout(() => {
                     if (isValidWord) {
                         player.score += this.validationService.calcPoints();
                         for (const objective of game.publicObj) {
                             const objNumber = objective[0];
-                            if (this.objectvesService.checkObjective(objNumber, toPlace, game)) {
-                                if (game.completePublic(objNumber)) player.score += this.objectvesService.getPoints(objNumber);
+                            if (this.objectivesService.checkObjective(objNumber, toPlace, game)) {
+                                if (game.completePublic(objNumber)) player.score += this.objectivesService.getPoints(objNumber);
                             }
                         }
-                        if (this.objectvesService.checkObjective(player.privateObj[0], toPlace, game)) {
-                            if (player.completePrivate()) player.score += this.objectvesService.getPoints(player.privateObj[0]);
+                        if (this.objectivesService.checkObjective(player.privateObj[0], toPlace, game)) {
+                            if (player.completePrivate()) player.score += this.objectivesService.getPoints(player.privateObj[0]);
                         }
                         this.placingService.replenishHand(game.reserve, player);
-                        this.socketService.updateReserve(roomId, game.reserve.letters);
+                        this.socketService.updateReserve(roomID, game.reserve.letters);
                         this.updateScores(game);
-                        this.endGameService.resetTurnSkipCount(roomId);
+                        this.endGameService.resetTurnSkipCount(roomID);
                     } else {
                         game.validTurnCounter = 0;
                         this.placingService.returnLetters(toPlace, game.board, player);
                         this.socketService.sendMessage(socketID, MessageType.System, 'Votre placement forme des mots invalides');
                     }
-                    this.socketService.updateBoard(roomId, game.board.letters);
+                    this.socketService.updateBoard(roomID, game.board.letters);
                     this.socketService.updateObjectives(socketID, game.publicObj, player.privateObj);
                     this.updateHands(game);
                 }, DEFAULT_TURN_TIMEOUT);
 
-                this.changeTurn(roomId);
+                this.changeTurn(roomID);
             })
             .on('skipTurn', (roomID: string) => {
                 this.endGameService.incrementTurnSkipCount(roomID);
@@ -184,20 +184,20 @@ export class GameService {
             players.push([botID, bot]);
             this.botService.games.set(botID, roomID);
         }
-        const bonuses = this.getBonuses(!!configs.randomized);
+        const bonuses = this.getBonuses(configs.randomized);
 
         const publicObj: [number, boolean][] = [];
         if (configs.gameMode === GameMode.Log2990) {
             // If the gameMode is LOG2990 (with objectives)
-            const tempObj = this.objectvesService.getPublicObjectives();
+            const tempObj = this.objectivesService.getPublicObjectives();
             // eslint-disable-next-line @typescript-eslint/prefer-for-of
             for (let i = 0; i < tempObj.length; i++) {
                 publicObj.push([tempObj[i], false]);
             }
             Array.from(players.values()).forEach((player) => {
-                player[1].privateObj = [this.objectvesService.getPrivateObjectives(), false];
+                player[1].privateObj = [this.objectivesService.getPrivateObjectives(), false];
             });
-            this.objectvesService.resetObjArray();
+            this.objectivesService.resetObjArray();
         }
         return new Game(new Board(bonuses), new Map(players), publicObj);
     }

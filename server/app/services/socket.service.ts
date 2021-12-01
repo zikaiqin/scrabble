@@ -4,7 +4,9 @@ import * as io from 'socket.io';
 import { Service } from 'typedi';
 import { GameInfo, GameType } from '@app/classes/game-info';
 import { MessageType } from '@app/classes/message';
-import { ROOM_MARKER } from '@app/classes/config';
+import { DEFAULT_DICTIONARY, ROOM_MARKER } from '@app/classes/config';
+import { ValidationService } from '@app/services/validation.service';
+import { DatabaseService } from '@app/services/database.service';
 
 @Service()
 export class SocketService {
@@ -14,7 +16,7 @@ export class SocketService {
 
     private sio: io.Server;
 
-    constructor(server: http.Server) {
+    constructor(server: http.Server, private dbService: DatabaseService, private validationService: ValidationService) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
 
@@ -22,17 +24,45 @@ export class SocketService {
         this.sio.on('connection', (socket: io.Socket) => {
             socket.emit('updateRooms', this.roomList);
 
-            socket.on('createGame', (configs: GameInfo) => {
-                const room = `${ROOM_MARKER}${socket.id}`;
-                socket.join(room);
-                this.activeRooms.set(socket.id, room);
+            socket.on('createGame', async (configs: GameInfo, response) => {
+                const createGame = () => {
+                    socket.join(room);
+                    this.activeRooms.set(socket.id, room);
 
-                if (configs.gameType === GameType.Multi) {
-                    this.waitingRooms.set(room, configs);
-                    this.sio.emit('updateRooms', this.roomList);
-                } else {
-                    this.socketEvents.emit('createGame', room, configs, [{ socketID: socket.id, username: configs.username }]);
+                    if (configs.gameType === GameType.Multi) {
+                        this.waitingRooms.set(room, configs);
+                        this.sio.emit('updateRooms', this.roomList);
+                    } else {
+                        this.socketEvents.emit('createGame', room, configs, [
+                            {
+                                socketID: socket.id,
+                                username: configs.username,
+                            },
+                        ]);
+                    }
+                    response({
+                        status: 'ok',
+                    });
+                };
+
+                const room = `${ROOM_MARKER}${socket.id}`;
+                // eslint-disable-next-line no-underscore-dangle
+                if (configs.dictID === DEFAULT_DICTIONARY._id) {
+                    this.validationService.dictionaries.set(room, DEFAULT_DICTIONARY.words);
+                    createGame();
+                    return;
                 }
+                this.dbService
+                    .getDictionaryContent(configs.dictID)
+                    .then((dictionary) => {
+                        this.validationService.dictionaries.set(room, dictionary?.words);
+                        createGame();
+                    })
+                    .catch(() =>
+                        response({
+                            status: 'fail',
+                        }),
+                    );
             });
 
             socket.on('joinGame', (username: string, room: string, response) => {

@@ -27,10 +27,10 @@ export class BotController {
             });
             this.dbService
                 .getBots(Number(difficulty))
-                .then((dbNames) => {
+                .then((customNames) => {
                     res.json(
                         names.concat(
-                            dbNames.map((bot) => {
+                            customNames.map((bot) => {
                                 // eslint-disable-next-line no-underscore-dangle
                                 return { id: bot._id, name: bot.name, default: false };
                             }),
@@ -47,12 +47,9 @@ export class BotController {
                 return;
             }
             this.dbService
-                .findBot(name)
-                .then((found) => {
-                    if (
-                        found.some((bot) => bot?.name === name) ||
-                        [...DEFAULT_BOT_NAMES.easy, ...DEFAULT_BOT_NAMES.hard].some((botName) => botName === name)
-                    ) {
+                .countBots(name)
+                .then(([easyCount, hardCount]) => {
+                    if (easyCount + hardCount > 0 || [...DEFAULT_BOT_NAMES.easy, ...DEFAULT_BOT_NAMES.hard].some((botName) => botName === name)) {
                         res.status(409).json();
                     } else {
                         this.dbService
@@ -71,12 +68,9 @@ export class BotController {
                 return;
             }
             this.dbService
-                .findBot(name)
-                .then((found) => {
-                    if (
-                        found.some((bot) => bot?.name === name) ||
-                        [...DEFAULT_BOT_NAMES.easy, ...DEFAULT_BOT_NAMES.hard].some((botName) => botName === name)
-                    ) {
+                .countBots(name)
+                .then(([easyCount, hardCount]) => {
+                    if (easyCount + hardCount > 0 || [...DEFAULT_BOT_NAMES.easy, ...DEFAULT_BOT_NAMES.hard].some((botName) => botName === name)) {
                         res.status(409).json();
                     } else {
                         this.dbService
@@ -99,10 +93,9 @@ export class BotController {
             this.dbService
                 .deleteBots(ids, difficulty)
                 .then((deleteResult) => {
-                    res.sendStatus(deleteResult.deletedCount > 0 ? 200 : 404);
+                    res.sendStatus(deleteResult.deletedCount ? 200 : 404);
                 })
                 .catch(() => res.sendStatus(500));
         });
-        /* eslint-enable @typescript-eslint/no-magic-numbers */
     }
 }

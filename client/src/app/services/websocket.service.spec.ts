@@ -13,7 +13,7 @@ describe('WebsocketService', () => {
     const alertServiceSpy = jasmine.createSpyObj('AlertService', ['showAlert']);
     const textboxServiceSpy = jasmine.createSpyObj('TextboxService', ['displayMessage']);
     let mockSocket: EventEmitter;
-    let mockGameInfo: GameInfo;
+    let mockGameInfo: Partial<GameInfo>;
     const mockLetters = new Map<string, string>();
 
     beforeEach(() => {
@@ -38,7 +38,7 @@ describe('WebsocketService', () => {
     it('should emit createRoom', () => {
         // eslint-disable-next-line
         const spy = spyOn(service['socket'], 'emit');
-        service.createGame(mockGameInfo);
+        service.createGame(mockGameInfo, () => void 0);
         expect(spy).toHaveBeenCalled();
     });
 
