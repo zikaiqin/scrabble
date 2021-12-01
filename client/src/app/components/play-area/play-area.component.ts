@@ -75,17 +75,10 @@ export class PlayAreaComponent implements AfterViewInit {
         this.buttonPressed = event.key;
 
         if (this.buttonPressed === 'Enter') {
-
-            if(this.ok === 0){
-                this.commandPlace();
-                this.ok++;
-            }
-            else{
-                console.log('initHand:')
-                for(let i = 0 ; i< this.initHand.length ;i++){
-
-                    console.log(this.initHand[i])
-                }
+            this.commandPlace();
+            console.log('initHand:')
+            for(let i = 0 ; i< this.initHand.length ;i++){
+                console.log(this.initHand[i])
             }
         }
         if (this.buttonPressed === 'Escape') {
@@ -147,26 +140,13 @@ export class PlayAreaComponent implements AfterViewInit {
             this.webSocketService.gameBoard.next(this.temp);
         }
     }
-    commandPlace() {
-        // show initHand
-        const replaceInidHand = [...this.initHand];
-        // remove from the board pour placer des lettres
-        this.removeAll();
-        const direction = this.gridService.arrowDirection ? 'v' : 'h';
-        // convert a string : 1 -> a, 0 -> 1
-        const coords = String.fromCharCode(this.initPosition.y + CHARCODE_SMALL_A) + String(this.initPosition.x + 1);
-
-        const command = `!placer ${coords}${direction} ${replaceInidHand.join('')}`;
-        this.commandService.parseCommand(command);
-        this.textboxService.displayMessage(MessageType.Own, command);
-        this.gridService.isPlacing = false;
-    }
 
     removeAll() {
         while (this.initHand.length > 0) {
             // back to the removing position
             this.stepBack();
             while (!this.placedLetters.has(this.positionStr())){
+                this.initHand.splice(0, 1);
                 this.stepBack();
             }
             // update gameBoard
@@ -174,7 +154,6 @@ export class PlayAreaComponent implements AfterViewInit {
                 this.gameBoard.delete(this.positionStr());
             }
             this.placedLetters.delete(this.positionStr());
-            this.temp = [];
 
             // passing the board to service
             this.convertMapToStringArray();
@@ -200,10 +179,15 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     stepBack(){
+        console.log(this.initPosition.x)
+        console.log(this.initPosition.y)
         if (!this.gridService.arrowDirection) 
-            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x--, y: this.mousePosition.y });
+            this.mousePosition.x--;
+            
+            //this.gridService.mousePositionSubject.next({ x: this.mousePosition.x--, y: this.mousePosition.y });
         else
-            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y-- });
+            this.mousePosition.y--;
+            //this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y-- });
     }
     removeInitHand(): void {
         const index = this.initHand.indexOf(this.playerHand[this.playerHand.length - 1]);
@@ -227,6 +211,7 @@ export class PlayAreaComponent implements AfterViewInit {
             // back to the removing position
             this.stepBack();
             while (!this.placedLetters.has(this.positionStr())){
+                this.initHand.splice(0, 1);
                 this.stepBack();
             }
             if (this.placedLetters.has(this.positionStr())) {
@@ -250,10 +235,8 @@ export class PlayAreaComponent implements AfterViewInit {
         if (this.playerHand.length === HAND_MAX_SIZE) {
             this.isPlacing = false;
             this.gridService.isPlacing = false;
-
         }
     }
-
 
     isUpperCase(): boolean {
         this.upperCaseButtonPressed = this.buttonPressed.toUpperCase();
@@ -284,35 +267,47 @@ export class PlayAreaComponent implements AfterViewInit {
         return false;
     }
 
-    mouseHitDetect(event: MouseEvent) {
-        if (!this.isPlacing && this.turnState) {
-            if (event.button === MouseButton.Left) {
-                this.mousePosition = { x: event.offsetX, y: event.offsetY };
+    commandPlace() {
+        // show initHand
+        const replaceInidHand = [...this.initHand];
+        // remove from the board pour placer des lettres
+        this.removeAll();
+        const direction = this.gridService.arrowDirection ? 'v' : 'h';
+        // convert a string : 1 -> a, 0 -> 1
+        const coords = String.fromCharCode(this.initPosition.y + CHARCODE_SMALL_A) + String(this.initPosition.x + 1);
 
-                // 0 et 0
-                this.mousePosition.x = Math.floor(this.mousePosition.x / (PIXEL_SIZE_GAMEBOARD / NUMBER_MAX_COORD)) - 1; // 600-40 / 15
-                this.mousePosition.y = Math.floor(this.mousePosition.y / (PIXEL_SIZE_GAMEBOARD / NUMBER_MAX_COORD)) - 1;
-                if (!this.gameBoard.has(this.positionStr())) {
-                    this.gridService.mousePositionSubject.next({
-                        x: this.mousePosition.x,
-                        y: this.mousePosition.y,
-                    });
-                    if (this.initPosition.x === this.mousePosition.x && this.initPosition.y === this.mousePosition.y) {
-                        this.gridService.arrowDirection = !this.gridService.arrowDirection;
-                    } else this.gridService.arrowDirection = false;
-                    // convert pixel into x and y coord
-                    // 0 to 14
-                    // this.isDirectionUP = this.gridService.selectSquare(this.mousePosition.x, this.mousePosition.y); // 0 to 14
-                    this.gridService.selectSquare(this.mousePosition.x, this.mousePosition.y);
-                    // this.mousePosition.x++; // cuz it starts at 1
-                    this.initPosition = this.mousePosition; // save for command placer for initial positions
-                    // this.mousePosition.y++; //1 to 15
-                    // .x++; // 1 to 15 to convert in map string string
-                }
+        const command = `!placer ${coords}${direction} ${replaceInidHand.join('')}`;
+        this.commandService.parseCommand(command);
+        this.textboxService.displayMessage(MessageType.Own, command);
+        this.gridService.isPlacing = false;
+    }
+
+    mouseHitDetect(event: MouseEvent) {
+        if (!this.isPlacing && this.turnState && event.button === MouseButton.Left) {
+
+            this.mousePosition = { x: event.offsetX, y: event.offsetY };
+
+            // 0 et 0
+            // convert pixel into x and y coord
+            this.mousePosition.x = Math.floor(this.mousePosition.x / (PIXEL_SIZE_GAMEBOARD / NUMBER_MAX_COORD)) - 1; // 600-40 / 15
+            this.mousePosition.y = Math.floor(this.mousePosition.y / (PIXEL_SIZE_GAMEBOARD / NUMBER_MAX_COORD)) - 1;
+            if (!this.gameBoard.has(this.positionStr())) {
+                this.gridService.mousePositionSubject.next({
+                    x: this.mousePosition.x,
+                    y: this.mousePosition.y,
+                });
+                if (this.initPosition.x === this.mousePosition.x && this.initPosition.y === this.mousePosition.y) {
+                    this.gridService.arrowDirection = !this.gridService.arrowDirection;
+                } else this.gridService.arrowDirection = false;
+
+                // 0 to 14
+                // and 0 to 14
+                this.gridService.selectSquare(this.mousePosition.x, this.mousePosition.y);
+
+                // deep copy it so it can't get modified by stepback()
+                this.initPosition = {... this.mousePosition}; // save for command placer for initial positions
             }
         }
-
-        // diff position
     }
 
     removeAccents(): string {
