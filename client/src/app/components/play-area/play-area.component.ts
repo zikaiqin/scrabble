@@ -1,28 +1,14 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { CHARCODE_SMALL_A } from '@app/classes/config';
 import { MessageType } from '@app/classes/message';
+import { DEFAULT_HEIGHT_ALL, DEFAULT_WIDTH_ALL, HAND_MAX_SIZE, MouseButton, NUMBER_MAX_COORD, PIXEL_SIZE_GAMEBOARD } from '@app/classes/play-area';
 import { Vec2 } from '@app/classes/vec2';
 import { CommandService } from '@app/services/command.service';
 import { GridService } from '@app/services/grid.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
 
-// TODO : Avoir un fichier séparé pour les constantes!
-const DEFAULT_WIDTH_ALL = 650; // 525
-const DEFAULT_HEIGHT_ALL = 650; // 625
-const HAND_MAX_SIZE = 7; // 625
-const NUMBER_MAX_COORD = 15; // 625
-const PIXEL_SIZE_GAMEBOARD = 560;
-
-// TODO : Déplacer ça dans un fichier séparé accessible par tous
-export enum MouseButton {
-    Left = 0,
-    Middle = 1,
-    Right = 2,
-    Back = 3,
-    Forward = 4,
-}
-
+// DON'T REMOVE MY COMMENTS MIGHT USEFUL FOP ME LATER
 @Component({
     selector: 'app-play-area',
     templateUrl: './play-area.component.html',
@@ -47,7 +33,7 @@ export class PlayAreaComponent implements AfterViewInit {
     private gameBoard: Map<string, string> = new Map<string, string>();
     private upperCaseButtonPressed: string;
     private canvasSize = { x: DEFAULT_WIDTH_ALL, y: DEFAULT_HEIGHT_ALL };
-    // DON'T REMOVE MY COMMENTS MIGHT USEFUL FOP ME LATER
+    ok:number = 0;
     constructor(
         private readonly gridService: GridService,
         private commandService: CommandService,
@@ -89,7 +75,18 @@ export class PlayAreaComponent implements AfterViewInit {
         this.buttonPressed = event.key;
 
         if (this.buttonPressed === 'Enter') {
-            this.commandPlace();
+
+            if(this.ok === 0){
+                this.commandPlace();
+                this.ok++;
+            }
+            else{
+                console.log('initHand:')
+                for(let i = 0 ; i< this.initHand.length ;i++){
+
+                    console.log(this.initHand[i])
+                }
+            }
         }
         if (this.buttonPressed === 'Escape') {
             this.removeAll();
@@ -106,21 +103,13 @@ export class PlayAreaComponent implements AfterViewInit {
             }
             else if (this.isPlacing ){
                 while(this.gameBoard.has(this.positionStr())){
-                    this.initHand.push(this.gameBoard.get(this.positionStr())!);
+                    //const string :string= this.gameBoard.get(this.positionStr())!;
+                    //console.log(string);
+                    //this.initHand.push(string);
                     this.jumpLetter();
                 }
-                
                 this.placeLetter();
             }
-        }
-    }
-
-    jumpLetter(){
-        if(this.gridService.arrowDirection){ //down
-            this.mousePosition.y++;
-        }
-        if(!this.gridService.arrowDirection){ //up
-            this.mousePosition.x++;
         }
     }
 
@@ -128,7 +117,7 @@ export class PlayAreaComponent implements AfterViewInit {
         //verify if inside the board coord
         if (this.mousePosition.x < NUMBER_MAX_COORD && this.mousePosition.y < NUMBER_MAX_COORD) {
             // this.positionStr output a1 for the 1st square
-    
+
             // updating chevalet
             this.removePlayerHand();
     
@@ -137,20 +126,95 @@ export class PlayAreaComponent implements AfterViewInit {
                 this.buttonPressed = this.upperCaseButtonPressed;
             }
             this.initHand.push(this.buttonPressed);
-    
+            
+            // check if there are othere lettre existed after this letter
+            // if yes, add it into initHand
+            
+            //let counter = 0;
+            this.jumpLetter();
+            while(this.gameBoard.has(this.positionStr())){
+                this.initHand.push(this.gameBoard.get(this.positionStr())!);
+                //counter++;
+                this.jumpLetter();
+            }
+            // counter --;
+            // for(let i = 0; i<counter;i++){
+            //     this.stepBack();
+            // }
+
             this.placedLetters.set(this.positionStr(), this.buttonPressed);
-            if (!this.gameBoard.has(this.positionStr())) this.gameBoard.set(this.positionStr(), this.buttonPressed);
-    
+            this.gameBoard.set(this.positionStr(), this.buttonPressed);
+
             // to the next position
             if (!this.gridService.arrowDirection)
                 this.gridService.mousePositionSubject.next({ x: this.mousePosition.x + 1, y: this.mousePosition.y });
             else this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y + 1 });
-    
+
             // convert Map to Array
+            // passing the board to service
             this.convertMapToStringArray();
             this.webSocketService.gameBoard.next(this.temp);
         }
-        
+    }
+    commandPlace() {
+        // show initHand
+        const replaceInidHand = [...this.initHand];
+        // remove from the board pour placer des lettres
+        this.removeAll();
+        const direction = this.gridService.arrowDirection ? 'v' : 'h';
+        // convert a string : 1 -> a, 0 -> 1
+        const coords = String.fromCharCode(this.initPosition.y + CHARCODE_SMALL_A) + String(this.initPosition.x + 1);
+
+        const command = `!placer ${coords}${direction} ${replaceInidHand.join('')}`;
+        this.commandService.parseCommand(command);
+        this.textboxService.displayMessage(MessageType.Own, command);
+        this.gridService.isPlacing = false;
+    }
+
+    removeAll() {
+        while (this.initHand.length > 0) {
+            // back to the removing position
+            this.stepBack();
+            while (!this.placedLetters.has(this.positionStr())){
+                this.stepBack();
+            }
+            // update gameBoard
+            if (this.gameBoard.has(this.positionStr())) {
+                this.gameBoard.delete(this.positionStr());
+            }
+            this.placedLetters.delete(this.positionStr());
+            this.temp = [];
+
+            // passing the board to service
+            this.convertMapToStringArray();
+            this.webSocketService.gameBoard.next(this.temp);
+
+            // update playerHand
+            if (this.initHand[0] === this.initHand[0].toUpperCase()) this.playerHand.push('*');
+            else this.playerHand.push(this.initHand[0]);
+            this.initHand.splice(0, 1);
+        }
+
+        this.gridService.drawGrid();
+        this.isPlacing = false;
+        this.gridService.isPlacing = false;
+    }
+    jumpLetter(){
+        if(this.gridService.arrowDirection){ //down
+            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y++ });
+
+        }
+        if(!this.gridService.arrowDirection){ //up
+            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x++, y: this.mousePosition.y });
+
+        }
+    }
+
+    stepBack(){
+        if (!this.gridService.arrowDirection) 
+            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x++, y: this.mousePosition.y });
+        else
+            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y++ });
     }
     removeInitHand(): void {
         const index = this.initHand.indexOf(this.playerHand[this.playerHand.length - 1]);
@@ -168,12 +232,7 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     // back to the removing position
-    stepBack(){
-        if (!this.gridService.arrowDirection) 
-            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x - 1, y: this.mousePosition.y });
-        else
-            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y - 1 });
-    }
+
     removeOne(): void {
         if (this.initHand.length > 0) {
             // back to the removing position
@@ -194,6 +253,7 @@ export class PlayAreaComponent implements AfterViewInit {
                 this.removeInitHand();
 
                 // convert Map to Array
+                // passing the board to service
                 this.convertMapToStringArray();
                 this.webSocketService.gameBoard.next(this.temp);
             }
@@ -205,43 +265,6 @@ export class PlayAreaComponent implements AfterViewInit {
         }
     }
 
-    removeAll() {
-        while (this.initHand.length > 0) {
-            // back to the removing position
-            this.stepBack();
-            while (!this.placedLetters.has(this.positionStr())){
-                this.stepBack();
-            }
-            // update gameBoard
-            if (this.gameBoard.has(this.positionStr())) {
-                this.gameBoard.delete(this.positionStr());
-            }
-            this.placedLetters.delete(this.positionStr());
-            this.temp = [];
-
-            this.convertMapToStringArray();
-            this.webSocketService.gameBoard.next(this.temp);
-
-            // update playerHand
-            if (this.initHand[0] === this.initHand[0].toUpperCase()) this.playerHand.push('*');
-            else this.playerHand.push(this.initHand[0]);
-            this.initHand.splice(0, 1);
-        }
-        // this.gameService.gameBoard.next(this.gameBoard);
-        // console.log('playerhand');
-        // for (let i = 0; i < this.playerHand.length; i++) {
-        //     console.log(this.playerHand[i]);
-        //     // if(replaceInidHand[i] === '*'){
-        //     //     replaceInidHand[i] = this.upperCaseButtonPressed;
-        //     // }
-        // }
-        // console.log('playerhand');
-
-        this.gridService.drawGrid();
-        this.isPlacing = false;
-        this.gridService.isPlacing = false;
-
-    }
 
     isUpperCase(): boolean {
         this.upperCaseButtonPressed = this.buttonPressed.toUpperCase();
@@ -324,21 +347,6 @@ export class PlayAreaComponent implements AfterViewInit {
             this.temp[i] = [it[0], it[1]];
             i++;
         }
-    }
-    commandPlace() {
-
-        // show initHand
-        const replaceInidHand = [...this.initHand];
-        // remove from the board pour placer des lettres
-        this.removeAll();
-        const direction = this.gridService.arrowDirection ? 'v' : 'h';
-        // convert a string : 1 -> a, 0 -> 1
-        const coords = String.fromCharCode(this.initPosition.y + CHARCODE_SMALL_A) + String(this.initPosition.x + 1);
-
-        const command = `!placer ${coords}${direction} ${replaceInidHand.join('')}`;
-        this.commandService.parseCommand(command);
-        this.textboxService.displayMessage(MessageType.Own, command);
-        this.gridService.isPlacing = false;
     }
 
     get width(): number {
