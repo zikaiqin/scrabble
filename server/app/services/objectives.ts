@@ -92,7 +92,7 @@ export class ObjectivesService {
                     for (const char of letters) {
                         wordContainer += char[1].toLowerCase();
                     }
-                    const regex = /kwxyz/gi;
+                    const regex = /[kwxyz]/gi;
                     const result = wordContainer.match(regex);
                     if (!result) return false;
                     return new Set(result).size >= 2;
