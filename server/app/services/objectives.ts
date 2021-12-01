@@ -38,9 +38,13 @@ export class ObjectivesService {
                 // Faire un placement valide contenant une double lettre ("ss", "ll", "mm",... lettre blanche acceptée)
                 3,
                 (letters: Map<string, string>): boolean => {
-                    const arr: string[] = [];
-                    for (const char of letters) arr.push(char[1].toLowerCase());
-                    return new Set(arr).size !== arr.length;
+                    let wordContainer = '';
+                    for (const char of letters) {
+                        wordContainer += char[1];
+                    }
+                    const regex = /([a-zA-Z])\1/gi;
+                    const result = wordContainer.match(regex);
+                    return !!result;
                 },
             ],
             [
@@ -48,9 +52,8 @@ export class ObjectivesService {
                 4,
                 (letters: Map<string, string>): boolean => {
                     let wordContainer = '';
-                    // eslint-disable-next-line guard-for-in
                     for (const char of letters) {
-                        wordContainer += char[1];
+                        wordContainer += char[1].toLowerCase();
                     }
                     const regex = /[aeiou]/gi;
                     const result = wordContainer.match(regex);
@@ -87,7 +90,7 @@ export class ObjectivesService {
                     let wordContainer = '';
                     // eslint-disable-next-line guard-for-in
                     for (const char of letters) {
-                        wordContainer += char[1];
+                        wordContainer += char[1].toLowerCase();
                     }
                     const regex = /kwxyz/gi;
                     const result = wordContainer.match(regex);
