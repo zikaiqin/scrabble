@@ -1,6 +1,5 @@
 /* eslint-disable dot-notation,max-lines,@typescript-eslint/no-explicit-any,@typescript-eslint/no-magic-numbers */
 // we need this disable in order to declare spies (type is too complicated) --> any
-/* import { SocketService } from '@app/services/socket.service';*/
 import { Container } from 'typedi';
 import { io, Socket } from 'socket.io-client';
 import { beforeEach, describe, it } from 'mocha';
@@ -41,7 +40,7 @@ describe('SocketService', () => {
         clientSocket2.close();
     });
 
-    it('updateObjectives should call the right function', (done) => {
+    it('updateObjectives should return valid objectives', (done) => {
         let publicObjContainer: [number, boolean][];
         let privateObjContainer: [number, boolean];
         clientSocket.on('updateObjectives', (publicObjective: [number, boolean][], privateObjective: [number, boolean]) => {
@@ -49,21 +48,26 @@ describe('SocketService', () => {
             privateObjContainer = privateObjective;
             counter++;
         });
-        clientSocket.emit('createGame', configs);
-        clientSocket.emit('fetchObjectives');
+        setTimeout(() => {
+            clientSocket.emit('createGame', configs);
+        }, 100);
+        setTimeout(() => {
+            clientSocket.emit('fetchObjectives');
+        }, 200);
+
         setTimeout(() => {
             expect(publicObjContainer[0][0]).greaterThan(0);
             expect(publicObjContainer[1][0]).greaterThan(0);
             expect(privateObjContainer[0]).greaterThan(0);
             expect(counter).greaterThan(0);
             done();
-        }, 500);
+        }, 300);
     });
 
     it('convertGame should call the right functions', (done) => {
         configs.gameType = GameType.Multi;
-        const spy = sandbox.spy(service['waitingRooms'], 'delete');
         clientSocket.emit('createGame', configs);
+        const spy = sandbox.spy(service['waitingRooms'], 'delete');
         clientSocket.emit('convertGame', 1);
         setTimeout(() => {
             expect(spy.called).to.equals(true);
@@ -71,7 +75,7 @@ describe('SocketService', () => {
         }, 500);
     });
 
-    it('sendMessage should call the right functions', (done) => {
+    it('sendMessage should send properly the message', (done) => {
         configs.gameType = GameType.Multi;
         let typeContainer: string;
         let messageContainer: string;
@@ -96,23 +100,26 @@ describe('SocketService', () => {
             expect(messageContainer).to.equals('Hello World');
             expect(counter).greaterThan(0);
             done();
-        }, 500);
+        }, 400);
     });
 
-    // Multiple calls of done()
-    /*    it('deleteRoom should call the right functions', (done) => {
-        configs = { username: 'test', turnLength: 60, randomized: false, gameMode: GameMode.Log2990, gameType: GameType.Multi, difficulty: 1 };
-        clientSocket1.on('updateRooms', () => {
+    it('place should call the right functions', (done) => {
+        let boardContainer: [string, string][];
+        clientSocket.on('updateBoard', (board: [string, string][]) => {
+            boardContainer = board;
+        });
+        clientSocket.on('updateHands', () => {
             counter++;
         });
-        clientSocket1.emit('createGame', configs);
-        clientSocket1.emit('joinGame', 'test2', '_' + clientSocket1.id, (response: { status: string }) => {
-            expect(response.status).to.equals('ok');
-        });
-
+        clientSocket.emit('createGame', configs);
+        clientSocket.emit('place', 'h8', [
+            ['h8', 'l'],
+            ['h9', 'e'],
+        ]);
         setTimeout(() => {
+            expect(boardContainer.length).greaterThan(0);
             expect(counter).greaterThan(0);
             done();
-        }, 500);
-    });*/
+        }, 200);
+    });
 });
