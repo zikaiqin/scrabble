@@ -102,10 +102,9 @@ export class PlayAreaComponent implements AfterViewInit {
                 this.gridService.isPlacing = true;
             }
             else if (this.isPlacing ){
+                //adding to initHand the letters already on the board for push on command
                 while(this.gameBoard.has(this.positionStr())){
-                    //const string :string= this.gameBoard.get(this.positionStr())!;
-                    //console.log(string);
-                    //this.initHand.push(string);
+                    this.initHand.push(this.gameBoard.get(this.positionStr())!);
                     this.jumpLetter();
                 }
                 this.placeLetter();
@@ -126,29 +125,21 @@ export class PlayAreaComponent implements AfterViewInit {
                 this.buttonPressed = this.upperCaseButtonPressed;
             }
             this.initHand.push(this.buttonPressed);
+
+            this.placedLetters.set(this.positionStr(), this.buttonPressed);
+            this.gameBoard.set(this.positionStr(), this.buttonPressed);
+            
+            // to the next position
+            this.jumpLetter();
+
             
             // check if there are othere lettre existed after this letter
             // if yes, add it into initHand
-            
-            //let counter = 0;
-            this.jumpLetter();
-            while(this.gameBoard.has(this.positionStr())){
-                this.initHand.push(this.gameBoard.get(this.positionStr())!);
-                //counter++;
-                this.jumpLetter();
-            }
+
             // counter --;
             // for(let i = 0; i<counter;i++){
             //     this.stepBack();
             // }
-
-            this.placedLetters.set(this.positionStr(), this.buttonPressed);
-            this.gameBoard.set(this.positionStr(), this.buttonPressed);
-
-            // to the next position
-            if (!this.gridService.arrowDirection)
-                this.gridService.mousePositionSubject.next({ x: this.mousePosition.x + 1, y: this.mousePosition.y });
-            else this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y + 1 });
 
             // convert Map to Array
             // passing the board to service
@@ -201,20 +192,18 @@ export class PlayAreaComponent implements AfterViewInit {
     }
     jumpLetter(){
         if(this.gridService.arrowDirection){ //down
-            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y++ });
-
+            this.mousePosition.y++;
         }
         if(!this.gridService.arrowDirection){ //up
-            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x++, y: this.mousePosition.y });
-
+            this.mousePosition.x++;
         }
     }
 
     stepBack(){
         if (!this.gridService.arrowDirection) 
-            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x++, y: this.mousePosition.y });
+            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x--, y: this.mousePosition.y });
         else
-            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y++ });
+            this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y-- });
     }
     removeInitHand(): void {
         const index = this.initHand.indexOf(this.playerHand[this.playerHand.length - 1]);
