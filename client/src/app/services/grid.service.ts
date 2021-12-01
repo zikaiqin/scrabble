@@ -28,7 +28,7 @@ export class GridService {
     arrowDirection: boolean = false; // false = horizontal; true = vertival
     mousePosition: Vec2 = { x: 0, y: 0 };
     mousePositionSubject = new Subject<Vec2>();
-    isPlacing :boolean = false ;
+    isPlacing: boolean = false;
     private counter: number = 0;
     private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };

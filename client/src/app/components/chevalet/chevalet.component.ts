@@ -19,7 +19,12 @@ export class ChevaletComponent {
     activeLetter: boolean[] = [false, false, false, false, false, false, false];
     isYourTurn: boolean = true;
     isEventReceiver: boolean = false;
-    constructor(private eRef: ElementRef, private commandService: CommandService, private textboxService: TextboxService, private gridService: GridService) {
+    constructor(
+        private eRef: ElementRef,
+        private commandService: CommandService,
+        private textboxService: TextboxService,
+        private gridService: GridService,
+    ) {
         this.addWindowListener();
     }
     @HostListener('document:click', ['$event'])
