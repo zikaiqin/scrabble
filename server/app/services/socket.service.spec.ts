@@ -122,4 +122,60 @@ describe('SocketService', () => {
             done();
         }, 200);
     });
+
+    it('exchange should call the right functions', (done) => {
+        clientSocket.on('updateReserve', () => {
+            counter++;
+        });
+        clientSocket.emit('exchange', 'abcd');
+        setTimeout(() => {
+            expect(counter).greaterThan(0);
+            done();
+        }, 100);
+    });
+
+    it('skipTurn should call the right functions', (done) => {
+        clientSocket.on('updateTurn', () => {
+            counter++;
+        });
+        clientSocket.emit('createGame', configs);
+        clientSocket.emit('skipTurn');
+        setTimeout(() => {
+            expect(counter).greaterThan(0);
+            done();
+        }, 100);
+    });
+
+    it('updateScores should send data properly', (done) => {
+        let ownScoreContainer: number;
+        let opponentScoreContainer: number;
+        clientSocket.on('updateScores', (ownScore: number, opponentScore: number) => {
+            ownScoreContainer = ownScore;
+            opponentScoreContainer = opponentScore;
+            counter++;
+        });
+        clientSocket.emit('createGame', configs);
+        service.updateScores(clientSocket.id, 2, 1);
+        setTimeout(() => {
+            expect(ownScoreContainer).to.equals(2);
+            expect(opponentScoreContainer).to.equals(1);
+            expect(counter).greaterThan(0);
+            done();
+        }, 100);
+    });
+
+    it('gameEnded should send data properly', (done) => {
+        let winnerContainer: string;
+        clientSocket.on('gameEnded', (winner: string) => {
+            winnerContainer = winner;
+            counter++;
+        });
+        clientSocket.emit('createGame', configs);
+        service.gameEnded('_' + clientSocket.id, 'Hello');
+        setTimeout(() => {
+            expect(winnerContainer).to.equals('Hello');
+            expect(counter).greaterThan(0);
+            done();
+        }, 100);
+    });
 });
