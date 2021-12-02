@@ -97,9 +97,12 @@ export class WebsocketService {
             this.connectionStatus.next('connectionLost');
         });
         this.socket.on('connect_error', () =>
-            this.alertService.showAlertWithCallback('Le serveur est présentement inaccessible', 'Réessayer la connexion', DEFAULT_TIMEOUT, () => {
-                this.connect();
-            }),
+            this.alertService.showAlertWithCallback(
+                'Le serveur est présentement inaccessible',
+                'Réessayer la connexion',
+                () => this.connect(),
+                DEFAULT_TIMEOUT,
+            ),
         );
     }
 
