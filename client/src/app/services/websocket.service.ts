@@ -6,7 +6,7 @@ import { AlertService } from '@app/services/alert.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { MAX_RECONNECT_ATTEMPT } from '@app/classes/config';
+import { DEFAULT_TIMEOUT } from '@app/classes/config';
 
 type SocketStatus = 'ok' | 'fail';
 
@@ -28,7 +28,6 @@ export class WebsocketService {
     private gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
     private gameScores = new Subject<{ ownScore: number; opponentScore: number }>();
     private gameEnded = new Subject<string>();
-    private attempt = MAX_RECONNECT_ATTEMPT;
 
     constructor(private router: Router, private textBox: TextboxService, private alertService: AlertService) {}
 
@@ -97,12 +96,11 @@ export class WebsocketService {
             this.alertService.showAlert('La connexion au serveur a été interrompue');
             this.connectionStatus.next('connectionLost');
         });
-        this.socket.on('connect_error', () => {
-            this.attempt -= 1;
-            if (this.attempt === 0) {
-                this.alertService.showAlert('Le serveur est inaccessible');
-            }
-        });
+        this.socket.on('connect_error', () =>
+            this.alertService.showAlertWithCallback('Le serveur est présentement inaccessible', 'Réessayer la connexion', DEFAULT_TIMEOUT, () => {
+                this.connect();
+            }),
+        );
     }
 
     /**
@@ -156,15 +154,10 @@ export class WebsocketService {
         this.socket.emit('fetchObjectives');
     }
 
-    connect(socket?: Socket): void {
-        this.socket = socket
-            ? socket
-            : io(environment.serverUrl, {
-                  reconnection: true,
-                  reconnectionDelay: 1000,
-                  reconnectionDelayMax: 3000,
-                  reconnectionAttempts: MAX_RECONNECT_ATTEMPT,
-              }).connect();
+    connect(): void {
+        this.socket = io(environment.serverUrl, {
+            reconnection: false,
+        }).connect();
         this.attachListeners();
     }
 

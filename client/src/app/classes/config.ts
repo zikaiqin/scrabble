@@ -9,5 +9,3 @@ export const MAX_NAME_LENGTH = 16;
 export const MAX_DESCRIPTION_LENGTH = 140;
 
 export const CHARCODE_SMALL_A = 97;
-
-export const MAX_RECONNECT_ATTEMPT = 3;
