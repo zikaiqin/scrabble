@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DictConfigComponent } from './dict-config.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 describe('DictConfigComponent', () => {
     let component: DictConfigComponent;
@@ -8,6 +9,7 @@ describe('DictConfigComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
+            imports: [MatDialogModule],
             declarations: [DictConfigComponent],
         }).compileComponents();
     });

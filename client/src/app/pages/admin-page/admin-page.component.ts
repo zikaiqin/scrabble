@@ -65,6 +65,10 @@ export class AdminPageComponent {
         });
     }
 
+    addDict(): void {
+        void 0;
+    }
+
     downloadDict(id: string) {
         this.httpService.downloadDict(id).subscribe((res) => {
             const name = (res as Dictionary).name;
@@ -75,6 +79,14 @@ export class AdminPageComponent {
             a.click();
             a.remove();
         });
+    }
+
+    parseFile() {
+        void 0;
+    }
+
+    selectFile() {
+        void 0;
     }
 }
 

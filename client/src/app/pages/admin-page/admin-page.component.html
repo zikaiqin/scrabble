@@ -38,6 +38,7 @@
                     *ngIf="page === 'dict'"
                     [data]="dictData"
                     (get)="getDicts()"
+                    (add)="selectFile()"
                     (download)="downloadDict($event)"
                 ></app-dict-config>
             </mat-card>

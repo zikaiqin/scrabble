@@ -4,8 +4,10 @@ import { Dictionary } from '@app/classes/game-info';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
+import { DictConfigDialogComponent } from '@app/components/dict-config-dialog/dict-config-dialog.component';
 
-export type DialogAction = 'add' | 'edit' | 'delete';
+export type DialogAction = 'edit' | 'delete';
+export type DialogResult = { confirmation: boolean; name: string; description: string };
 
 @Component({
     selector: 'app-dict-config',
@@ -19,7 +21,7 @@ export class DictConfigComponent implements AfterViewInit {
         this.selection.clear();
     }
     @Output() get = new EventEmitter<null>();
-    @Output() add = new EventEmitter<Partial<Dictionary>>();
+    @Output() add = new EventEmitter<null>();
     @Output() delete = new EventEmitter<string[]>();
     @Output() edit = new EventEmitter<Partial<Dictionary>>();
     @Output() download = new EventEmitter<string>();
@@ -61,8 +63,8 @@ export class DictConfigComponent implements AfterViewInit {
         this.get.emit();
     }
 
-    addDict(name: string, description: string) {
-        this.add.emit({ name, description });
+    addDict() {
+        this.add.emit();
     }
 
     deleteDict(ids: string[]) {
@@ -77,7 +79,24 @@ export class DictConfigComponent implements AfterViewInit {
         this.download.emit(id);
     }
 
+    getInvalid(dictionary: Dictionary): Dictionary[] {
+        return this.tableData.data.filter((entry) => entry.id !== dictionary.id);
+    }
+
     openDialog(action: DialogAction, target?: Partial<Dictionary>, params?: Partial<Dictionary>[]) {
-        void [action, target, params];
+        const dialogRef = this.dialog.open(DictConfigDialogComponent, {
+            data: { action, target, params },
+        });
+        dialogRef.afterClosed().subscribe((res: DialogResult) => {
+            if (!res.confirmation) {
+                return;
+            }
+            if (action === 'delete') {
+                this.deleteDict((params as Dictionary[]).map((dict) => dict.id));
+            }
+            if (action === 'edit') {
+                this.editDict(target?.id as string, res.name, res.description);
+            }
+        });
     }
 }
