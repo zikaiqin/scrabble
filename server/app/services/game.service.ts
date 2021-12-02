@@ -15,9 +15,9 @@ import { SocketService } from '@app/services/socket.service';
 import { ValidationService } from '@app/services/validation.service';
 import { ObjectivesService } from '@app/services/objectives';
 import { DatabaseService } from '@app/services/database.service';
-import { Service } from 'typedi';
 import { TurnService } from '@app/services/turn.service';
 import { GameDisplayService } from '@app/services/game-display.service';
+import { Service } from 'typedi';
 
 @Service()
 export class GameService {
