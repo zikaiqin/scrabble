@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+// For the sake of numbering the objectives
 import { Service } from 'typedi';
 import { ValidationService } from '@app/services/validation.service';
 import { Game } from '@app/classes/game';

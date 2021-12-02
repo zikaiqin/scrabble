@@ -190,9 +190,8 @@ export class GameService {
         if (configs.gameMode === GameMode.Log2990) {
             // If the gameMode is LOG2990 (with objectives)
             const tempObj = this.objectivesService.getPublicObjectives();
-            // eslint-disable-next-line @typescript-eslint/prefer-for-of
-            for (let i = 0; i < tempObj.length; i++) {
-                publicObj.push([tempObj[i], false]);
+            for (const objective of tempObj) {
+                publicObj.push([objective, false]);
             }
             Array.from(players.values()).forEach((player) => {
                 player[1].privateObj = [this.objectivesService.getPrivateObjectives(), false];

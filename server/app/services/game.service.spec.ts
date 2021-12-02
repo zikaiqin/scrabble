@@ -17,7 +17,6 @@ import { expect } from 'chai';
 import { TurnService } from '@app/services/turn.service';
 import { GameDisplayService } from '@app/services/game-display.service';
 
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('GameService', () => {
     let service: GameService;
     let fakeSocketService: SocketService;
