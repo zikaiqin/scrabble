@@ -12,6 +12,9 @@ const DEFAULT_NB_CASES = 16;
 const STROKE_RANGE = 4;
 const ARROW_SIZE = 15;
 const ARROW_SIZE2 = 25;
+const ARROW_SIZE3 = 10;
+const ARROW_SIZE4 = 20;
+
 const SCALE_MAX = 1.5;
 const SCALE_MIN = 0.8;
 const TEXT_DEFAULT_PX = 20;
@@ -42,7 +45,6 @@ export class GridService {
     constructor(private websocketService: WebsocketService, private readonly gridLettersService: GridLettersService) {
         this.mousePositionSubject.asObservable().subscribe((mousePos) => {
             this.mousePosition = mousePos;
-            //this.drawArrow(posY: number,posX :number);
         });
         this.websocketService.init.subscribe((init) => {
             this.bonuses = new Map<string, string>(init.bonuses);
@@ -56,16 +58,16 @@ export class GridService {
         });
     }
 
-    drawArrow(posX: number,posY :number) {
-        const img = new Image(10, 20)
+    drawArrow(posX: number, posY: number) {
+        const img = new Image(ARROW_SIZE3, ARROW_SIZE4);
         if (this.arrowDirection) {
             // down
             img.src = 'https://i.ibb.co/mN7tnhW/flecheup.jpg';
-            this.gridContext.drawImage(img, posX + this.tuileSize, posY ,ARROW_SIZE ,ARROW_SIZE2);
+            this.gridContext.drawImage(img, posX + this.tuileSize, posY, ARROW_SIZE, ARROW_SIZE2);
         } else {
             // left
             img.src = 'https://i.ibb.co/Y7zBLFV/fleche-Left.jpg';
-            this.gridContext.drawImage(img, posX, posY - this.tuileSize/2 ,ARROW_SIZE2 ,ARROW_SIZE);
+            this.gridContext.drawImage(img, posX, posY - this.tuileSize / 2, ARROW_SIZE2, ARROW_SIZE);
         }
     }
     selectSquare(posX: number, posY: number): void {
@@ -89,7 +91,7 @@ export class GridService {
 
             this.gridContext.strokeStyle = 'purple';
             this.gridContext.strokeRect(tuileX + 2, tuileY + 2, this.tuileSize - STROKE_RANGE, this.tuileSize - STROKE_RANGE);
-            this.drawArrow(tuileX,tuileY);
+            this.drawArrow(tuileX, tuileY);
         }
         // return this.arrowDirection;
     }
