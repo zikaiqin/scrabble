@@ -1,5 +1,4 @@
-/* eslint-disable dot-notation,max-lines,@typescript-eslint/no-explicit-any,@typescript-eslint/no-magic-numbers */
-// we need this disable in order to declare spies (type is too complicated) --> any
+/* eslint-disable dot-notation */
 import { Container } from 'typedi';
 import { io, Socket } from 'socket.io-client';
 import { beforeEach, describe, it } from 'mocha';
@@ -16,14 +15,31 @@ describe('SocketService', () => {
     let clientSocket2: Socket;
     let server: Server;
     let configs: GameInfo;
-    const sandbox = createSandbox();
     let counter: number;
+    const sandbox = createSandbox();
     const url = 'http://localhost:3000';
+    const turnLengthValue = 60;
+    const DEFAULT_BASE_DELAY = 100;
+    const INCREMENT_DELAY = 100;
+    const DEFAULT_DELAY = 500;
 
     beforeEach(() => {
         service = server['socketService'];
-        configs = { username: 'test', turnLength: 60, randomized: false, gameMode: GameMode.Log2990, gameType: GameType.Single, difficulty: 1 };
+        configs = {
+            username: 'test',
+            turnLength: turnLengthValue,
+            randomized: false,
+            gameMode: GameMode.Log2990,
+            gameType: GameType.Single,
+            difficulty: 1,
+            roomID: '-' + clientSocket.id,
+            dictID: '$default',
+        };
         counter = 0;
+        clientSocket = io(url);
+        clientSocket.connect();
+        clientSocket2 = io(url);
+        clientSocket2.connect();
     });
 
     before(() => {
@@ -35,7 +51,7 @@ describe('SocketService', () => {
         clientSocket2.connect();
     });
 
-    after(() => {
+    afterEach(() => {
         clientSocket.close();
         clientSocket2.close();
     });
@@ -49,11 +65,13 @@ describe('SocketService', () => {
             counter++;
         });
         setTimeout(() => {
-            clientSocket.emit('createGame', configs);
-        }, 100);
+            clientSocket.emit('createGame', configs, (response: { status: string }) => {
+                void response;
+            });
+        }, DEFAULT_BASE_DELAY);
         setTimeout(() => {
             clientSocket.emit('fetchObjectives');
-        }, 200);
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY);
 
         setTimeout(() => {
             expect(publicObjContainer[0][0]).greaterThan(0);
@@ -61,7 +79,7 @@ describe('SocketService', () => {
             expect(privateObjContainer[0]).greaterThan(0);
             expect(counter).greaterThan(0);
             done();
-        }, 300);
+        }, DEFAULT_DELAY);
     });
 
     it('convertGame should call the right functions', (done) => {
@@ -72,7 +90,7 @@ describe('SocketService', () => {
         setTimeout(() => {
             expect(spy.called).to.equals(true);
             done();
-        }, 500);
+        }, DEFAULT_DELAY);
     });
 
     it('sendMessage should send properly the message', (done) => {
@@ -86,21 +104,46 @@ describe('SocketService', () => {
         });
         setTimeout(() => {
             clientSocket.emit('createGame', configs);
-        }, 100);
+        }, DEFAULT_BASE_DELAY);
         setTimeout(() => {
             clientSocket2.emit('joinGame', 'test2', '_' + clientSocket.id, (response: { status: string }) => {
                 void [response];
             });
-        }, 200);
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY);
         setTimeout(() => {
             clientSocket.emit('sendMessage', 'Hello World');
-        }, 300);
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY + INCREMENT_DELAY);
         setTimeout(() => {
             expect(typeContainer).to.equals(MessageType.User);
             expect(messageContainer).to.equals('Hello World');
             expect(counter).greaterThan(0);
             done();
-        }, 400);
+        }, DEFAULT_DELAY);
+    });
+
+    it('sendMessage shouldn`t send anything', (done) => {
+        configs.gameType = GameType.Multi;
+        let typeContainer: string;
+        let messageContainer: string;
+        clientSocket2.on('receiveMessage', (type: string, message: string) => {
+            typeContainer = type;
+            messageContainer = message;
+            counter++;
+        });
+        setTimeout(() => {
+            clientSocket2.emit('joinGame', 'test2', '_' + clientSocket.id, (response: { status: string }) => {
+                void [response];
+            });
+        }, DEFAULT_BASE_DELAY);
+        setTimeout(() => {
+            clientSocket.emit('sendMessage', 'Hello World');
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY);
+        setTimeout(() => {
+            expect(typeContainer).to.equals(undefined);
+            expect(messageContainer).to.equals(undefined);
+            expect(counter).to.equals(0);
+            done();
+        }, DEFAULT_DELAY);
     });
 
     it('place should call the right functions', (done) => {
@@ -111,39 +154,86 @@ describe('SocketService', () => {
         clientSocket.on('updateHands', () => {
             counter++;
         });
-        clientSocket.emit('createGame', configs);
-        clientSocket.emit('place', 'h8', [
-            ['h8', 'l'],
-            ['h9', 'e'],
-        ]);
+        setTimeout(() => {
+            clientSocket.emit('createGame', configs);
+        }, DEFAULT_BASE_DELAY);
+        setTimeout(() => {
+            clientSocket.emit('place', 'h8', [
+                ['h8', 'l'],
+                ['h9', 'e'],
+            ]);
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY);
         setTimeout(() => {
             expect(boardContainer.length).greaterThan(0);
             expect(counter).greaterThan(0);
             done();
-        }, 200);
+        }, DEFAULT_DELAY);
+    });
+
+    it('place shouldn`t call anything', (done) => {
+        let boardContainer: [string, string][];
+        clientSocket.on('updateBoard', (board: [string, string][]) => {
+            boardContainer = board;
+        });
+        clientSocket.on('updateHands', () => {
+            counter++;
+        });
+        setTimeout(() => {
+            clientSocket.emit('place', 'h8', [
+                ['h8', 'l'],
+                ['h9', 'e'],
+            ]);
+        }, DEFAULT_BASE_DELAY);
+        setTimeout(() => {
+            expect(boardContainer).to.equals(undefined);
+            expect(counter).to.equals(0);
+            done();
+        }, DEFAULT_DELAY);
     });
 
     it('exchange should call the right functions', (done) => {
         clientSocket.on('updateReserve', () => {
             counter++;
         });
-        clientSocket.emit('exchange', 'abcd');
+        setTimeout(() => {
+            clientSocket.emit('createGame', configs);
+        }, DEFAULT_BASE_DELAY);
+        setTimeout(() => {
+            clientSocket.emit('exchange', 'abcd');
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY);
         setTimeout(() => {
             expect(counter).greaterThan(0);
             done();
-        }, 100);
+        }, DEFAULT_DELAY);
+    });
+
+    it('exchange shouldn`t call anything', (done) => {
+        clientSocket.on('updateReserve', () => {
+            counter++;
+        });
+        setTimeout(() => {
+            clientSocket.emit('exchange', 'abcd');
+        }, DEFAULT_BASE_DELAY);
+        setTimeout(() => {
+            expect(counter).to.equals(0);
+            done();
+        }, DEFAULT_DELAY);
     });
 
     it('skipTurn should call the right functions', (done) => {
         clientSocket.on('updateTurn', () => {
             counter++;
         });
-        clientSocket.emit('createGame', configs);
-        clientSocket.emit('skipTurn');
+        setTimeout(() => {
+            clientSocket.emit('createGame', configs);
+        }, DEFAULT_BASE_DELAY);
+        setTimeout(() => {
+            clientSocket.emit('skipTurn');
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY);
         setTimeout(() => {
             expect(counter).greaterThan(0);
             done();
-        }, 100);
+        }, DEFAULT_DELAY);
     });
 
     it('updateScores should send data properly', (done) => {
@@ -154,14 +244,18 @@ describe('SocketService', () => {
             opponentScoreContainer = opponentScore;
             counter++;
         });
-        clientSocket.emit('createGame', configs);
-        service.updateScores(clientSocket.id, 2, 1);
+        setTimeout(() => {
+            clientSocket.emit('createGame', configs);
+        }, DEFAULT_BASE_DELAY);
+        setTimeout(() => {
+            service.updateScores(clientSocket.id, 2, 1);
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY);
         setTimeout(() => {
             expect(ownScoreContainer).to.equals(2);
             expect(opponentScoreContainer).to.equals(1);
             expect(counter).greaterThan(0);
             done();
-        }, 100);
+        }, DEFAULT_DELAY);
     });
 
     it('gameEnded should send data properly', (done) => {
@@ -170,12 +264,16 @@ describe('SocketService', () => {
             winnerContainer = winner;
             counter++;
         });
-        clientSocket.emit('createGame', configs);
-        service.gameEnded('_' + clientSocket.id, 'Hello');
+        setTimeout(() => {
+            clientSocket.emit('createGame', configs);
+        }, DEFAULT_BASE_DELAY);
+        setTimeout(() => {
+            service.gameEnded('_' + clientSocket.id, 'Hello');
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY);
         setTimeout(() => {
             expect(winnerContainer).to.equals('Hello');
             expect(counter).greaterThan(0);
             done();
-        }, 100);
+        }, DEFAULT_DELAY);
     });
 });
