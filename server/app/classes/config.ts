@@ -1,6 +1,6 @@
 // For the value of each letter sometimes they value 10 or 8
 
-import { HighScore } from './highscore';
+import { HighScore } from '@app/classes/highscore';
 import { Dictionary } from '@app/classes/game-info';
 // eslint-disable-next-line no-restricted-imports
 import * as data from '@app/config/dictionary.json';

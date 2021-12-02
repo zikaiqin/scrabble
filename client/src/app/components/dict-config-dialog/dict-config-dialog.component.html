@@ -26,6 +26,13 @@
 
     <div mat-dialog-actions class="button-row" [ngStyle]="data.action === 'delete' ? { marginTop: '36px' } : {}">
         <button mat-button (click)="dialogRef.close(confirm(false))">Annuler</button>
-        <button mat-raised-button [color]="data.action === 'delete' ? 'warn' : 'primary'" [disabled]="data.action === 'delete' ? false : formGroup.invalid" (click)="dialogRef.close(confirm(true))">{{ action }}</button>
+        <button
+            mat-raised-button
+            [color]="data.action === 'delete' ? 'warn' : 'primary'"
+            [disabled]="data.action === 'delete' ? false : formGroup.invalid"
+            (click)="dialogRef.close(confirm(true))"
+        >
+            {{ action }}
+        </button>
     </div>
 </div>

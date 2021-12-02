@@ -1,7 +1,5 @@
 <div class="title-container">
-    <h1 class="title">
-        Liste des dictionnaires
-    </h1>
+    <h1 class="title">Liste des dictionnaires</h1>
 </div>
 
 <span class="table-actions">
@@ -30,7 +28,8 @@
                     [disabled]="!isToggleEnabled()"
                     [checked]="selection.hasValue() && isAllSelected()"
                     [indeterminate]="selection.hasValue() && !isAllSelected()"
-                    (change)="$event ? toggleAll() : null">
+                    (change)="$event ? toggleAll() : null"
+                >
                 </mat-checkbox>
             </th>
             <td mat-cell *matCellDef="let element">
@@ -38,7 +37,8 @@
                     [disabled]="isDefault(element)"
                     [checked]="selection.isSelected(element)"
                     (click)="$event.stopPropagation()"
-                    (change)="$event ? selection.toggle(element) : null">
+                    (change)="$event ? selection.toggle(element) : null"
+                >
                 </mat-checkbox>
             </td>
         </ng-container>
@@ -52,7 +52,7 @@
         <!-- Actions Column -->
         <ng-container matColumnDef="description">
             <th mat-header-cell *matHeaderCellDef>Description</th>
-            <td mat-cell *matCellDef="let element" [ngStyle]="{ fontWeight: isDefault(element) ? 550 : 'normal' }"> {{ element.description }} </td>
+            <td mat-cell *matCellDef="let element" [ngStyle]="{ fontWeight: isDefault(element) ? 550 : 'normal' }">{{ element.description }}</td>
         </ng-container>
 
         <!-- Actions Column -->

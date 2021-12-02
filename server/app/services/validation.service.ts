@@ -1,15 +1,7 @@
 import { Board } from '@app/classes/board';
-import { DEFAULT_POINTS, DEFAULT_TURN_TIMEOUT } from '@app/classes/config';
-import { MessageType } from '@app/classes/message';
+import { DEFAULT_POINTS } from '@app/classes/config';
 import { Vec2 } from '@app/classes/vec2';
 import { Service } from 'typedi';
-import { ObjectivesService } from '@app/services/objectives';
-import { Player } from '@app/classes/player';
-import { Game } from '@app/classes/game';
-import { PlacingService } from '@app/services/placing.service';
-import { SocketService } from './socket.service';
-import { GameDisplayService } from '@app/services/game-display.service';
-import { EndGameService } from '@app/services/end-game.service';
 
 export const ASCII_SMALL_A = 97;
 const BINGO_BONUS = 50;
@@ -34,13 +26,6 @@ export class ValidationService {
     // Key -- ID of the room <br>
     // Value -- Valid words in the game's dictionary
     readonly dictionaries = new Map<string, string[]>();
-
-    constructor(
-        private objectivesService: ObjectivesService,
-        private placingService: PlacingService,
-        private gameDisplayService: GameDisplayService,
-        private endGameService: EndGameService,
-    ) {}
     /**
      * @description Startup to initialize the attributes
      * @param startCoords the starting coordinates of the placed word/letter
@@ -227,34 +212,5 @@ export class ValidationService {
         // IF the player placed all of his hand, gains an extra 50 pts
         if (this.newWord.size === BINGO_WORD) totalPoints += BINGO_BONUS;
         return totalPoints;
-    }
-
-    validatePlacing(player: Player, game: Game, toPlace: Map<string, string>, socket: SocketService, roomID: string, socketId: string) {
-        const isValidWord = this.findWord(roomID, this.fetchWords());
-        setTimeout(() => {
-            if (isValidWord) {
-                player.score += this.calcPoints();
-                for (const objective of game.publicObj) {
-                    const objNumber = objective[0];
-                    if (this.objectivesService.checkObjective(objNumber, toPlace, game)) {
-                        if (game.completePublic(objNumber)) player.score += this.objectivesService.getPoints(objNumber);
-                    }
-                }
-                if (this.objectivesService.checkObjective(player.privateObj[0], toPlace, game)) {
-                    if (player.completePrivate()) player.score += this.objectivesService.getPoints(player.privateObj[0]);
-                }
-                this.placingService.replenishHand(game.reserve, player);
-                socket.updateReserve(roomID, game.reserve.letters);
-                this.gameDisplayService.updateScores(game, socket);
-                this.endGameService.resetTurnSkipCount(roomID);
-            } else {
-                game.validTurnCounter = 0;
-                this.placingService.returnLetters(toPlace, game.board, player);
-                socket.sendMessage(socketId, MessageType.System, 'Votre placement forme des mots invalides');
-            }
-            socket.updateBoard(roomID, game.board.letters);
-            socket.updateObjectives(socketId, game.publicObj, player.privateObj);
-            this.gameDisplayService.updateHands(game, socket);
-        }, DEFAULT_TURN_TIMEOUT);
     }
 }
