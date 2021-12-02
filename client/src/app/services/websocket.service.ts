@@ -163,7 +163,7 @@ export class WebsocketService {
                   reconnection: true,
                   reconnectionDelay: 1000,
                   reconnectionDelayMax: 3000,
-                  reconnectionAttempts: 2,
+                  reconnectionAttempts: MAX_RECONNECT_ATTEMPT,
               }).connect();
         this.attachListeners();
     }
