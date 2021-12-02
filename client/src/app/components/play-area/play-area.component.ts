@@ -165,18 +165,22 @@ export class PlayAreaComponent implements AfterViewInit {
         if (this.gridService.arrowDirection) {
             // down
             this.mousePosition.y++;
-        }
-        if (!this.gridService.arrowDirection) {
+            this.gridService.selectSquare(this.mousePosition.x, this.mousePosition.y);
+        } else {
             // up
             this.mousePosition.x++;
+            this.gridService.selectSquare(this.mousePosition.x, this.mousePosition.y);
         }
     }
 
     stepBack() {
-        if (!this.gridService.arrowDirection) this.mousePosition.x--;
-        // this.gridService.mousePositionSubject.next({ x: this.mousePosition.x--, y: this.mousePosition.y });
-        else this.mousePosition.y--;
-        // this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y-- });
+        if (!this.gridService.arrowDirection) {
+            this.mousePosition.x--;
+            this.gridService.selectSquare(this.mousePosition.x, this.mousePosition.y);
+        } else {
+            this.mousePosition.y--;
+            this.gridService.selectSquare(this.mousePosition.x, this.mousePosition.y);
+        }
     }
 
     removecommandHand(): void {
