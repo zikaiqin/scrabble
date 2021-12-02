@@ -102,6 +102,12 @@ export class HttpService {
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                this.catchHttpErrorWithStatus(err, 413, () => {
+                    this.alertService.showAlert('Le dictionnaire est trop large');
+                }),
+            ),
+            catchError((err) =>
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 this.catchHttpErrorWithStatus(err, 409, () => {
                     this.alertService.showAlert(`Un dictionnaire avec le nom ${name} existe déjà`);
                 }),
