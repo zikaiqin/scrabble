@@ -1,18 +1,18 @@
-<mat-card class="menu-card center mat-elevation-z2">
+<mat-card class="menu-card center mat-elevation-z2" width = "200px" style = "background:linear-gradient(315deg, #ff4e00 0%, #ec9f05 74%) " >
     <div class="title-container">
         <h1 class="title">
             {{ getTitle() }}
         </h1>
     </div>
-
+    
     <div class="stretch-column">
         <ng-template ngFor let-button [ngForOf]="getButtons()">
-            <button mat-raised-button *ngIf="button.name !== 'Back'; else backButton" (click)="buttonClick.emit(button.name)">
+            <button class = "container" mat-raised-button *ngIf="button.name !== 'Back'; else backButton" (click)="buttonClick.emit(button.name)">
                 {{ button.text }}
             </button>
-
+            
             <ng-template #backButton>
-                <button mat-button (click)="buttonClick.emit('Back')">Retour</button>
+                <button mat-button style = "font-family:'Fuzzy Bubbles', sans-serif; color: white;" (click)="buttonClick.emit('Back')">Retour</button>
             </ng-template>
         </ng-template>
     </div>
