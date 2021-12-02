@@ -31,7 +31,10 @@ export class AdminPageComponent {
             if (reset) {
                 this.httpService.resetDB().subscribe({
                     next: () => this.alertService.showAlert('Le système a été réinitialisé'),
-                    complete: () => this.getBots(),
+                    complete: () => {
+                        this.getBots();
+                        this.getDicts();
+                    },
                 });
             }
         });
@@ -73,7 +76,18 @@ export class AdminPageComponent {
 
     addDict(name: string, description: string, words: string[]): void {
         this.httpService.addDict(name, description, words).subscribe({
-            next: () => this.alertService.showAlert(`Le dictionnaire ${name} a été téléversé`),
+            complete: () => this.getDicts(),
+        });
+    }
+
+    deleteDicts(ids: string[]): void {
+        this.httpService.deleteDicts(ids).subscribe({
+            complete: () => this.getDicts(),
+        });
+    }
+
+    editDict(dict: Partial<Dictionary>): void {
+        this.httpService.editDict(dict.id as string, dict.name as string, dict.description as string).subscribe({
             complete: () => this.getDicts(),
         });
     }
@@ -91,6 +105,7 @@ export class AdminPageComponent {
     }
 
     handleFile() {
+        this.getDicts();
         const file: File = this.upload.nativeElement.files?.item(0);
         if (!file) {
             this.alertService.showGenericError();

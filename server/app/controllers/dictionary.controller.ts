@@ -46,7 +46,7 @@ export class DictionaryController {
             this.dbService
                 .countDictionaries(name)
                 .then((count) => {
-                    if (count > 0 || name === DEFAULT_DICTIONARY.name) {
+                    if (count > 0) {
                         res.sendStatus(409);
                         return;
                     }
@@ -65,9 +65,18 @@ export class DictionaryController {
                 return;
             }
             this.dbService
-                .editDictionary(id, name, description)
-                .then((updateResult) => {
-                    res.sendStatus(updateResult.matchedCount ? 200 : 404);
+                .countDictionaries(name)
+                .then((count) => {
+                    if (count > 0) {
+                        res.sendStatus(409);
+                        return;
+                    }
+                    this.dbService
+                        .editDictionary(id, name, description)
+                        .then((updateResult) => {
+                            res.sendStatus(updateResult.matchedCount ? 200 : 404);
+                        })
+                        .catch(() => res.sendStatus(500));
                 })
                 .catch(() => res.sendStatus(500));
         });

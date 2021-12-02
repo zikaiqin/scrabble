@@ -28,7 +28,7 @@ export class DictConfigDialogComponent {
     }
 
     confirm(confirmation: boolean): DialogResult {
-        return { confirmation, name: this.name.value, description: '' };
+        return { confirmation, name: this.name.value, description: this.description.value };
     }
 
     get title(): string {

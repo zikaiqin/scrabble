@@ -39,6 +39,8 @@
                     [data]="dictData"
                     (get)="getDicts()"
                     (add)="upload.click()"
+                    (delete)="deleteDicts($event)"
+                    (edit)="editDict($event)"
                     (download)="downloadDict($event)"
                 ></app-dict-config>
             </mat-card>

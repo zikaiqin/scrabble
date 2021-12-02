@@ -112,6 +112,42 @@ export class HttpService {
         );
     }
 
+    deleteDicts(ids: string[]) {
+        return this.http.delete(dictPath, { body: { ids }, responseType: 'text' }).pipe(
+            timeout(DEFAULT_TIMEOUT),
+            catchError((err) =>
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                this.catchHttpErrorWithStatus(err, 404, () => {
+                    this.alertService.showAlert(`${ids.length > 1 ? 'Les dictionnaires' : 'Le dictionnaire'} que vous voulez supprimer n'existe pas`);
+                }),
+            ),
+            catchError((err) => this.catchAnyHttpError(err, true)),
+            catchError((err) => this.catchTimeoutError(err, true)),
+            catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
+        );
+    }
+
+    editDict(id: string, name: string, description: string) {
+        return this.http.put(dictPath, { id, name, description }, { responseType: 'text' }).pipe(
+            timeout(DEFAULT_TIMEOUT),
+            catchError((err) =>
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                this.catchHttpErrorWithStatus(err, 409, () => {
+                    this.alertService.showAlert(`Un dictionnaire le nom ${name} existe déjà`);
+                }),
+            ),
+            catchError((err) =>
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                this.catchHttpErrorWithStatus(err, 404, () => {
+                    this.alertService.showAlert("Le dictionnaire que vous voulez modifier n'existe pas");
+                }),
+            ),
+            catchError((err) => this.catchAnyHttpError(err, true)),
+            catchError((err) => this.catchTimeoutError(err, true)),
+            catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
+        );
+    }
+
     downloadDict(id: string) {
         return this.http.get(`${dictPath}/download`, { params: { id }, responseType: 'json' }).pipe(
             timeout(DEFAULT_TIMEOUT),

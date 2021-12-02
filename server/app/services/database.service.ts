@@ -35,7 +35,7 @@ export class DatabaseService {
             this.botDB.dropCollection(DATABASE.bot.collections.hard),
             this.highScoreDB.dropCollection(DATABASE.highScore.collections.classical),
             this.highScoreDB.dropCollection(DATABASE.highScore.collections.log2990),
-            this.botDB.dropCollection(DATABASE.dict.collection),
+            this.dictDB.dropCollection(DATABASE.dict.collection),
         ]);
     }
 
@@ -117,7 +117,7 @@ export class DatabaseService {
         return this.dictDB.collection(DATABASE.dict.collection).deleteMany({ _id: { $in: ids.map((id) => new ObjectId(id)) } });
     }
 
-    async countDictionaries(name: string) {
-        return this.dictDB.collection(DATABASE.dict.collection).countDocuments({ name });
+    async countDictionaries(name: string, id?: string) {
+        return this.dictDB.collection(DATABASE.dict.collection).countDocuments({ _id: id ? { $ne: new ObjectId(id) } : {}, name });
     }
 }
