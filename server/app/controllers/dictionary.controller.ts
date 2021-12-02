@@ -39,13 +39,22 @@ export class DictionaryController {
 
         this.router.post('/', (req: Request, res: Response) => {
             const { name, description, words } = req.body;
-            if (!name || !description || words === undefined) {
+            if (!name || !description || !words) {
                 res.sendStatus(400);
                 return;
             }
             this.dbService
-                .insertDictionary(name, description, words)
-                .then(() => res.sendStatus(200))
+                .countDictionaries(name)
+                .then((count) => {
+                    if (count > 0 || name === DEFAULT_DICTIONARY.name) {
+                        res.sendStatus(409);
+                        return;
+                    }
+                    this.dbService
+                        .insertDictionary(name, description, words)
+                        .then(() => res.sendStatus(200))
+                        .catch(() => res.sendStatus(500));
+                })
                 .catch(() => res.sendStatus(500));
         });
 

@@ -38,7 +38,7 @@
                     *ngIf="page === 'dict'"
                     [data]="dictData"
                     (get)="getDicts()"
-                    (add)="selectFile()"
+                    (add)="upload.click()"
                     (download)="downloadDict($event)"
                 ></app-dict-config>
             </mat-card>
@@ -56,3 +56,6 @@
         <span>Retourner à l'accueil</span>
     </button>
 </mat-menu>
+
+<a hidden #download></a>
+<input type="file" accept="application/json" hidden #upload (change)="handleFile(); upload.value = ''">

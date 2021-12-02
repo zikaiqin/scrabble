@@ -50,13 +50,13 @@ export class BotController {
                 .countBots(name)
                 .then(([easyCount, hardCount]) => {
                     if (easyCount + hardCount > 0 || [...DEFAULT_BOT_NAMES.easy, ...DEFAULT_BOT_NAMES.hard].some((botName) => botName === name)) {
-                        res.status(409).json();
-                    } else {
-                        this.dbService
-                            .insertBot(name, difficulty)
-                            .then(() => res.sendStatus(200))
-                            .catch(() => res.sendStatus(500));
+                        res.sendStatus(409);
+                        return;
                     }
+                    this.dbService
+                        .insertBot(name, difficulty)
+                        .then(() => res.sendStatus(200))
+                        .catch(() => res.sendStatus(500));
                 })
                 .catch(() => res.sendStatus(500));
         });

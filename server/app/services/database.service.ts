@@ -74,13 +74,6 @@ export class DatabaseService {
             .toArray();
     }
 
-    async countBots(name: string): Promise<[number, number]> {
-        return Promise.all([
-            this.botDB.collection(DATABASE.bot.collections.easy).countDocuments({ name }),
-            this.botDB.collection(DATABASE.bot.collections.hard).countDocuments({ name }),
-        ]);
-    }
-
     async insertBot(name: string, difficulty: number) {
         return this.botDB.collection(DATABASE.bot.collections[difficulty === GameDifficulty.Easy ? 'easy' : 'hard']).insertOne({ name });
     }
@@ -95,6 +88,13 @@ export class DatabaseService {
         return this.botDB
             .collection(DATABASE.bot.collections[difficulty === GameDifficulty.Easy ? 'easy' : 'hard'])
             .deleteMany({ _id: { $in: ids.map((id) => new ObjectId(id)) } });
+    }
+
+    async countBots(name: string): Promise<[number, number]> {
+        return Promise.all([
+            this.botDB.collection(DATABASE.bot.collections.easy).countDocuments({ name }),
+            this.botDB.collection(DATABASE.bot.collections.hard).countDocuments({ name }),
+        ]);
     }
 
     async getDictionaryDescriptions(): Promise<Partial<Dictionary>[]> {
@@ -115,5 +115,9 @@ export class DatabaseService {
 
     async deleteDictionaries(ids: string[]) {
         return this.dictDB.collection(DATABASE.dict.collection).deleteMany({ _id: { $in: ids.map((id) => new ObjectId(id)) } });
+    }
+
+    async countDictionaries(name: string) {
+        return this.dictDB.collection(DATABASE.dict.collection).countDocuments({ name });
     }
 }

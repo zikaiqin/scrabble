@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '@env/environment';
-import { catchError, tap, timeout } from 'rxjs/operators';
+import { catchError, timeout } from 'rxjs/operators';
 import { DEFAULT_TIMEOUT } from '@app/classes/config';
 import { EMPTY, throwError, TimeoutError } from 'rxjs';
 import { AlertService } from '@app/services/alert.service';
@@ -97,6 +97,21 @@ export class HttpService {
         );
     }
 
+    addDict(name: string, description: string, words: string[]) {
+        return this.http.post(dictPath, { name, description, words }, { responseType: 'text' }).pipe(
+            timeout(DEFAULT_TIMEOUT),
+            catchError((err) =>
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                this.catchHttpErrorWithStatus(err, 409, () => {
+                    this.alertService.showAlert(`Un dictionnaire avec le nom ${name} existe déjà`);
+                }),
+            ),
+            catchError((err) => this.catchAnyHttpError(err, true)),
+            catchError((err) => this.catchTimeoutError(err, true)),
+            catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
+        );
+    }
+
     downloadDict(id: string) {
         return this.http.get(`${dictPath}/download`, { params: { id }, responseType: 'json' }).pipe(
             timeout(DEFAULT_TIMEOUT),
@@ -112,7 +127,6 @@ export class HttpService {
             catchError((err) => this.catchAnyHttpError(err)),
             catchError((err) => this.catchTimeoutError(err)),
             catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
-            tap(() => this.alertService.showAlert('Le système a été réinitialisé')),
         );
     }
 
@@ -145,7 +159,7 @@ export class HttpService {
         if (expectedTypes.some((expectedType) => err instanceof expectedType)) {
             return throwError(err);
         }
-        this.alertService.showAlert("Une erreur s'est produite");
+        this.alertService.showGenericError();
         return EMPTY;
     }
 }
