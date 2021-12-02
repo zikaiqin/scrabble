@@ -235,6 +235,10 @@ export const DEFAULT_SOCKET_TIMEOUT = 5000;
 export const BOT_MARKER = '*';
 export const ROOM_MARKER = '_';
 
+export const MAX_TURN_SKIP_COUNT = 6;
+
+export const HALF = 0.5;
+
 export const DATABASE = {
     url: 'mongodb+srv://equipe105:giornogiovanna@cluster0.9flzh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
     highScore: {

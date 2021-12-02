@@ -70,7 +70,7 @@ export class WebsocketService {
             this.socket.on('updateTime', (time: number) => {
                 this.gameTime.next(time);
             });
-
+            
             this.socket.on('updateTurn', (turn: boolean) => {
                 this.gameTurn.next(turn);
             });

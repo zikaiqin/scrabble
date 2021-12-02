@@ -1,8 +1,9 @@
 /* eslint-disable max-classes-per-file */
-import { expect } from 'chai';
-import { EndGameService } from '@app/services/end-game.service';
 import { Player } from '@app/classes/player';
 import { Reserve } from '@app/classes/reserve';
+import { EndGameService } from '@app/services/end-game.service';
+import { GameDisplayService } from '@app/services/game-display.service';
+import { expect } from 'chai';
 import { createSandbox } from 'sinon';
 
 class MockPlayer extends Player {
@@ -33,6 +34,7 @@ class MockReserve extends Reserve {
 
 describe('End Game Service', () => {
     let endGameService: EndGameService;
+    let fakeGameDisplayService: GameDisplayService;
     let player: MockPlayer;
     let opponent: MockPlayer;
     const randomLetters1: string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
@@ -43,7 +45,7 @@ describe('End Game Service', () => {
     const sandBox = createSandbox();
 
     beforeEach(() => {
-        endGameService = new EndGameService();
+        endGameService = new EndGameService(fakeGameDisplayService);
         /* eslint-disable */
         endGameService.turnSkipMap.set(room1, 3);
         endGameService.turnSkipMap.set(room2, 6);

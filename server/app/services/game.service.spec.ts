@@ -14,6 +14,8 @@ import * as http from 'http';
 import * as sinon from 'sinon';
 import { beforeEach, describe, it } from 'mocha';
 import { expect } from 'chai';
+import { TurnService } from '@app/services/turn.service';
+import { GameDisplayService } from '@app/services/game-display.service';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('GameService', () => {
@@ -26,6 +28,8 @@ describe('GameService', () => {
     let fakeValidationService: ValidationService;
     let fakeObjectivesService: ObjectivesService;
     let fakeDatabaseService: DatabaseService;
+    let fakeTurnService: TurnService;
+    let fakeGameDisplayService: GameDisplayService;
 
     let fakeSocketEvents: EventEmitter;
 
@@ -50,6 +54,8 @@ describe('GameService', () => {
             fakeValidationService,
             fakeObjectivesService,
             fakeDatabaseService,
+            fakeTurnService,
+            fakeGameDisplayService,
         );
         sinon.replace(fakeSocketService, 'socketEvents', fakeSocketEvents);
         service.attachSocketListeners();
