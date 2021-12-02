@@ -10,15 +10,12 @@ const DEFAULT_HEIGHT = 600;
 
 const DEFAULT_NB_CASES = 16;
 const STROKE_RANGE = 4;
-const ARROW_POSITION1 = 635;
-const ARROW_POSITION2 = 400;
-const ARROW_POSITION3 = 615;
-const ARROW_POSITION4 = 625;
-const ARROW_POSITION5 = 425;
-const ARROW_POSITION6 = 225;
+const ARROW_SIZE = 15;
+const ARROW_SIZE2 = 25;
 const SCALE_MAX = 1.5;
 const SCALE_MIN = 0.8;
 const TEXT_DEFAULT_PX = 20;
+
 @Injectable({
     providedIn: 'root',
 })
@@ -45,7 +42,7 @@ export class GridService {
     constructor(private websocketService: WebsocketService, private readonly gridLettersService: GridLettersService) {
         this.mousePositionSubject.asObservable().subscribe((mousePos) => {
             this.mousePosition = mousePos;
-            this.drawArrow();
+            //this.drawArrow(posY: number,posX :number);
         });
         this.websocketService.init.subscribe((init) => {
             this.bonuses = new Map<string, string>(init.bonuses);
@@ -59,31 +56,16 @@ export class GridService {
         });
     }
 
-    drawArrow() {
+    drawArrow(posX: number,posY :number) {
+        const img = new Image(10, 20)
         if (this.arrowDirection) {
             // down
-            this.gridContext.lineWidth = 20;
-            this.gridContext.beginPath();
-            this.gridContext.moveTo(ARROW_POSITION1, ARROW_POSITION2);
-            this.gridContext.lineTo(ARROW_POSITION3, ARROW_POSITION2);
-            this.gridContext.lineTo(ARROW_POSITION4, ARROW_POSITION5);
-            this.gridContext.closePath();
-            this.gridContext.stroke();
-            this.gridContext.moveTo(ARROW_POSITION4, ARROW_POSITION6);
-            this.gridContext.lineTo(ARROW_POSITION4, ARROW_POSITION2);
-            this.gridContext.stroke();
+            img.src = 'https://i.ibb.co/mN7tnhW/flecheup.jpg';
+            this.gridContext.drawImage(img, posX + this.tuileSize, posY ,ARROW_SIZE ,ARROW_SIZE2);
         } else {
             // left
-            this.gridContext.lineWidth = 20;
-            this.gridContext.beginPath();
-            this.gridContext.moveTo(ARROW_POSITION2, ARROW_POSITION1);
-            this.gridContext.lineTo(ARROW_POSITION2, ARROW_POSITION3);
-            this.gridContext.lineTo(ARROW_POSITION5, ARROW_POSITION4);
-            this.gridContext.closePath();
-            this.gridContext.stroke();
-            this.gridContext.moveTo(ARROW_POSITION6, ARROW_POSITION4);
-            this.gridContext.lineTo(ARROW_POSITION2, ARROW_POSITION4);
-            this.gridContext.stroke();
+            img.src = 'https://i.ibb.co/Y7zBLFV/fleche-Left.jpg';
+            this.gridContext.drawImage(img, posX, posY - this.tuileSize/2 ,ARROW_SIZE2 ,ARROW_SIZE);
         }
     }
     selectSquare(posX: number, posY: number): void {
@@ -107,10 +89,7 @@ export class GridService {
 
             this.gridContext.strokeStyle = 'purple';
             this.gridContext.strokeRect(tuileX + 2, tuileY + 2, this.tuileSize - STROKE_RANGE, this.tuileSize - STROKE_RANGE);
-            this.drawArrow();
-
-            // console.log(this.samePosY);
-            // console.log(this.samePosX);
+            this.drawArrow(tuileX,tuileY);
         }
         // return this.arrowDirection;
     }

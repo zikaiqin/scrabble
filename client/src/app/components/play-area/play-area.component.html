@@ -10,6 +10,7 @@
         </mat-card-actions>
 
         <canvas id="canvas" #gridCanvas (click)="mouseHitDetect($event)" [attr.width]="width" [attr.height]="height"></canvas>
+
         <mat-card-actions>
             <button mat-icon-button id="place" (click)="placeLetter()">
                 <mat-icon>play_for_work</mat-icon>

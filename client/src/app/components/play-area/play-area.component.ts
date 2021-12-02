@@ -23,10 +23,10 @@ export class PlayAreaComponent implements AfterViewInit {
     buttonPressed = '';
     isVisible: boolean;
     temp: [string, string][] = [];
-
     isEventReceiver: boolean = false;
-    // isDirectionUP: boolean;
-    initHand: string[] = [];
+
+    // used as save a hand for command. At that moment, it's the lettres that is gonna write on the command
+    commandHand: string[] = [];
     isPlacing: boolean = false;
     placedLetters: Map<string, string> = new Map<string, string>();
     private turnState: boolean;
@@ -42,9 +42,7 @@ export class PlayAreaComponent implements AfterViewInit {
     ) {
         this.webSocketService.init.subscribe((initPayload) => {
             this.playerHand = initPayload.hand;
-            if (initPayload.turnState !== undefined) {
-                this.turnState = initPayload.turnState;
-            }
+            if (initPayload.turnState !== undefined) this.turnState = initPayload.turnState;
         });
         this.webSocketService.hands.subscribe((hands) => {
             this.playerHand = hands.ownHand;
@@ -88,17 +86,22 @@ export class PlayAreaComponent implements AfterViewInit {
                 this.placeLetter();
                 this.isPlacing = true;
                 this.gridService.isPlacing = true;
+                this.manageUntouchableLetters();
             } else if (this.isPlacing) {
-                // adding to initHand the letters already on the board for push on command
-                while (this.gameBoard.has(this.positionStr())) {
-                    this.initHand.push(this.gameBoard.get(this.positionStr()) as string);
-                    this.jumpLetter();
-                }
+                this.manageUntouchableLetters();
                 this.placeLetter();
+                this.manageUntouchableLetters();
             }
         }
     }
-
+    // adding to commandHand the letters already on the board for saving for call later on command
+    // and jump that square until it's an empty square
+    manageUntouchableLetters() {
+        while (this.gameBoard.has(this.positionStr())) {
+            this.commandHand.push(this.gameBoard.get(this.positionStr()) as string);
+            this.jumpLetter();
+        }
+    }
     placeLetter() {
         // verify if inside the board coord
         if (this.mousePosition.x < NUMBER_MAX_COORD && this.mousePosition.y < NUMBER_MAX_COORD) {
@@ -111,7 +114,7 @@ export class PlayAreaComponent implements AfterViewInit {
             if (this.buttonPressed === '*') {
                 this.buttonPressed = this.upperCaseButtonPressed;
             }
-            this.initHand.push(this.buttonPressed);
+            this.commandHand.push(this.buttonPressed);
 
             this.placedLetters.set(this.positionStr(), this.buttonPressed);
             this.gameBoard.set(this.positionStr(), this.buttonPressed);
@@ -127,15 +130,15 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     removeAll() {
-        while (this.initHand.length > 0) {
+        while (this.commandHand.length > 0) {
             // back to the removing position
             this.stepBack();
 
             // exemple: you see on the board: eTEe
             // TE already existed on the board so not from hand
-            // we need to remove TE from initHand
+            // we need to remove TE from commandHand
             while (!this.placedLetters.has(this.positionStr())) {
-                this.initHand.splice(0, 1);
+                this.commandHand.splice(0, 1);
                 this.stepBack();
             }
             // update gameBoard
@@ -149,9 +152,9 @@ export class PlayAreaComponent implements AfterViewInit {
             this.webSocketService.gameBoard.next(this.temp);
 
             // update playerHand
-            if (this.initHand[0] === this.initHand[0].toUpperCase()) this.playerHand.push('*');
-            else this.playerHand.push(this.initHand[0]);
-            this.initHand.splice(0, 1);
+            if (this.commandHand[0] === this.commandHand[0].toUpperCase()) this.playerHand.push('*');
+            else this.playerHand.push(this.commandHand[0]);
+            this.commandHand.splice(0, 1);
         }
 
         this.gridService.drawGrid();
@@ -175,11 +178,10 @@ export class PlayAreaComponent implements AfterViewInit {
         else this.mousePosition.y--;
         // this.gridService.mousePositionSubject.next({ x: this.mousePosition.x, y: this.mousePosition.y-- });
     }
-    removeInitHand(): void {
-        const index = this.initHand.indexOf(this.playerHand[this.playerHand.length - 1]);
-        if (index >= 0) {
-            this.initHand.splice(index, 1);
-        }
+
+    removecommandHand(): void {
+        const index = this.commandHand.indexOf(this.playerHand[this.playerHand.length - 1]);
+        if (index >= 0) this.commandHand.splice(index, 1);
     }
 
     // remove a specified letter from playerHand
@@ -190,18 +192,17 @@ export class PlayAreaComponent implements AfterViewInit {
         }
     }
 
-    // back to the removing position
-
+    // back to the removed position
     removeOne(): void {
-        if (this.initHand.length > 0) {
+        if (this.commandHand.length > 0) {
             // back to the removing position
             this.stepBack();
 
             // exemple: you see on the board: eTEe
             // TE already existed on the board so not from hand
-            // we need to remove TE from initHand
+            // we need to remove TE from commandHand
             while (!this.placedLetters.has(this.positionStr())) {
-                this.initHand.splice(0, 1);
+                this.commandHand.pop();
                 this.stepBack();
             }
             if (this.placedLetters.has(this.positionStr())) {
@@ -212,8 +213,8 @@ export class PlayAreaComponent implements AfterViewInit {
 
                 this.placedLetters.delete(this.positionStr());
                 // updating chevalet
-                this.playerHand.push(this.initHand[this.initHand.length - 1]); // addHand
-                this.removeInitHand();
+                this.playerHand.push(this.commandHand[this.commandHand.length - 1]); // addHand
+                this.removecommandHand();
 
                 // convert Map to Array
                 // passing the board to service
@@ -250,15 +251,13 @@ export class PlayAreaComponent implements AfterViewInit {
             if (this.upperCaseButtonPressed === '') return false;
             this.buttonPressed = '*';
         }
-        for (const it of this.playerHand) {
-            if (it === this.buttonPressed) return true;
-        }
+        for (const it of this.playerHand) if (it === this.buttonPressed) return true;
         return false;
     }
 
     commandPlace() {
-        // show initHand
-        const replaceInidHand = [...this.initHand];
+        // show commandHand
+        const replaceInidHand = [...this.commandHand];
         // remove from the board pour placer des lettres
         this.removeAll();
         const direction = this.gridService.arrowDirection ? 'v' : 'h';
@@ -284,9 +283,9 @@ export class PlayAreaComponent implements AfterViewInit {
                     x: this.mousePosition.x,
                     y: this.mousePosition.y,
                 });
-                if (this.initPosition.x === this.mousePosition.x && this.initPosition.y === this.mousePosition.y) {
+                if (this.initPosition.x === this.mousePosition.x && this.initPosition.y === this.mousePosition.y)
                     this.gridService.arrowDirection = !this.gridService.arrowDirection;
-                } else this.gridService.arrowDirection = false;
+                else this.gridService.arrowDirection = false;
 
                 // 0 to 14
                 // and 0 to 14
