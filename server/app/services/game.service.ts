@@ -6,7 +6,7 @@ import { Board } from '@app/classes/board';
 import { Player } from '@app/classes/player';
 import { MessageType } from '@app/classes/message';
 import { GameInfo, GameMode, GameType, PlayerInfo } from '@app/classes/game-info';
-import { BOT_MARKER, DEFAULT_BONUSES, DEFAULT_SOCKET_TIMEOUT, DEFAULT_TURN_TIMEOUT, HALF } from '@app/classes/config';
+import { BOT_MARKER, DEFAULT_BONUSES, DEFAULT_SOCKET_TIMEOUT, HALF } from '@app/classes/config';
 import { BotService } from '@app/services/bot.service';
 import { EndGameService } from '@app/services/end-game.service';
 import { ExchangeService } from '@app/services/exchange.service';
@@ -76,35 +76,7 @@ export class GameService {
                 this.validationService.init(startCoords, toPlace, game.board);
                 this.socketService.updateBoard(socketID, game.board.letters);
                 this.socketService.updateHands(socketID, player.hand, Array.from(game.players.values()).filter((p) => p !== player)[0].hand);
-
-                // TODO: Move to validation.service as game.service is getting too long
-                const isValidWord = this.validationService.findWord(roomID, this.validationService.fetchWords());
-                setTimeout(() => {
-                    if (isValidWord) {
-                        player.score += this.validationService.calcPoints();
-                        for (const objective of game.publicObj) {
-                            const objNumber = objective[0];
-                            if (this.objectivesService.checkObjective(objNumber, toPlace, game)) {
-                                if (game.completePublic(objNumber)) player.score += this.objectivesService.getPoints(objNumber);
-                            }
-                        }
-                        if (this.objectivesService.checkObjective(player.privateObj[0], toPlace, game)) {
-                            if (player.completePrivate()) player.score += this.objectivesService.getPoints(player.privateObj[0]);
-                        }
-                        this.placingService.replenishHand(game.reserve, player);
-                        this.socketService.updateReserve(roomID, game.reserve.letters);
-                        this.gameDisplayService.updateScores(game, this.socketService);
-                        this.endGameService.resetTurnSkipCount(roomID);
-                    } else {
-                        game.validTurnCounter = 0;
-                        this.placingService.returnLetters(toPlace, game.board, player);
-                        this.socketService.sendMessage(socketID, MessageType.System, 'Votre placement forme des mots invalides');
-                    }
-                    this.socketService.updateBoard(roomID, game.board.letters);
-                    this.socketService.updateObjectives(socketID, game.publicObj, player.privateObj);
-                    this.gameDisplayService.updateHands(game, this.socketService);
-                }, DEFAULT_TURN_TIMEOUT);
-
+                this.validationService.validatePlacing(player, game, toPlace, this.socketService, roomID, socketID);
                 this.turnService.changeTurn(roomID, this.timers.get(roomID) as Timer, this.socketService);
             })
             .on('skipTurn', (roomID: string) => {
