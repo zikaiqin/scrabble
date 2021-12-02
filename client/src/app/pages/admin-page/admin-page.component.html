@@ -33,6 +33,16 @@
                     (delete)="deleteBots($event)"
                     (edit)="editBot($event)"
                 ></app-bot-config>
+                <app-dict-config
+                    class="stretch-col stretch-col-content"
+                    *ngIf="page === 'dict'"
+                    [data]="dictData"
+                    (get)="getDicts()"
+                    (add)="upload.click()"
+                    (delete)="deleteDicts($event)"
+                    (edit)="editDict($event)"
+                    (download)="downloadDict($event)"
+                ></app-dict-config>
             </mat-card>
         </mat-drawer-content>
     </mat-drawer-container>
@@ -48,3 +58,6 @@
         <span>Retourner à l'accueil</span>
     </button>
 </mat-menu>
+
+<a hidden #download></a>
+<input type="file" accept="application/json" hidden #upload (change)="handleFile(); upload.value = ''">

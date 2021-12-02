@@ -1,5 +1,5 @@
 import { Board } from '@app/classes/board';
-import { DEFAULT_BONUSES } from '@app/classes/config';
+import { DEFAULT_BONUSES, DEFAULT_DICTIONARY } from '@app/classes/config';
 import { expect } from 'chai';
 import { ASCII_SMALL_A, ValidationService } from './validation.service';
 
@@ -20,6 +20,8 @@ describe('ValidationService', () => {
 
     beforeEach(() => {
         service = new ValidationService();
+        service.dictionaries.set('-1', DEFAULT_DICTIONARY.words);
+
         coords = 'a2';
         startCoord = 'a1';
         map = new Map([['h8', 'abaca']]);
@@ -50,11 +52,11 @@ describe('ValidationService', () => {
     });
 
     it('findWord should return true', () => {
-        expect(service.findWord(validDictSearch)).to.equals(true);
+        expect(service.findWord('-1', validDictSearch)).to.equals(true);
     });
 
     it('findWord should return false', () => {
-        expect(service.findWord(invalidDictSearch)).to.equals(false);
+        expect(service.findWord('-1', invalidDictSearch)).to.equals(false);
     });
 
     it('variableReset should affect correct value', () => {

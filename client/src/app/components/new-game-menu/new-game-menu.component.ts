@@ -12,13 +12,14 @@ export class NewGameMenuComponent implements OnInit {
     @Input() gameMode: number;
     @Input() gameType: number;
     @Output() readonly buttonClick = new EventEmitter<string>();
-    @Output() readonly newGame = new EventEmitter<GameInfo>();
+    @Output() readonly newGame = new EventEmitter<Partial<GameInfo>>();
 
     readonly gameTypes = GameType;
     readonly difficulties = GameDifficulty;
     readonly form: FormGroup;
     turnLength: number = DEFAULT_TURN_LENGTH;
     randomized: boolean = false;
+    private dictID = '-1';
 
     constructor(private formBuilder: FormBuilder) {
         this.form = this.formBuilder.group({
@@ -74,6 +75,7 @@ export class NewGameMenuComponent implements OnInit {
             gameMode: this.gameMode,
             gameType: this.gameType,
             difficulty: this.difficulty.value,
+            dictID: this.dictID,
         });
     }
 

@@ -10,4 +10,8 @@ export class AlertService {
     showAlert(message: string): void {
         this.snackBar.open(message, 'Fermer');
     }
+
+    showGenericError(): void {
+        this.snackBar.open("Une erreur s'est produite", 'Fermer');
+    }
 }

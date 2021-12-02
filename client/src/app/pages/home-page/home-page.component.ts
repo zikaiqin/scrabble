@@ -14,7 +14,7 @@ export class HomePageComponent {
     showBrowser = false;
     showWaitingRoom = false;
     showScoreboard = false;
-    gameConfigs: GameInfo;
+    gameConfigs: Partial<GameInfo>;
 
     constructor(private router: Router, private webSocketService: WebsocketService) {
         this.webSocketService.status.subscribe((event) => {
@@ -64,7 +64,7 @@ export class HomePageComponent {
         }
     }
 
-    showPage(): string {
+    showMenu(): string {
         if (this.showScoreboard) {
             return 'Scoreboard';
         }
@@ -77,23 +77,22 @@ export class HomePageComponent {
         return this.showWaitingRoom ? 'WaitingRoom' : 'NewGame';
     }
 
-    showSettings(): void {
+    showAdminPage(): void {
         this.router.navigateByUrl('/admin');
     }
 
-    createGame(configs: GameInfo): void {
-        this.webSocketService.connect();
-        this.webSocketService.createGame(configs);
+    createGame(configs: Partial<GameInfo>): void {
         this.gameConfigs = configs;
-        if (configs.gameType === GameType.Multi) {
-            this.showWaitingRoom = true;
-        }
+        this.webSocketService.connect();
+        this.webSocketService.createGame(configs, () => {
+            if (configs.gameType === GameType.Multi) {
+                this.showWaitingRoom = true;
+            }
+        });
     }
 
-    joinGame(configs: GameInfo): void {
-        if (configs.roomID !== undefined) {
-            this.webSocketService.joinGame(configs);
-        }
+    joinGame(configs: Partial<GameInfo>): void {
+        this.webSocketService.joinGame(configs);
     }
 
     convertGame(difficulty: number): void {

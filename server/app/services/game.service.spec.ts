@@ -31,13 +31,13 @@ describe('GameService', () => {
 
     beforeEach(() => {
         fakeDatabaseService = Container.get(DatabaseService);
-        fakeSocketService = new SocketService(http.createServer());
         fakeBotService = Container.get(BotService);
         fakeEndGameService = Container.get(EndGameService);
         fakeExchangeService = Container.get(ExchangeService);
         fakePlacingService = Container.get(PlacingService);
         fakeValidationService = Container.get(ValidationService);
         fakeObjectivesService = Container.get(ObjectivesService);
+        fakeSocketService = new SocketService(http.createServer(), fakeDatabaseService, fakeValidationService);
 
         fakeSocketEvents = new EventEmitter();
 
