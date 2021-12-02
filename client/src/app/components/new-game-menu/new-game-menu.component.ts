@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { GameMode, GameType, GameInfo, GameDifficulty } from '@app/classes/game-info';
-import { DEFAULT_TURN_LENGTH, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/classes/config';
+import { DEFAULT_DICTIONARY_ID, DEFAULT_TURN_LENGTH, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/classes/config';
 
 @Component({
     selector: 'app-new-game-menu',
@@ -19,7 +19,7 @@ export class NewGameMenuComponent implements OnInit {
     readonly form: FormGroup;
     turnLength: number = DEFAULT_TURN_LENGTH;
     randomized: boolean = false;
-    private dictID = '-1';
+    private dictID = DEFAULT_DICTIONARY_ID;
 
     constructor(private formBuilder: FormBuilder) {
         this.form = this.formBuilder.group({

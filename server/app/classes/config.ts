@@ -2,6 +2,7 @@
 
 import { HighScore } from './highscore';
 import { Dictionary } from '@app/classes/game-info';
+// eslint-disable-next-line no-restricted-imports
 import * as data from '@app/config/dictionary.json';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers*/
