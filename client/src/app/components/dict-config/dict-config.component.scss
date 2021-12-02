@@ -1,0 +1,20 @@
+.container {
+    align-items: end;
+}
+
+.mat-column-select {
+    width: 15%;
+}
+
+.mat-column-name {
+    width: 20%;
+}
+
+.mat-column-actions {
+    width: 15%;
+}
+
+.table-container {
+    flex-direction: column-reverse;
+    justify-content: start;
+}

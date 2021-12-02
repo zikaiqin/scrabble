@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DatabaseResetDialogComponent } from '@app/components/database-reset-dialog/database-reset-dialog.component';
 import { HttpService } from '@app/services/http.service';
-import { BotName, GameDifficulty } from '@app/classes/game-info';
+import { BotName, Dictionary, GameDifficulty } from '@app/classes/game-info';
 
 type Page = 'dict' | 'bot';
 
@@ -13,7 +13,8 @@ type Page = 'dict' | 'bot';
     styleUrls: ['../../styles.scss', './admin-page.component.scss'],
 })
 export class AdminPageComponent {
-    page: Page = 'bot';
+    page: Page = 'dict';
+    dictData: Dictionary[];
     botData: BotName[];
     botDifficulty = GameDifficulty.Easy;
 
@@ -40,21 +41,41 @@ export class AdminPageComponent {
         });
     }
 
-    addBot(name: string) {
+    addBot(name: string): void {
         this.httpService.addBot(name, this.botDifficulty).subscribe({
             complete: () => this.getBots(),
         });
     }
 
-    deleteBots(ids: string[]) {
+    deleteBots(ids: string[]): void {
         this.httpService.deleteBots(ids, this.botDifficulty).subscribe({
             complete: () => this.getBots(),
         });
     }
 
-    editBot(bot: Partial<BotName>) {
+    editBot(bot: Partial<BotName>): void {
         this.httpService.editBot(bot.id as string, bot.name as string, this.botDifficulty).subscribe({
             complete: () => this.getBots(),
         });
     }
+
+    getDicts(): void {
+        this.httpService.getDicts().subscribe((res) => {
+            this.dictData = res as Dictionary[];
+        });
+    }
+
+    downloadDict(id: string) {
+        this.httpService.downloadDict(id).subscribe((res) => {
+            const name = (res as Dictionary).name;
+            const file = new Blob([JSON.stringify(res, null, JSON_INDENT)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(file);
+            a.download = name;
+            a.click();
+            a.remove();
+        });
+    }
 }
+
+const JSON_INDENT = 4;

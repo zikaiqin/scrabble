@@ -76,5 +76,37 @@ export class DictionaryController {
                 })
                 .catch(() => res.sendStatus(500));
         });
+
+        this.router.get('/download', (req: Request, res: Response) => {
+            const { id } = req.query;
+            if (id === undefined) {
+                res.sendStatus(400);
+                return;
+            }
+            // eslint-disable-next-line no-underscore-dangle
+            if (id === DEFAULT_DICTIONARY._id) {
+                res.json({
+                    name: DEFAULT_DICTIONARY.name,
+                    description: DEFAULT_DICTIONARY.description,
+                    words: DEFAULT_DICTIONARY.words,
+                });
+                return;
+            }
+            this.dbService
+                .getDictionary(id as string)
+                .then((dictionary) => {
+                    if (!dictionary) {
+                        res.sendStatus(404);
+                        return;
+                    }
+                    const { name, description, words } = dictionary;
+                    res.json({
+                        name,
+                        description,
+                        words,
+                    });
+                })
+                .catch(() => res.sendStatus(500));
+        });
     }
 }

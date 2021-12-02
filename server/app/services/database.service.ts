@@ -101,8 +101,8 @@ export class DatabaseService {
         return this.dictDB.collection(DATABASE.dict.collection).find().project({ name: 1, description: 1 }).toArray();
     }
 
-    async getDictionaryContent(id: string) {
-        return this.dictDB.collection(DATABASE.dict.collection).findOne({ _id: new ObjectId(id) }, { projection: { words: 1, _id: 0 } });
+    async getDictionary(id: string) {
+        return this.dictDB.collection(DATABASE.dict.collection).findOne({ _id: new ObjectId(id) });
     }
 
     async insertDictionary(name: string, description: string, words: string[]) {

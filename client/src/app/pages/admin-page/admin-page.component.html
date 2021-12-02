@@ -33,6 +33,13 @@
                     (delete)="deleteBots($event)"
                     (edit)="editBot($event)"
                 ></app-bot-config>
+                <app-dict-config
+                    class="stretch-col stretch-col-content"
+                    *ngIf="page === 'dict'"
+                    [data]="dictData"
+                    (get)="getDicts()"
+                    (download)="downloadDict($event)"
+                ></app-dict-config>
             </mat-card>
         </mat-drawer-content>
     </mat-drawer-container>

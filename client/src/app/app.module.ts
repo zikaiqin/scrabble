@@ -28,6 +28,7 @@ import { DatabaseResetDialogComponent } from './components/database-reset-dialog
 import { BotConfigComponent } from './components/bot-config/bot-config.component';
 import { BotConfigSelectComponent } from './components/bot-config/bot-config-select.component';
 import { BotConfigDialogComponent } from './components/bot-config-dialog/bot-config-dialog.component';
+import { DictConfigComponent } from './components/dict-config/dict-config.component';
 
 /**
  * Main module that is used in main.ts.
@@ -60,6 +61,7 @@ import { BotConfigDialogComponent } from './components/bot-config-dialog/bot-con
         BotConfigComponent,
         BotConfigSelectComponent,
         BotConfigDialogComponent,
+        DictConfigComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
 

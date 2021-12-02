@@ -7,6 +7,9 @@ import { EMPTY, throwError, TimeoutError } from 'rxjs';
 import { AlertService } from '@app/services/alert.service';
 
 const basePath = `${environment.serverUrl}/api`;
+const scorePath = `${basePath}/score`;
+const botPath = `${basePath}/bot`;
+const dictPath = `${basePath}/dict`;
 
 @Injectable({
     providedIn: 'root',
@@ -15,7 +18,7 @@ export class HttpService {
     constructor(private alertService: AlertService, private http: HttpClient) {}
 
     getHighScores(gameMode: number) {
-        return this.http.get(`${basePath}/score`, { params: { gameMode }, responseType: 'json' }).pipe(
+        return this.http.get(scorePath, { params: { gameMode }, responseType: 'json' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) => this.catchAnyHttpError(err)),
             catchError((err) => this.catchTimeoutError(err)),
@@ -24,7 +27,7 @@ export class HttpService {
     }
 
     getBots(difficulty: number) {
-        return this.http.get(`${basePath}/bot`, { params: { difficulty }, responseType: 'json' }).pipe(
+        return this.http.get(botPath, { params: { difficulty }, responseType: 'json' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) => this.catchAnyHttpError(err)),
             catchError((err) => this.catchTimeoutError(err)),
@@ -33,7 +36,7 @@ export class HttpService {
     }
 
     addBot(name: string, difficulty: number) {
-        return this.http.post(`${basePath}/bot`, { name, difficulty }, { responseType: 'text' }).pipe(
+        return this.http.post(botPath, { name, difficulty }, { responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -48,7 +51,7 @@ export class HttpService {
     }
 
     deleteBots(ids: string[], difficulty: number) {
-        return this.http.delete(`${basePath}/bot`, { body: { ids, difficulty }, responseType: 'text' }).pipe(
+        return this.http.delete(botPath, { body: { ids, difficulty }, responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -65,7 +68,7 @@ export class HttpService {
     }
 
     editBot(id: string, name: string, difficulty: number) {
-        return this.http.put(`${basePath}/bot`, { id, name, difficulty }, { responseType: 'text' }).pipe(
+        return this.http.put(botPath, { id, name, difficulty }, { responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -85,8 +88,26 @@ export class HttpService {
         );
     }
 
+    getDicts() {
+        return this.http.get(dictPath, { responseType: 'json' }).pipe(
+            timeout(DEFAULT_TIMEOUT),
+            catchError((err) => this.catchAnyHttpError(err)),
+            catchError((err) => this.catchTimeoutError(err)),
+            catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
+        );
+    }
+
+    downloadDict(id: string) {
+        return this.http.get(`${dictPath}/download`, { params: { id }, responseType: 'json' }).pipe(
+            timeout(DEFAULT_TIMEOUT),
+            catchError((err) => this.catchAnyHttpError(err)),
+            catchError((err) => this.catchTimeoutError(err)),
+            catchError((err) => this.catchUnexpectedError(err, HttpErrorResponse, TimeoutError)),
+        );
+    }
+
     resetDB() {
-        return this.http.delete(`${basePath}`, { responseType: 'text' }).pipe(
+        return this.http.delete(basePath, { responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) => this.catchAnyHttpError(err)),
             catchError((err) => this.catchTimeoutError(err)),

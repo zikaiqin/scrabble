@@ -53,7 +53,7 @@ export class SocketService {
                     return;
                 }
                 this.dbService
-                    .getDictionaryContent(configs.dictID)
+                    .getDictionary(configs.dictID)
                     .then((dictionary) => {
                         this.validationService.dictionaries.set(room, dictionary?.words);
                         createGame();

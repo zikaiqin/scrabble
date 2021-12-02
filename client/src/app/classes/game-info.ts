@@ -41,3 +41,9 @@ export type BotName = {
     name: string;
     default: boolean;
 };
+
+export type Dictionary = {
+    id: string;
+    name: string;
+    description: string;
+};

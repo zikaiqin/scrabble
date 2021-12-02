@@ -256,4 +256,4 @@ export const DATABASE = {
     },
 };
 
-export const DEFAULT_DICTIONARY = { _id: '-1', ...JSON.parse(JSON.stringify(data)) } as Dictionary;
+export const DEFAULT_DICTIONARY = { _id: '$default', ...JSON.parse(JSON.stringify(data)) } as Dictionary;
