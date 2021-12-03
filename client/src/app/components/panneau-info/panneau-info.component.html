@@ -19,16 +19,9 @@
     </div>
 </div>
 <br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
+
+<app-end-game *ngIf="isGameEnded" [winnerMessage]="getWinnerMessage()" class="end-game-container"></app-end-game>
+
 <br />
 <div class="panneau">
     <div class="reserve">{{ getReserveMessage() }}</div>
@@ -39,5 +32,4 @@
             <mat-icon>skip_next</mat-icon>
         </button>
     </div>
-    <app-end-game *ngIf="isGameEnded" [winnerMessage]="getWinnerMessage()" class="end-game-container"></app-end-game>
 </div>

@@ -16,11 +16,10 @@
 
         <canvas id="canvas" #gridCanvas (click)="mouseHitDetect($event)" [attr.width]="width" [attr.height]="height"></canvas>
     </mat-card>
+    
     <app-chevalet [playerHand]="this.playerHand"></app-chevalet>
 </div>
 <br />
-<div class = "button">
     <button mat-fab color="accent" id="exit" (click)="openDialog()">
         <mat-icon>exit_to_app</mat-icon>
     </button>
-</div>
