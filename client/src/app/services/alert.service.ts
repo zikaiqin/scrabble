@@ -8,10 +8,21 @@ export class AlertService {
     constructor(private snackBar: MatSnackBar) {}
 
     showAlert(message: string): void {
-        this.snackBar.open(message, 'Fermer');
+        const snack = this.snackBar.open(message, 'Fermer');
+        const dismiss = () => snack.dismiss();
+        document.addEventListener('click', dismiss);
+        snack.afterDismissed().subscribe(() => document.removeEventListener('click', dismiss));
+    }
+
+    showAlertWithCallback(message: string, action: string, callback: () => void, duration?: number): void {
+        const snack = this.snackBar.open(message, action, duration ? { duration } : {});
+        const dismiss = () => snack.dismiss();
+        document.addEventListener('click', dismiss);
+        snack.onAction().subscribe(callback);
+        snack.afterDismissed().subscribe(() => document.removeEventListener('click', dismiss));
     }
 
     showGenericError(): void {
-        this.snackBar.open("Une erreur s'est produite", 'Fermer');
+        this.showAlert("Une erreur s'est produite");
     }
 }

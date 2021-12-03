@@ -6,6 +6,7 @@ import { AlertService } from '@app/services/alert.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
+import { DEFAULT_TIMEOUT } from '@app/classes/config';
 
 type SocketStatus = 'ok' | 'fail';
 
@@ -87,7 +88,6 @@ export class WebsocketService {
                 this.gameEnded.next(winner);
             });
         });
-
         this.socket.on('disconnect', (reason) => {
             if (reason === 'io client disconnect') {
                 return;
@@ -96,6 +96,14 @@ export class WebsocketService {
             this.alertService.showAlert('La connexion au serveur a été interrompue');
             this.connectionStatus.next('connectionLost');
         });
+        this.socket.on('connect_error', () =>
+            this.alertService.showAlertWithCallback(
+                'Le serveur est présentement inaccessible',
+                'Réessayer la connexion',
+                () => this.connect(),
+                DEFAULT_TIMEOUT,
+            ),
+        );
     }
 
     /**
@@ -149,8 +157,10 @@ export class WebsocketService {
         this.socket.emit('fetchObjectives');
     }
 
-    connect(socket?: Socket): void {
-        this.socket = socket ? socket : io(environment.serverUrl).connect();
+    connect(): void {
+        this.socket = io(environment.serverUrl, {
+            reconnection: false,
+        }).connect();
         this.attachListeners();
     }
 

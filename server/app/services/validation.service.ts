@@ -1,5 +1,5 @@
-import { DEFAULT_POINTS } from '@app/classes/config';
 import { Board } from '@app/classes/board';
+import { DEFAULT_POINTS } from '@app/classes/config';
 import { Vec2 } from '@app/classes/vec2';
 import { Service } from 'typedi';
 
@@ -26,7 +26,6 @@ export class ValidationService {
     // Key -- ID of the room <br>
     // Value -- Valid words in the game's dictionary
     readonly dictionaries = new Map<string, string[]>();
-
     /**
      * @description Startup to initialize the attributes
      * @param startCoords the starting coordinates of the placed word/letter

@@ -6,6 +6,10 @@
     margin-bottom: 20px;
 }
 
+.turn-select {
+    margin-top: 20px;
+}
+
 .flex-row {
     display: flex;
     justify-content: space-between;
@@ -13,4 +17,8 @@
 
 mat-slider {
     margin-bottom: 20px;
+}
+
+.mat-form-field.mat-form-field {
+    margin-bottom: 10px;
 }

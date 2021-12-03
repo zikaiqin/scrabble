@@ -1,7 +1,5 @@
 <div class="title-container">
-    <h1 class="title">
-        Liste des joueurs virtuels
-    </h1>
+    <h1 class="title">Liste des joueurs virtuels</h1>
 </div>
 
 <span class="table-actions">
@@ -33,7 +31,8 @@
                     [disabled]="!isToggleEnabled()"
                     [checked]="selection.hasValue() && isAllSelected()"
                     [indeterminate]="selection.hasValue() && !isAllSelected()"
-                    (change)="$event ? toggleAll() : null">
+                    (change)="$event ? toggleAll() : null"
+                >
                 </mat-checkbox>
             </th>
             <td mat-cell *matCellDef="let element">
@@ -41,7 +40,8 @@
                     [disabled]="element.default"
                     [checked]="selection.isSelected(element)"
                     (click)="$event.stopPropagation()"
-                    (change)="$event ? selection.toggle(element) : null">
+                    (change)="$event ? selection.toggle(element) : null"
+                >
                 </mat-checkbox>
             </td>
         </ng-container>
@@ -55,7 +55,7 @@
         <!-- Actions Column -->
         <ng-container matColumnDef="details">
             <th mat-header-cell *matHeaderCellDef>Remarques</th>
-            <td mat-cell *matCellDef="let element"> {{ element.default ? 'Nom par défaut' : '' }} </td>
+            <td mat-cell *matCellDef="let element">{{ element.default ? 'Nom par défaut' : '' }}</td>
         </ng-container>
 
         <!-- Actions Column -->
@@ -84,4 +84,3 @@
         <tr mat-row *matRowDef="let row; columns: tableColumns" class="table-row"></tr>
     </table>
 </div>
-

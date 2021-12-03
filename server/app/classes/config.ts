@@ -1,6 +1,6 @@
 // For the value of each letter sometimes they value 10 or 8
 
-import { HighScore } from './highscore';
+import { HighScore } from '@app/classes/highscore';
 import { Dictionary } from '@app/classes/game-info';
 // eslint-disable-next-line no-restricted-imports
 import * as data from '@app/config/dictionary.json';
@@ -234,6 +234,10 @@ export const DEFAULT_SOCKET_TIMEOUT = 5000;
 
 export const BOT_MARKER = '*';
 export const ROOM_MARKER = '_';
+
+export const MAX_TURN_SKIP_COUNT = 6;
+
+export const HALF = 0.5;
 
 export const DATABASE = {
     url: 'mongodb+srv://equipe105:giornogiovanna@cluster0.9flzh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',

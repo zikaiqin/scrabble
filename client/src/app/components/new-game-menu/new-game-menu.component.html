@@ -20,6 +20,13 @@
             </mat-error>
         </mat-form-field>
 
+        <mat-form-field>
+            <mat-label>Dictionnaire utilisé</mat-label>
+            <mat-select formControlName="dictionary" placeholder="Défaut">
+                <mat-option *ngFor="let dict of dictionaries" matTooltipPosition="right" matTooltipHideDelay="150" matTooltipShowDelay="150" [matTooltip]="dict.description" [value]="dict.id">{{ dict.name }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
         <mat-form-field *ngIf="gameType === gameTypes.Single">
             <mat-label>Profil de l'adversaire</mat-label>
             <mat-select formControlName="difficulty">
@@ -29,7 +36,7 @@
         </mat-form-field>
     </form>
 
-    <div class="stretch-column" [ngStyle]="{ 'margin-top': gameType === gameTypes.Single ? '0px' : '20px' }">
+    <div class="stretch-column turn-select">
         <div class="flex-row">
             <mat-label> Temps de tour : </mat-label>
             <mat-label>

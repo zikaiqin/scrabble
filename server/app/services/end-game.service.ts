@@ -1,14 +1,17 @@
-import { DEFAULT_POINTS } from '@app/classes/config';
+import { DEFAULT_POINTS, MAX_TURN_SKIP_COUNT } from '@app/classes/config';
+import { Game } from '@app/classes/game';
+import { MessageType } from '@app/classes/message';
 import { Player } from '@app/classes/player';
 import { Reserve } from '@app/classes/reserve';
 import { Service } from 'typedi';
-
-export const MAX_TURN_SKIP_COUNT = 6;
-const TEST_SUBJECT = 'testsubject';
+import { SocketService } from '@app/services/socket.service';
+import { GameDisplayService } from '@app/services/game-display.service';
 
 @Service()
 export class EndGameService {
     readonly turnSkipMap = new Map<string, number>();
+
+    constructor(private gameDisplayService: GameDisplayService) {}
     /**
      * @description Function that increments the turnSkipCounter to keep track of the number of turns skipped
      * @param roomID room where a turn has been skipped
@@ -50,9 +53,6 @@ export class EndGameService {
      * @param player player that needs to have its score deducted
      */
     deductPoints(player: Player): void {
-        if (player.name === TEST_SUBJECT) {
-            player.score += 100;
-        }
         player.hand.forEach((letter) => {
             if (letter !== '*') {
                 player.score -= DEFAULT_POINTS.get(letter) as number;
@@ -122,5 +122,20 @@ export class EndGameService {
         if (result) {
             this.addPoints(...result);
         }
+    }
+
+    gameEnded(roomID: string, game: Game, player1: Player, player2: Player, socket: SocketService): boolean {
+        const gameEnd: boolean = this.checkIfGameEnd(game.reserve, player1, player2, roomID);
+        if (!gameEnd) {
+            return false;
+        }
+        this.setPoints(player1, player2);
+        socket.gameEnded(roomID, this.getWinner(player1, player2));
+        for (const message of this.showLettersLeft(player1, player2)) {
+            socket.sendMessage(roomID, MessageType.System, message);
+        }
+        socket.updateTurn(roomID, false);
+        this.gameDisplayService.updateScores(game, socket);
+        return true;
     }
 }
