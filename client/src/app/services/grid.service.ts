@@ -10,13 +10,6 @@ const DEFAULT_HEIGHT = 600;
 const DEFAULT_NB_CASES = 16;
 const STROKE_RANGE = 4;
 
-const ARROW_POSITION1 = 635;
-const ARROW_POSITION2 = 400;
-const ARROW_POSITION3 = 615;
-const ARROW_POSITION4 = 625;
-const ARROW_POSITION5 = 425;
-const ARROW_POSITION6 = 225;
-
 const SCALE_MAX = 1.5;
 const SCALE_MIN = 0.8;
 const TEXT_DEFAULT_PX = 20;
@@ -33,7 +26,6 @@ export class GridService {
     isPlacing: boolean = false;
 
     turnState: boolean;
-
     private counter: number = 0;
     private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
@@ -66,32 +58,58 @@ export class GridService {
             }
         });
     }
+    // drawarrow positions container
 
-    drawArrow(xPosition: number, yPosition: number) {
-        if (this.arrowDirection) {
-            // down
-            this.gridContext.lineWidth = 5;
-            this.gridContext.beginPath();
-            this.gridContext.moveTo(14 + xPosition + this.tuileSize, 16 + yPosition);
-            this.gridContext.lineTo(14 + xPosition + this.tuileSize, 22 + yPosition);
-            this.gridContext.lineTo(19 + xPosition + this.tuileSize, 19 + yPosition);
-            this.gridContext.closePath();
-            this.gridContext.stroke();
-            this.gridContext.moveTo(19 + xPosition + this.tuileSize, 19 + yPosition);
-            this.gridContext.lineTo(0 + xPosition + this.tuileSize, 19 + yPosition);
-            this.gridContext.stroke();
-        } else {
-            this.gridContext.lineWidth = 20;
-            this.gridContext.beginPath();
-            this.gridContext.moveTo(ARROW_POSITION2, ARROW_POSITION1);
-            this.gridContext.lineTo(ARROW_POSITION2, ARROW_POSITION3);
-            this.gridContext.lineTo(ARROW_POSITION5, ARROW_POSITION4);
-            this.gridContext.closePath();
-            this.gridContext.stroke();
-            this.gridContext.moveTo(ARROW_POSITION6, ARROW_POSITION4);
-            this.gridContext.lineTo(ARROW_POSITION2, ARROW_POSITION4);
-            this.gridContext.stroke();
+    arrowPosition:Vec2 [] = [];
+
+    calculateArrow(xPosition: number, yPosition: number,posX: number, posY: number) {
+        this.arrowPosition = [];
+
+        if (this.arrowDirection){
+               // draw down arrow positions container
+               this.arrowPosition.push({x: 16 + xPosition, y : 16 + yPosition + this.tuileSize});
+               this.arrowPosition.push({x: 22+ xPosition, y : 16+ yPosition + this.tuileSize});
+               this.arrowPosition.push({x: 19+ xPosition, y : 19+ yPosition + this.tuileSize});
+               this.arrowPosition.push({x: 19+ xPosition, y : yPosition + this.tuileSize});
         }
+
+        if (!this.arrowDirection && posY < DEFAULT_NB_CASES - 1 && posX < DEFAULT_NB_CASES - 2) {
+            // draw left arrow positions container
+            this.arrowPosition.push({x: 14 + xPosition + this.tuileSize, y : 16 + yPosition});
+            this.arrowPosition.push({x: 14 + xPosition + this.tuileSize, y : 22 + yPosition});
+            this.arrowPosition.push({x: 19 + xPosition + this.tuileSize, y : 19 + yPosition});
+            this.arrowPosition.push({x: xPosition + this.tuileSize, y : 19 + yPosition});
+ 
+        }
+    }
+    drawArrow(xPosition: number, yPosition: number,posX: number, posY: number) {
+
+        this.calculateArrow(xPosition, yPosition, posX, posY);
+
+        if(this.arrowPosition !== []){
+
+        this.gridContext.lineWidth = 5;
+        this.gridContext.beginPath();
+        this.gridContext.moveTo(this.arrowPosition[0].x , this.arrowPosition[0].y);
+        this.gridContext.lineTo(this.arrowPosition[1].x, this.arrowPosition[1].y);
+        this.gridContext.lineTo(this.arrowPosition[2].x, this.arrowPosition[2].y);
+        this.gridContext.closePath();
+        this.gridContext.stroke();
+        this.gridContext.moveTo(this.arrowPosition[2].x, this.arrowPosition[2].y);
+        this.gridContext.lineTo(this.arrowPosition[3].x, this.arrowPosition[3].y);
+        this.gridContext.stroke();
+        }
+        
+        // this.gridContext.lineWidth = 5;
+        // this.gridContext.beginPath();
+        // this.gridContext.moveTo(16 + xPosition, 16 + yPosition + this.tuileSize);
+        // this.gridContext.lineTo(22+ xPosition,16+ yPosition + this.tuileSize);
+        // this.gridContext.lineTo(19+ xPosition, 19+ yPosition + this.tuileSize);
+        // this.gridContext.closePath();
+        // this.gridContext.stroke();
+        // this.gridContext.moveTo(19+ xPosition, 19+ yPosition + this.tuileSize);
+        // this.gridContext.lineTo(19+ xPosition,0+ yPosition + this.tuileSize);
+        // this.gridContext.stroke();
     }
     selectSquare(posX: number, posY: number): void {
         if (posY < DEFAULT_NB_CASES - 1 && posX < DEFAULT_NB_CASES - 1 && posX >= 0 && posY >= 0) {
@@ -114,7 +132,8 @@ export class GridService {
 
             this.gridContext.strokeStyle = 'purple';
             this.gridContext.strokeRect(tuileX + 2, tuileY + 2, this.tuileSize - STROKE_RANGE, this.tuileSize - STROKE_RANGE);
-            this.drawArrow(tuileX, tuileY);
+            
+            this.drawArrow(tuileX, tuileY, posX, posY);
         }
         // return this.arrowDirection;
     }

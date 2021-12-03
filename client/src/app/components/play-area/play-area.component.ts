@@ -277,7 +277,9 @@ export class PlayAreaComponent implements AfterViewInit {
     mouseHitDetect(event: MouseEvent) {
         if (!this.isPlacing && this.turnState && event.button === MouseButton.Left) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
-
+            console.log(event)
+            console.log(event.offsetX)
+            
             // 0 et 0
             // convert pixel into x and y coord
             this.mousePosition.x = Math.floor(this.mousePosition.x / (PIXEL_SIZE_GAMEBOARD / NUMBER_MAX_COORD)) - 1; // 600-40 / 15
@@ -291,6 +293,8 @@ export class PlayAreaComponent implements AfterViewInit {
                     this.gridService.arrowDirection = !this.gridService.arrowDirection;
                 else this.gridService.arrowDirection = false;
 
+                
+                
                 // 0 to 14
                 // and 0 to 14
                 this.gridService.selectSquare(this.mousePosition.x, this.mousePosition.y);
