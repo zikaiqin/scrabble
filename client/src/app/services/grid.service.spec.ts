@@ -1,17 +1,16 @@
 /* eslint-disable dot-notation */
 // On disable quand on essaie d'acceder un attribut prive de notre service
 import { TestBed } from '@angular/core/testing';
-
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
-import { GridService } from '@app/services/grid.service';
 import { GameInit } from '@app/classes/game-info';
-import { Subject } from 'rxjs';
+import { Vec2 } from '@app/classes/vec2';
+import { GridService } from '@app/services/grid.service';
 import { LetterExchangeService } from '@app/services/letter-exchange.service';
 import { WebsocketService } from '@app/services/websocket.service';
-import { Vec2 } from '@app/classes/vec2';
+import { Subject } from 'rxjs';
 import { GridLettersService } from './grid-letter.service';
 
-describe('GridService', () => {
+fdescribe('GridService', () => {
     let service: GridService;
     let websocketServiceSpy: jasmine.SpyObj<LetterExchangeService>;
     let ctxStub: CanvasRenderingContext2D;
@@ -23,13 +22,19 @@ describe('GridService', () => {
 
     const gameInit = new Subject<GameInit>();
     const gameBoard = new Subject<[string, string][]>();
+    const gameTurn = new Subject<boolean>();
+    const gameReserve = new Subject<string[]>();
+    const gameHands = new Subject<{ ownHand: string[]; opponentHand: string[] }>();
 
     beforeEach(() => {
         websocketServiceSpy = jasmine.createSpyObj('WebsocketService', [''], {
             init: gameInit.asObservable(),
             board: gameBoard.asObservable(),
+            turn: gameTurn.asObservable(),
+            reserve: gameReserve.asObservable(),
+            hands: gameHands.asObservable(),
         });
-        gridLetterServiceSpy = jasmine.createSpyObj('GridLettersService', ['drawCoords', 'drawGridCol', 'drawGridLine']);
+        gridLetterServiceSpy = jasmine.createSpyObj('GridLettersService', ['drawCoords', 'drawGridCol', 'drawGridLine', 'clearGrid']);
 
         TestBed.configureTestingModule({
             providers: [
@@ -79,18 +84,12 @@ describe('GridService', () => {
 
         expect(drawNONESpy).toHaveBeenCalled();
     });
-    it(' drawGridLetters should call drawGridLetters', () => {
-        const drawGridLettersSpy = spyOn(service, 'drawGridLetters').and.callThrough();
+    it(' drawGridLetter should call drawGridLetters', () => {
+        const drawGridLettersSpy = spyOn(service, 'drawLetter').and.callThrough();
 
         service.drawGridLetters(pointOnMap);
 
         expect(drawGridLettersSpy).toHaveBeenCalled();
-    });
-
-    it(' clearGrid should call clearRect ', () => {
-        const clearRectSpy = spyOn(service.gridContext, 'clearRect').and.callThrough();
-        service.clearGrid();
-        expect(clearRectSpy).toHaveBeenCalled();
     });
 
     it(' drawGrid should color pixels on the canvas', () => {
@@ -111,9 +110,9 @@ describe('GridService', () => {
         const scale = service['scaleCounter'];
         expect(scale).toBeLessThan(1);
     });
-    it('should call drawArrow when selectSquare', () => {
+    it('should call calculateArrow when selectSquare', () => {
         const mousePosition: Vec2 = { x: 1, y: 1 };
-        const drawArrowSpy = spyOn(service, 'drawArrow').and.callThrough();
+        const drawArrowSpy = spyOn(service, 'calculateArrow').and.callThrough();
         service.selectSquare(mousePosition.x, mousePosition.y);
         service.selectSquare(mousePosition.x + 1, mousePosition.y);
         service.selectSquare(mousePosition.x + 1, mousePosition.y + 1);

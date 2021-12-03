@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { GridLettersService } from './grid-letter.service';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
+import { GridLettersService } from './grid-letter.service';
 
 describe('GridLettersService', () => {
     let service: GridLettersService;
@@ -37,5 +37,10 @@ describe('GridLettersService', () => {
         service.drawCoords(ctxStub);
 
         expect(fillTextSpy).toHaveBeenCalledTimes(NUMBER_OF_COORD);
+    });
+    it(' clearGrid should call clearRect ', () => {
+        const clearRectSpy = spyOn(ctxStub, 'clearRect').and.callThrough();
+        service.clearGrid(ctxStub);
+        expect(clearRectSpy).toHaveBeenCalled();
     });
 });
