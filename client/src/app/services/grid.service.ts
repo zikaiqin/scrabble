@@ -9,10 +9,14 @@ const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 600;
 const DEFAULT_NB_CASES = 16;
 const STROKE_RANGE = 4;
-const ARROW_SIZE = 15;
-const ARROW_SIZE2 = 25;
-const ARROW_SIZE3 = 10;
-const ARROW_SIZE4 = 20;
+
+const ARROW_POSITION1 = 635;
+const ARROW_POSITION2 = 400;
+const ARROW_POSITION3 = 615;
+const ARROW_POSITION4 = 625;
+const ARROW_POSITION5 = 425;
+const ARROW_POSITION6 = 225;
+
 const SCALE_MAX = 1.5;
 const SCALE_MIN = 0.8;
 const TEXT_DEFAULT_PX = 20;
@@ -63,16 +67,30 @@ export class GridService {
         });
     }
 
-    drawArrow(posX: number, posY: number) {
-        const img = new Image(ARROW_SIZE3, ARROW_SIZE4);
+    drawArrow(xPosition: number, yPosition: number) {
         if (this.arrowDirection) {
             // down
-            img.src = 'https://i.ibb.co/mN7tnhW/flecheup.jpg';
-            this.gridContext.drawImage(img, posX + this.tuileSize, posY, ARROW_SIZE, ARROW_SIZE2);
+            this.gridContext.lineWidth = 5;
+            this.gridContext.beginPath();
+            this.gridContext.moveTo(14 + xPosition + this.tuileSize, 16 + yPosition);
+            this.gridContext.lineTo(14 + xPosition + this.tuileSize, 22 + yPosition);
+            this.gridContext.lineTo(19 + xPosition + this.tuileSize, 19 + yPosition);
+            this.gridContext.closePath();
+            this.gridContext.stroke();
+            this.gridContext.moveTo(19 + xPosition + this.tuileSize, 19 + yPosition);
+            this.gridContext.lineTo(0 + xPosition + this.tuileSize, 19 + yPosition);
+            this.gridContext.stroke();
         } else {
-            // left
-            img.src = 'https://i.ibb.co/Y7zBLFV/fleche-Left.jpg';
-            this.gridContext.drawImage(img, posX, posY - this.tuileSize / 2, ARROW_SIZE2, ARROW_SIZE);
+            this.gridContext.lineWidth = 20;
+            this.gridContext.beginPath();
+            this.gridContext.moveTo(ARROW_POSITION2, ARROW_POSITION1);
+            this.gridContext.lineTo(ARROW_POSITION2, ARROW_POSITION3);
+            this.gridContext.lineTo(ARROW_POSITION5, ARROW_POSITION4);
+            this.gridContext.closePath();
+            this.gridContext.stroke();
+            this.gridContext.moveTo(ARROW_POSITION6, ARROW_POSITION4);
+            this.gridContext.lineTo(ARROW_POSITION2, ARROW_POSITION4);
+            this.gridContext.stroke();
         }
     }
     selectSquare(posX: number, posY: number): void {
@@ -112,6 +130,7 @@ export class GridService {
             this.gridContext.fillStyle = 'lightgreen';
             this.gridContext.fillRect(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
         }
+
         // tracer le border
         this.drawBorder();
         // Afficher les coordonnes
