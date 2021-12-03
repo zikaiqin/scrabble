@@ -1,10 +1,7 @@
 <div id="grid-container">
     <mat-card>
-        
-        <canvas id="canvas" #gridCanvas (click)="mouseHitDetect($event)" [attr.width]="width" [attr.height]="height"></canvas>
-        
         <mat-card-actions>
-            
+
             <button mat-icon-button  style="background-color: grey" id="minimize" (click)="minimize()">
                 <mat-icon>fullscreen_exit</mat-icon>
             </button>
@@ -12,24 +9,28 @@
             <button mat-icon-button style="background-color: grey"  id="maximize" (click)="maximize()">
                 <mat-icon>fullscreen</mat-icon>
             </button>
-        
-            <button mat-icon-button style="background-color: green; margin-left: 500px;" id="place" (click)="commandPlace()">
+            <button  mat-icon-button  color="primary" style="background-color: green; " id="place" (click)="commandPlace()">
                 <mat-icon>check_circle_outline</mat-icon>
             </button>
+            
+            <button mat-icon-button color="accent" style=" margin-left: 500px;"  id="exit" (click)="openConfirmWindow()">
+                <mat-icon>exit_to_app</mat-icon>
+            </button>
+            
         </mat-card-actions>
+            
+        <canvas id="canvas" #gridCanvas (click)="mouseHitDetect($event)" [attr.width]="width" [attr.height]="height"></canvas>
+            
     </mat-card>
-    <br />
     <app-chevalet [playerHand]="this.playerHand"></app-chevalet>
+    
 </div>
 <br />
-<button mat-fab color="accent" id="exit" (click)="openConfirmWindow()">
-    <mat-icon>exit_to_app</mat-icon>
-</button>
 
 <mat-card class="popup" [style.display]="isVisible ? 'block' : 'none'">
     <div class="popup-content">
         <mat-card-title>Abandonner la partie et retourner à la page d'accueil?</mat-card-title>
-        <mat-card-actions align="end">
+        <mat-card-actions>
             <button mat-flat-button color="warn" (click)="redirectTo()">Confirmer</button>
             <button mat-flat-button (click)="cancel()">Annuler</button>
         </mat-card-actions>

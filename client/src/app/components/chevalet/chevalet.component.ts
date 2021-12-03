@@ -13,8 +13,8 @@ const MINUS1 = -1;
 export class ChevaletComponent {
     @Input() playerHand: string[];
     currentHand: string[] = [];
-    isExchangeActif: boolean = true;
     isContainSelectedCard = false;
+    isManipulating: boolean = false;
     isClicked: boolean[] = [false, false, false, false, false, false, false];
     activeLetter: boolean[] = [false, false, false, false, false, false, false];
     isYourTurn: boolean = true;
@@ -77,13 +77,13 @@ export class ChevaletComponent {
         }
     }
     onRightClick(event: MouseEvent, letter: string, index: number) {
-        let isManipulating = false;
+        this.isManipulating = false;
         for (const isActiveLetter of this.activeLetter) {
             if (!isActiveLetter) continue;
-            isManipulating = true;
+            this.isManipulating = true;
         }
 
-        if (!isManipulating && !this.gridService.isPlacing) {
+        if (!this.isManipulating && !this.gridService.isPlacing) {
             event.preventDefault();
             this.isClicked[index] = !this.isClicked[index];
             if (this.isClicked[index]) {
