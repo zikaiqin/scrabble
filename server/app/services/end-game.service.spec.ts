@@ -14,8 +14,8 @@ import { expect } from 'chai';
 import { createSandbox, createStubInstance, SinonStubbedInstance } from 'sinon';
 import { SocketService } from '@app/services/socket.service';
 import { Server } from 'http';
-import { DatabaseService } from './database.service';
-import { ValidationService } from './validation.service';
+import { DatabaseService } from '@app/services/database.service';
+import { ValidationService } from '@app/services/validation.service';
 
 class MockPlayer extends Player {
     name: string;
