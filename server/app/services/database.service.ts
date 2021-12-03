@@ -12,9 +12,9 @@ export class DatabaseService {
     private botDB: Db;
     private dictDB: Db;
 
-    async databaseConnect(): Promise<MongoClient | null> {
+    async databaseConnect(url: string): Promise<MongoClient | null> {
         try {
-            const client = await MongoClient.connect(DATABASE.url);
+            const client = await MongoClient.connect(url);
             this.client = client;
             this.highScoreDB = client.db(DATABASE.highScore.name);
             this.botDB = client.db(DATABASE.bot.name);
@@ -29,14 +29,15 @@ export class DatabaseService {
         return this.client.close();
     }
 
-    async resetDB() {
-        return Promise.all([
-            this.botDB.dropCollection(DATABASE.bot.collections.easy),
-            this.botDB.dropCollection(DATABASE.bot.collections.hard),
-            this.highScoreDB.dropCollection(DATABASE.highScore.collections.classical),
-            this.highScoreDB.dropCollection(DATABASE.highScore.collections.log2990),
-            this.dictDB.dropCollection(DATABASE.dict.collection),
-        ]);
+    async getHighScores(gameMode: number): Promise<HighScore[]> {
+        return this.highScoreDB
+            .collection(DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'])
+            .find({})
+            .sort({ score: -1 })
+            .toArray()
+            .then((score: HighScore[]) => {
+                return score;
+            });
     }
 
     async insertDefaultScores(): Promise<void> {
@@ -54,17 +55,6 @@ export class DatabaseService {
             // eslint-disable-next-line no-underscore-dangle
             this.highScoreDB.collection(collection).deleteOne({ _id: (lowestScore[0] as Document)._id });
         }
-    }
-
-    async getHighScores(gameMode: number): Promise<HighScore[]> {
-        return this.highScoreDB
-            .collection(DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'])
-            .find({})
-            .sort({ score: -1 })
-            .toArray()
-            .then((score: HighScore[]) => {
-                return score;
-            });
     }
 
     async getBots(difficulty: number): Promise<BotName[]> {
@@ -119,5 +109,15 @@ export class DatabaseService {
 
     async countDictionaries(name: string, id?: string) {
         return this.dictDB.collection(DATABASE.dict.collection).countDocuments({ _id: id ? { $ne: new ObjectId(id) } : {}, name });
+    }
+
+    async resetDB() {
+        return Promise.all([
+            this.botDB.dropCollection(DATABASE.bot.collections.easy),
+            this.botDB.dropCollection(DATABASE.bot.collections.hard),
+            this.highScoreDB.dropCollection(DATABASE.highScore.collections.classical),
+            this.highScoreDB.dropCollection(DATABASE.highScore.collections.log2990),
+            this.dictDB.dropCollection(DATABASE.dict.collection),
+        ]);
     }
 }
