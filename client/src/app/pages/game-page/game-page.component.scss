@@ -6,16 +6,22 @@
 .play-area-container {
     overflow: auto;
     flex: 1 1 auto;
+    display: flex;
+
 }
 
 .play-area {
     display: grid;
     width: min-content;
     outline: none;
+    display: flex;
+
 }
 
 .paneau-container {
     position: absolute;
     top: 0;
     right: 0;
+    display: flex;
+
 }

@@ -1,5 +1,5 @@
-<div class="grid-container">
-    <div class="panneau">
+<div class="grid-container" >
+    <div class="panneau" [style.backgroundColor]="getTurnColor()">
         <div class="joueur-container">
             <div class="joueur">Joueur</div>
             <div class="nom-joueur">{{ getName(playerType.Self) }}</div>
@@ -19,10 +19,12 @@
             <div *ngIf="isVisibleOpponent" class="main">{{ getHandMessage(playerType.Opponent) }}</div>
         </div>
         <div class="reserve">{{ getReserveMessage() }}</div>
-        <div class="tour" [style.backgroundColor]="getTurnColor()">{{ getTurnMessage() }}</div>
+    <div class="tour" [style.backgroundColor]="getTurnColor()">{{ getTurnMessage() }}</div>
         <div *ngIf="!isGameEnded" class="timer-container">
             <p class="time">{{ getTurnTime() }}</p>
-            <button mat-raised-button [disabled]="!getTurnState()" (click)="skipTurn()">Passer</button>
+            <button mat-raised-button [disabled]="!getTurnState()" (click)="skipTurn()">Passer
+                <mat-icon>accessible_forward</mat-icon>
+            </button>
         </div>
         <app-end-game *ngIf="isGameEnded" [winnerMessage]="getWinnerMessage()" class="end-game-container"></app-end-game>
     </div>

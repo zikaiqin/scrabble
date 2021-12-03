@@ -1,2 +1,5 @@
 <input autofocus class="textInput" type="text" [(ngModel)]="message" (keydown.enter)="sendMessage()" />
-<button mat-flat-button color="primary" class="send" type="button" (click)="sendMessage()">Envoyer</button>
+<!-- <button mat-flat-button color="primary" class="send" type="button" (click)="sendMessage()">Envoyer</button> -->
+<button color="primary" class="send" type="button" (click)="sendMessage()">
+    <mat-icon >send</mat-icon>
+</button>
