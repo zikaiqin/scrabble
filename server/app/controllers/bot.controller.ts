@@ -3,6 +3,7 @@ import { Request, Response, Router } from 'express';
 import { DEFAULT_BOT_NAMES } from '@app/classes/config';
 import { GameDifficulty } from '@app/classes/game-info';
 import { DatabaseService } from '@app/services/database.service';
+import { StatusCodes } from 'http-status-codes';
 
 @Service()
 export class BotController {
@@ -12,14 +13,13 @@ export class BotController {
         this.configureRouter();
     }
 
-    /* eslint-disable @typescript-eslint/no-magic-numbers */
     private configureRouter(): void {
         this.router = Router();
 
         this.router.get('/', (req: Request, res: Response) => {
             const { difficulty } = req.query;
             if (difficulty === undefined) {
-                res.sendStatus(400);
+                res.sendStatus(StatusCodes.BAD_REQUEST);
                 return;
             }
             const names = (difficulty === String(GameDifficulty.Easy) ? DEFAULT_BOT_NAMES.easy : DEFAULT_BOT_NAMES.hard).map((name, id) => {
@@ -37,65 +37,65 @@ export class BotController {
                         ),
                     );
                 })
-                .catch(() => res.sendStatus(500));
+                .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
         });
 
         this.router.post('/', (req: Request, res: Response) => {
             const { name, difficulty } = req.body;
             if (name === undefined || difficulty === undefined) {
-                res.sendStatus(400);
+                res.sendStatus(StatusCodes.BAD_REQUEST);
                 return;
             }
             this.dbService
                 .countBots(name)
                 .then(([easyCount, hardCount]) => {
                     if (easyCount + hardCount > 0 || [...DEFAULT_BOT_NAMES.easy, ...DEFAULT_BOT_NAMES.hard].some((botName) => botName === name)) {
-                        res.sendStatus(409);
+                        res.sendStatus(StatusCodes.CONFLICT);
                         return;
                     }
                     this.dbService
                         .insertBot(name, difficulty)
-                        .then(() => res.sendStatus(200))
-                        .catch(() => res.sendStatus(500));
+                        .then(() => res.sendStatus(StatusCodes.OK))
+                        .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
                 })
-                .catch(() => res.sendStatus(500));
+                .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
         });
 
         this.router.put('/', (req: Request, res: Response) => {
             const { id, name, difficulty } = req.body;
             if (id === undefined || name === undefined || difficulty === undefined) {
-                res.sendStatus(400);
+                res.sendStatus(StatusCodes.BAD_REQUEST);
                 return;
             }
             this.dbService
                 .countBots(name)
                 .then(([easyCount, hardCount]) => {
                     if (easyCount + hardCount > 0 || [...DEFAULT_BOT_NAMES.easy, ...DEFAULT_BOT_NAMES.hard].some((botName) => botName === name)) {
-                        res.status(409).json();
+                        res.status(StatusCodes.CONFLICT).json();
                     } else {
                         this.dbService
                             .editBot(id, name, difficulty)
                             .then((updateResult) => {
-                                res.sendStatus(updateResult.matchedCount ? 200 : 404);
+                                res.sendStatus(updateResult.matchedCount ? StatusCodes.OK : StatusCodes.NOT_FOUND);
                             })
-                            .catch(() => res.sendStatus(500));
+                            .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
                     }
                 })
-                .catch(() => res.sendStatus(500));
+                .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
         });
 
         this.router.delete('/', (req: Request, res: Response) => {
             const { ids, difficulty } = req.body;
             if (!ids || difficulty === undefined) {
-                res.sendStatus(400);
+                res.sendStatus(StatusCodes.BAD_REQUEST);
                 return;
             }
             this.dbService
                 .deleteBots(ids, difficulty)
                 .then((deleteResult) => {
-                    res.sendStatus(deleteResult.deletedCount ? 200 : 404);
+                    res.sendStatus(deleteResult.deletedCount ? StatusCodes.OK : StatusCodes.NOT_FOUND);
                 })
-                .catch(() => res.sendStatus(500));
+                .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
         });
     }
 }
