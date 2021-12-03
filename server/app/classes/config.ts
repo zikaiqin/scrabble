@@ -219,7 +219,7 @@ export const DEFAULT_HIGH_SCORES = {
         { name: 'MoistCr1TiKaL', score: 60 },
         { name: 'ショタコン', score: 53 },
         { name: 'Nigerian Prince', score: 39 },
-        { name: 'tyler1', score: 8 },
+        { name: 'tyler1', score: 12 },
     ] as HighScore[],
 };
 
