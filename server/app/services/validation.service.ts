@@ -1,7 +1,6 @@
 import { Board } from '@app/classes/board';
 import { DEFAULT_POINTS } from '@app/classes/config';
 import { Vec2 } from '@app/classes/vec2';
-import * as data from '@app/services/dictionnary.json';
 import { Service } from 'typedi';
 
 export const ASCII_SMALL_A = 97;
@@ -24,7 +23,9 @@ export class ValidationService {
     newWord: Map<string, string>;
     gameBoard: Board;
 
-    private dictionary = JSON.parse(JSON.stringify(data));
+    // Key -- ID of the room <br>
+    // Value -- Valid words in the game's dictionary
+    readonly dictionaries = new Map<string, string[]>();
     /**
      * @description Startup to initialize the attributes
      * @param startCoords the starting coordinates of the placed word/letter
@@ -151,12 +152,13 @@ export class ValidationService {
     }
     /**
      * @description Function that verifies the validity of a word with the dictionnary
+     * @param roomID ID of the room
      * @param words the words that needs to be verified
      * @returns true if all words are valid / false if any 1 word isn't valid
      */
-    findWord(words: string[]): boolean {
+    findWord(roomID: string, words: string[]): boolean {
         const wordsToCheck = words.filter((word) => word.length >= 2 && !word.includes('-') && !word.includes("'")).map((word) => word.toLowerCase());
-        return wordsToCheck.every((word) => this.dictionary.words.includes(word));
+        return wordsToCheck.every((word) => this.dictionaries.get(roomID)?.includes(word));
     }
     /**
      * @description Wrapper function that calculates all the points with all the formed words

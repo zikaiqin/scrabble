@@ -15,6 +15,11 @@ export class ScoreController {
 
         this.router.get('/', (req: Request, res: Response) => {
             const gameMode = Number(req.query.gameMode);
+            if (!gameMode) {
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                res.sendStatus(400);
+                return;
+            }
             this.dbService
                 .getHighScores(gameMode)
                 .then((scores) => {
@@ -22,7 +27,7 @@ export class ScoreController {
                 })
                 .catch(() => {
                     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                    res.sendStatus(502);
+                    res.sendStatus(500);
                 });
         });
     }

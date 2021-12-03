@@ -11,6 +11,8 @@ import { PlacingService } from '@app/services/placing.service';
 import { ValidationService } from '@app/services/validation.service';
 import { ObjectivesService } from '@app/services/objectives';
 import { DatabaseService } from '@app/services/database.service';
+import { TurnService } from '@app/services/turn.service';
+import { GameDisplayService } from '@app/services/game-display.service';
 
 @Service()
 export class Server {
@@ -30,6 +32,8 @@ export class Server {
         private validationService: ValidationService,
         private objectivesService: ObjectivesService,
         private databaseService: DatabaseService,
+        private turnService: TurnService,
+        private gameDisplayService: GameDisplayService,
     ) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
@@ -47,25 +51,6 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
-        this.socketService = new SocketService(this.server);
-        this.socketService.handleSockets();
-
-        this.gameService = new GameService(
-            this.socketService,
-            this.botService,
-            this.endGameService,
-            this.exchangeService,
-            this.placingService,
-            this.validationService,
-            this.objectivesService,
-            this.databaseService,
-        );
-        this.gameService.attachSocketListeners();
-        this.gameService.attachBotListeners();
-
-        this.server.listen(Server.appPort);
-        this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
-        this.server.on('listening', () => this.onListening());
         this.databaseService
             .databaseConnect()
             .then(() => {
@@ -77,6 +62,29 @@ export class Server {
                 console.error('Database connection failed !');
                 process.exit(1);
             });
+
+        this.socketService = new SocketService(this.server, this.databaseService, this.validationService);
+        this.socketService.handleSockets();
+
+        this.gameService = new GameService(
+            this.socketService,
+            this.botService,
+            this.endGameService,
+            this.exchangeService,
+            this.placingService,
+            this.validationService,
+            this.objectivesService,
+            this.databaseService,
+            this.turnService,
+            this.gameDisplayService,
+        );
+
+        this.gameService.attachSocketListeners();
+        this.gameService.attachBotListeners();
+
+        this.server.listen(Server.appPort);
+        this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
+        this.server.on('listening', () => this.onListening());
     }
 
     private onError(error: NodeJS.ErrnoException): void {

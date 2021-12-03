@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+// For the sake of numbering the objectives
 import { Service } from 'typedi';
 import { ValidationService } from '@app/services/validation.service';
 import { Game } from '@app/classes/game';
@@ -92,7 +93,7 @@ export class ObjectivesService {
                     for (const char of letters) {
                         wordContainer += char[1].toLowerCase();
                     }
-                    const regex = /kwxyz/gi;
+                    const regex = /[kwxyz]/gi;
                     const result = wordContainer.match(regex);
                     if (!result) return false;
                     return new Set(result).size >= 2;

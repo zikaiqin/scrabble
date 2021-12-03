@@ -83,6 +83,10 @@ export class Timer extends EventEmitter {
     get isLocked(): boolean {
         return this.locked;
     }
+
+    get turn(): boolean {
+        return this.turnState;
+    }
 }
 
 const SECOND = 1000;

@@ -4,7 +4,7 @@ import { GameDifficulty } from '@app/classes/game-info';
 @Component({
     selector: 'app-bot-config-select',
     template: `
-        <mat-form-field appearance="outline" class="select">
+        <mat-form-field appearance="outline">
             <mat-select [value]="difficulty" (valueChange)="difficultyChange.emit($event)">
                 <mat-option [value]="gameDifficulty.Easy">Profil Novice</mat-option>
                 <mat-option [value]="gameDifficulty.Hard">Profil Expert</mat-option>
@@ -13,24 +13,24 @@ import { GameDifficulty } from '@app/classes/game-info';
     `,
     styles: [
         `
-            .select .mat-form-field.mat-form-field {
-                margin-bottom: 0;
+            app-bot-config-select .mat-form-field.mat-form-field {
+                margin-bottom: 0 !important;
             }
-            .select .mat-form-field-flex {
+            app-bot-config-select .mat-form-field-flex {
                 margin-top: 0 !important;
             }
-            .select .mat-form-field-infix {
+            app-bot-config-select .mat-form-field-infix {
                 border-top: none;
                 padding: 0.6em 0 !important;
             }
-            .select .mat-form-field-outline {
+            app-bot-config-select .mat-form-field-outline {
                 top: 0 !important;
             }
-            .select .mat-form-field-wrapper {
+            app-bot-config-select .mat-form-field-wrapper {
                 margin: 0 !important;
                 padding: 0;
             }
-            .select .mat-select-arrow-wrapper {
+            app-bot-config-select .mat-select-arrow-wrapper {
                 transform: none !important;
             }
         `,

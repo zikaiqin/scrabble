@@ -6,6 +6,9 @@ import { AlertService } from '@app/services/alert.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
+import { DEFAULT_TIMEOUT } from '@app/classes/config';
+
+type SocketStatus = 'ok' | 'fail';
 
 @Injectable({
     providedIn: 'root',
@@ -85,7 +88,6 @@ export class WebsocketService {
                 this.gameEnded.next(winner);
             });
         });
-
         this.socket.on('disconnect', (reason) => {
             if (reason === 'io client disconnect') {
                 return;
@@ -94,23 +96,38 @@ export class WebsocketService {
             this.alertService.showAlert('La connexion au serveur a été interrompue');
             this.connectionStatus.next('connectionLost');
         });
+        this.socket.on('connect_error', () =>
+            this.alertService.showAlertWithCallback(
+                'Le serveur est présentement inaccessible',
+                'Réessayer la connexion',
+                () => this.connect(),
+                DEFAULT_TIMEOUT,
+            ),
+        );
     }
 
     /**
      * @param configs configs for new game. No room ID, difficulty optional.
+     * @param onSuccess function to execute upon successful acknowledgement
      * @link NewGameMenuComponent.newGame
      */
-    createGame(configs: GameInfo): void {
-        this.socket.emit('createGame', configs);
+    createGame(configs: Partial<GameInfo>, onSuccess: () => void): void {
+        this.socket.emit('createGame', configs, (response: { status: SocketStatus }) => {
+            if (response.status === 'ok') {
+                onSuccess();
+                return;
+            }
+            this.alertService.showAlert("Le dictionnaire sélectionné n'existe pas");
+        });
     }
 
     /**
      * @param info username and ID of room to join
      * @link GameBrowserComponent.joinRoom
      */
-    joinGame(info: GameInfo): void {
-        this.socket.emit('joinGame', info.username, info.roomID, (response: { status: string }) => {
-            if (response.status !== 'ok') {
+    joinGame(info: Partial<GameInfo>): void {
+        this.socket.emit('joinGame', info.username, info.roomID, (response: { status: SocketStatus }) => {
+            if (response.status === 'fail') {
                 this.alertService.showAlert("La partie que vous avez essayé de joindre n'est plus disponible");
             }
         });
@@ -140,8 +157,10 @@ export class WebsocketService {
         this.socket.emit('fetchObjectives');
     }
 
-    connect(socket?: Socket): void {
-        this.socket = socket ? socket : io(environment.serverUrl).connect();
+    connect(): void {
+        this.socket = io(environment.serverUrl, {
+            reconnection: false,
+        }).connect();
         this.attachListeners();
     }
 

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { GameInfo, GameMode, GameType } from '@app/classes/game-info';
+import { Dictionary, GameInfo, GameMode, GameType } from '@app/classes/game-info';
 import { WebsocketService } from '@app/services/websocket.service';
+import { HttpService } from '@app/services/http.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -14,9 +15,10 @@ export class HomePageComponent {
     showBrowser = false;
     showWaitingRoom = false;
     showScoreboard = false;
-    gameConfigs: GameInfo;
+    gameConfigs: Partial<GameInfo>;
+    dictionaries: Dictionary[];
 
-    constructor(private router: Router, private webSocketService: WebsocketService) {
+    constructor(private router: Router, private httpService: HttpService, private webSocketService: WebsocketService) {
         this.webSocketService.status.subscribe((event) => {
             if (event === 'connectionLost') {
                 if (this.showWaitingRoom) {
@@ -35,6 +37,9 @@ export class HomePageComponent {
         }
         if (button === 'Single' || button === 'Multi') {
             this.gameType = GameType[button];
+            this.httpService.getDicts().subscribe((res) => {
+                this.dictionaries = res as Dictionary[];
+            });
         }
         if (button === 'Browse') {
             this.webSocketService.connect();
@@ -64,7 +69,7 @@ export class HomePageComponent {
         }
     }
 
-    showPage(): string {
+    showMenu(): string {
         if (this.showScoreboard) {
             return 'Scoreboard';
         }
@@ -77,23 +82,22 @@ export class HomePageComponent {
         return this.showWaitingRoom ? 'WaitingRoom' : 'NewGame';
     }
 
-    showSettings(): void {
+    showAdminPage(): void {
         this.router.navigateByUrl('/admin');
     }
 
-    createGame(configs: GameInfo): void {
-        this.webSocketService.connect();
-        this.webSocketService.createGame(configs);
+    createGame(configs: Partial<GameInfo>): void {
         this.gameConfigs = configs;
-        if (configs.gameType === GameType.Multi) {
-            this.showWaitingRoom = true;
-        }
+        this.webSocketService.connect();
+        this.webSocketService.createGame(configs, () => {
+            if (configs.gameType === GameType.Multi) {
+                this.showWaitingRoom = true;
+            }
+        });
     }
 
-    joinGame(configs: GameInfo): void {
-        if (configs.roomID !== undefined) {
-            this.webSocketService.joinGame(configs);
-        }
+    joinGame(configs: Partial<GameInfo>): void {
+        this.webSocketService.joinGame(configs);
     }
 
     convertGame(difficulty: number): void {

@@ -1,5 +1,4 @@
 /* eslint-disable dot-notation */
-/* eslint-disable prettier/prettier */
 // On disable quand on essaie d'acceder un attribut prive de notre service
 import { TestBed } from '@angular/core/testing';
 

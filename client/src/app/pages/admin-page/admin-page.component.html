@@ -7,7 +7,7 @@
     </mat-toolbar>
 
     <mat-drawer-container class="stretch-col stretch-col-content">
-        <mat-drawer opened mode='side' class="mat-elevation-z1">
+        <mat-drawer opened mode="side" class="mat-elevation-z1">
             <mat-action-list>
                 <mat-list-item [disabled]="page === 'dict'" (click)="page = 'dict'">
                     <mat-icon mat-list-icon>spellcheck</mat-icon>
@@ -33,13 +33,23 @@
                     (delete)="deleteBots($event)"
                     (edit)="editBot($event)"
                 ></app-bot-config>
+                <app-dict-config
+                    class="stretch-col stretch-col-content"
+                    *ngIf="page === 'dict'"
+                    [data]="dictData"
+                    (get)="getDicts()"
+                    (add)="upload.click()"
+                    (delete)="deleteDicts($event)"
+                    (edit)="editDict($event)"
+                    (download)="downloadDict($event)"
+                ></app-dict-config>
             </mat-card>
         </mat-drawer-content>
     </mat-drawer-container>
 </div>
 
 <mat-menu #menu="matMenu">
-    <button mat-menu-item class='reset' (click)="openResetDialog()">
+    <button mat-menu-item class="reset" (click)="openResetDialog()">
         <mat-icon mat-list-icon>restore</mat-icon>
         <span>Réinitialiser le système</span>
     </button>
@@ -48,3 +58,6 @@
         <span>Retourner à l'accueil</span>
     </button>
 </mat-menu>
+
+<a hidden #download></a>
+<input type="file" accept="application/json" hidden #upload (change)="handleFile(); upload.value = ''" />
