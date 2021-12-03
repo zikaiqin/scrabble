@@ -1,10 +1,16 @@
 /* eslint-disable max-classes-per-file */
+import { Board } from '@app/classes/board';
+import { DEFAULT_BONUSES } from '@app/classes/config';
+import { Game } from '@app/classes/game';
 import { Player } from '@app/classes/player';
 import { Reserve } from '@app/classes/reserve';
 import { EndGameService } from '@app/services/end-game.service';
 import { GameDisplayService } from '@app/services/game-display.service';
 import { expect } from 'chai';
 import { createSandbox } from 'sinon';
+import { SocketService } from '@app/services/socket.service'
+import { Server } from '@app/server';
+import Container from 'typedi';
 
 class MockPlayer extends Player {
     name: string;
@@ -35,6 +41,7 @@ class MockReserve extends Reserve {
 describe('End Game Service', () => {
     let endGameService: EndGameService;
     let fakeGameDisplayService: GameDisplayService;
+    let fakeSocketService: SocketService;
     let player: MockPlayer;
     let opponent: MockPlayer;
     const randomLetters1: string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
@@ -43,8 +50,10 @@ describe('End Game Service', () => {
     const room1 = 'room1';
     const room2 = 'room2';
     const sandBox = createSandbox();
+    let server: Server;
 
     beforeEach(() => {
+        fakeGameDisplayService = new GameDisplayService();
         endGameService = new EndGameService(fakeGameDisplayService);
         /* eslint-disable */
         endGameService.turnSkipMap.set(room1, 3);
@@ -56,6 +65,11 @@ describe('End Game Service', () => {
         opponent.addAll(randomLetters2);
         reserve = new MockReserve();
         reserve.setLetters(randomLetters2);
+    });
+
+    before(() => {
+        server = Container.get(Server);
+        server.init();
     });
 
     it('should increment the turn skipped counter by 1 to the right room', () => {
@@ -193,5 +207,27 @@ describe('End Game Service', () => {
         expect(player.score).to.equals(14);
         expect(opponent.score).to.equals(73);
         /* eslint-enable */
+    });
+
+    it('should make the appropriate actions when calling gameEnded if the game has ended', () => {
+        fakeSocketService = server['socketService'];
+        const socketServiceSpy1 = sandBox.spy(fakeSocketService, 'gameEnded');
+        const socketServiceSpy2 = sandBox.spy(fakeSocketService, 'sendMessage');
+        const socketServiceSpy3 = sandBox.spy(fakeSocketService, 'updateTurn');
+        const players = new Map<string, MockPlayer>([['test1', player], ['test2', opponent]]);
+        const fakeGame = new Game(new Board(DEFAULT_BONUSES), players, [[1, false], [2, false]]);
+        const game = endGameService.gameEnded(room2, fakeGame, player, opponent, fakeSocketService);
+        expect(socketServiceSpy1.called);
+        expect(socketServiceSpy2.called);
+        expect(socketServiceSpy3.called);
+        expect(game).to.be.true;
+    });
+
+    it('should should return false and do nothing when calling gameEnded if the game has not ended', () => {
+        fakeSocketService = server['socketService'];
+        const players = new Map<string, MockPlayer>([['test1', player], ['test2', opponent]]);
+        const fakeGame = new Game(new Board(DEFAULT_BONUSES), players, [[1, false], [2, false]]);
+        const game = endGameService.gameEnded(room1, fakeGame, player, opponent, fakeSocketService);
+        expect(game).to.be.false;
     });
 });

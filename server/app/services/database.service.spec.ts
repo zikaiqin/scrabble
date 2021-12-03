@@ -9,11 +9,11 @@ import { DatabaseService } from "@app/services/database.service";
 import { GameDifficulty, GameMode } from "@app/classes/game-info";
 // import { DATABASE } from "@app/classes/config";
 
-describe('Database service', () => {
+describe.only('Database service', () => {
     let databaseService: DatabaseService;
     let mongoServer: MongoMemoryServer;
     const fakeScorer1 = {name: 'FakePlayerButCooler', score: 100};
-    const fakeScorer2 = {name: 'FakePlayer', score: 12};
+    const fakeScorer2 = {name: 'FakePlayer', score: 8};
     // const fakeDictionary = {name: 'fakeDict', description: 'a fake dictionary', words: ['why']};
 
     beforeEach(async () => {
@@ -119,7 +119,7 @@ describe('Database service', () => {
       await databaseService.insertBot('Gridman', GameDifficulty.Hard);
       let bot = await databaseService.getBots(GameDifficulty.Hard);
       for (const it of bot) {
-        if (it.name = 'Gridman') {
+        if (it.name === 'Gridman') {
           expect(it.name).to.equal('Gridman');
         }
       }
@@ -128,40 +128,66 @@ describe('Database service', () => {
     it('should change the name of a bot identified with its id and difficulty', async () => {
       const mongoUri = await mongoServer.getUri();
       await databaseService.databaseConnect(mongoUri);
+      await databaseService.insertBot('Gridman', GameDifficulty.Hard);
       let botList = await databaseService.getBots(GameDifficulty.Hard);
-      setTimeout( () => {
-        let bot = botList[0];
-        databaseService.editBot(bot._id as string, 'Gridman', GameDifficulty.Hard);
-      }, 5000);
+      let bot = botList[0]._id;
+      await databaseService.editBot(bot, 'Dynazenon', GameDifficulty.Hard);
       botList = await databaseService.getBots(GameDifficulty.Hard);
+      let expected: string = '';
       for (const it of botList) {
-        if (it.name = 'Gridman') {
-          expect(it.name).to.equal('Gridman');
+        if (it.name === 'Dynazenon') {
+          expected = it.name;
         }
       }
+      expect(expected).to.equal('Dynazenon');
+    });
+
+    it('should delete the bot identified with its id and difficulty', async () => {
+      const mongoUri = await mongoServer.getUri();
+      await databaseService.databaseConnect(mongoUri);
+      await databaseService.insertBot('Gridman', GameDifficulty.Hard);
+      let botList = await databaseService.getBots(GameDifficulty.Hard);
+      let botID = [botList[0]._id];
+      await databaseService.deleteBots(botID, GameDifficulty.Hard);
+      botList = await databaseService.getBots(GameDifficulty.Hard);
+      expect(botList).to.be.empty;
     });
 
     it('should return the number of bots of the same name in each difficulty', async () => {
       const mongoUri = await mongoServer.getUri();
       await databaseService.databaseConnect(mongoUri);
-      await databaseService.insertBot('Gridman', GameDifficulty.Hard);
-      await databaseService.insertBot('Gridman', GameDifficulty.Hard);
-      await databaseService.insertBot('Gridman', GameDifficulty.Hard);
-      await databaseService.insertBot('Gridman', GameDifficulty.Easy);
-      await databaseService.insertBot('Gridman', GameDifficulty.Easy);
-      await databaseService.insertBot('Gridman', GameDifficulty.Easy);
+      for (let i = 0; i < 3; i++) {
+        await databaseService.insertBot('Gridman', GameDifficulty.Hard);
+      }
+      for (let i = 0; i < 3; i++) {
+        await databaseService.insertBot('Gridman', GameDifficulty.Easy);
+      }
       let bots = await databaseService.countBots('Gridman');
       expect(bots).to.deep.equals([ 3, 3 ]);
     });
 
-    /*it('should return the dictionary with the right id with getDictionary', async () => {
+    /*it('should return the number of dictionaries currently in the database', async () => {
       const mongoUri = await mongoServer.getUri();
       await databaseService.databaseConnect(mongoUri);
       await databaseService.insertDictionary(fakeDictionary.name, fakeDictionary.description, fakeDictionary.words);
-      let dict = await databaseService.getDictionaryDescriptions();
-    it('should reset the database', async () => {
+      let dict = await databaseService.countDictionaries();
+
+    it('should return the dictionary with the right id with getDictionary', async () => {
       const mongoUri = await mongoServer.getUri();
       await databaseService.databaseConnect(mongoUri);
-      await databaseService.resetDB();
-    });*/
+      await databaseService.insertDictionary(fakeDictionary.name, fakeDictionary.description, fakeDictionary.words);
+      let dict = await databaseService.getDictionaryDescriptions();*/
+
+    it('should reset the database when calling resetDB', async () => {
+      const mongoUri = await mongoServer.getUri();
+      await databaseService.databaseConnect(mongoUri);
+      setTimeout( () => {
+        databaseService.insertDefaultScores();
+      }, 5000);
+      setTimeout( () => {
+        databaseService.resetDB();
+      }, 5000);
+      let scoreLog2990 = await databaseService.getHighScores(GameMode.Log2990);
+      expect(scoreLog2990).to.be.empty;
+    });
 })
