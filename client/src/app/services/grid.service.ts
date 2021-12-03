@@ -71,6 +71,7 @@ export class GridService {
                this.arrowPosition.push({x: 22+ xPosition, y : 16+ yPosition + this.tuileSize});
                this.arrowPosition.push({x: 19+ xPosition, y : 19+ yPosition + this.tuileSize});
                this.arrowPosition.push({x: 19+ xPosition, y : yPosition + this.tuileSize});
+               this.drawArrow(xPosition, yPosition, posX, posY);
         }
 
         if (!this.arrowDirection && posY < DEFAULT_NB_CASES - 1 && posX < DEFAULT_NB_CASES - 2) {
@@ -79,14 +80,10 @@ export class GridService {
             this.arrowPosition.push({x: 14 + xPosition + this.tuileSize, y : 22 + yPosition});
             this.arrowPosition.push({x: 19 + xPosition + this.tuileSize, y : 19 + yPosition});
             this.arrowPosition.push({x: xPosition + this.tuileSize, y : 19 + yPosition});
- 
+            this.drawArrow(xPosition, yPosition, posX, posY);
         }
     }
     drawArrow(xPosition: number, yPosition: number,posX: number, posY: number) {
-
-        this.calculateArrow(xPosition, yPosition, posX, posY);
-
-        if(this.arrowPosition !== []){
 
         this.gridContext.lineWidth = 5;
         this.gridContext.beginPath();
@@ -98,7 +95,6 @@ export class GridService {
         this.gridContext.moveTo(this.arrowPosition[2].x, this.arrowPosition[2].y);
         this.gridContext.lineTo(this.arrowPosition[3].x, this.arrowPosition[3].y);
         this.gridContext.stroke();
-        }
         
         // this.gridContext.lineWidth = 5;
         // this.gridContext.beginPath();
@@ -132,8 +128,7 @@ export class GridService {
 
             this.gridContext.strokeStyle = 'purple';
             this.gridContext.strokeRect(tuileX + 2, tuileY + 2, this.tuileSize - STROKE_RANGE, this.tuileSize - STROKE_RANGE);
-            
-            this.drawArrow(tuileX, tuileY, posX, posY);
+            this.calculateArrow(tuileX, tuileY, posX, posY);
         }
         // return this.arrowDirection;
     }
