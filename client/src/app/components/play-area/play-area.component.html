@@ -20,16 +20,6 @@
     <app-chevalet [playerHand]="this.playerHand"></app-chevalet>
 </div>
 <br />
-<button mat-fab color="accent" id="exit" (click)="openConfirmWindow()">
+<button mat-fab color="accent" id="exit" (click)="openDialog()">
     <mat-icon>exit_to_app</mat-icon>
 </button>
-
-<mat-card class="popup" [style.display]="isVisible ? 'block' : 'none'">
-    <div class="popup-content">
-        <mat-card-title>Abandonner la partie et retourner à la page d'accueil?</mat-card-title>
-        <mat-card-actions align="end">
-            <button mat-flat-button color="warn" (click)="redirectTo()">Confirmer</button>
-            <button mat-flat-button (click)="cancel()">Annuler</button>
-        </mat-card-actions>
-    </div>
-</mat-card>

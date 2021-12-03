@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { DatabaseResetDialogComponent } from '@app/components/database-reset-dialog/database-reset-dialog.component';
+import { BasicActionDialogComponent } from '@app/components/basic-action-dialog/basic-action-dialog.component';
 import { AlertService } from '@app/services/alert.service';
 import { HttpService } from '@app/services/http.service';
 import { BotName, Dictionary, GameDifficulty } from '@app/classes/game-info';
@@ -26,7 +26,9 @@ export class AdminPageComponent {
     constructor(public dialog: MatDialog, private alertService: AlertService, private httpService: HttpService, private router: Router) {}
 
     openResetDialog(): void {
-        const dialogRef = this.dialog.open(DatabaseResetDialogComponent);
+        const dialogRef = this.dialog.open(BasicActionDialogComponent, {
+            data: { title: 'Réinitialiser le système?', action: 'Réinitialiser', cancel: 'Annuler' },
+        });
         dialogRef.afterClosed().subscribe((reset) => {
             if (reset) {
                 this.httpService.resetDB().subscribe({
