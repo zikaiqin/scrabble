@@ -125,6 +125,20 @@ describe('Database service', () => {
       }
     });
 
+    /*it('should change the name of a bot identified with its id and difficulty', async () => {
+      const mongoUri = await mongoServer.getUri();
+      await databaseService.databaseConnect(mongoUri);
+      let botList = await databaseService.getBots(GameDifficulty.Hard);
+      let bot = botList[0];
+      await databaseService.editBot(bot._id as string, 'Gridman', GameDifficulty.Hard);
+      botList = await databaseService.getBots(GameDifficulty.Hard);
+      for (const it of botList) {
+        if (it.name = 'Gridman') {
+          expect(it.name).to.equal('Gridman');
+        }
+      }
+    });*/
+
     it('should return the number of bots of the same name in each difficulty', async () => {
       const mongoUri = await mongoServer.getUri();
       await databaseService.databaseConnect(mongoUri);
@@ -143,8 +157,6 @@ describe('Database service', () => {
       await databaseService.databaseConnect(mongoUri);
       await databaseService.insertDictionary(fakeDictionary.name, fakeDictionary.description, fakeDictionary.words);
       let dict = await databaseService.getDictionaryDescriptions();
-      expect(dict).to.deep.equals(fakeDictionary);
-    });
     it('should reset the database', async () => {
       const mongoUri = await mongoServer.getUri();
       await databaseService.databaseConnect(mongoUri);
