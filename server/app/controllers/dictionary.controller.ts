@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { Request, Response, Router } from 'express';
 import { DatabaseService } from '@app/services/database.service';
 import { DEFAULT_DICTIONARY } from '@app/classes/config';
+import { StatusCodes } from 'http-status-codes';
 
 @Service()
 export class DictionaryController {
@@ -11,7 +12,6 @@ export class DictionaryController {
         this.configureRouter();
     }
 
-    /* eslint-disable @typescript-eslint/no-magic-numbers */
     private configureRouter(): void {
         this.router = Router();
 
@@ -34,71 +34,71 @@ export class DictionaryController {
                         ),
                     );
                 })
-                .catch(() => res.sendStatus(500));
+                .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
         });
 
         this.router.post('/', (req: Request, res: Response) => {
             const { name, description, words } = req.body;
             if (!name || !description || !words) {
-                res.sendStatus(400);
+                res.sendStatus(StatusCodes.BAD_REQUEST);
                 return;
             }
             this.dbService
                 .countDictionaries(name)
                 .then((count) => {
                     if (count > 0) {
-                        res.sendStatus(409);
+                        res.sendStatus(StatusCodes.CONFLICT);
                         return;
                     }
                     this.dbService
                         .insertDictionary(name, description, words)
-                        .then(() => res.sendStatus(200))
-                        .catch(() => res.sendStatus(500));
+                        .then(() => res.sendStatus(StatusCodes.OK))
+                        .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
                 })
-                .catch(() => res.sendStatus(500));
+                .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
         });
 
         this.router.put('/', (req: Request, res: Response) => {
             const { id, name, description } = req.body;
             if (!name || !description || !id) {
-                res.sendStatus(400);
+                res.sendStatus(StatusCodes.BAD_REQUEST);
                 return;
             }
             this.dbService
                 .countDictionaries(name)
                 .then((count) => {
                     if (count > 0) {
-                        res.sendStatus(409);
+                        res.sendStatus(StatusCodes.CONFLICT);
                         return;
                     }
                     this.dbService
                         .editDictionary(id, name, description)
                         .then((updateResult) => {
-                            res.sendStatus(updateResult.matchedCount ? 200 : 404);
+                            res.sendStatus(updateResult.matchedCount ? StatusCodes.OK : StatusCodes.NOT_FOUND);
                         })
-                        .catch(() => res.sendStatus(500));
+                        .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
                 })
-                .catch(() => res.sendStatus(500));
+                .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
         });
 
         this.router.delete('/', (req: Request, res: Response) => {
             const { ids } = req.body;
             if (!ids) {
-                res.sendStatus(400);
+                res.sendStatus(StatusCodes.BAD_REQUEST);
                 return;
             }
             this.dbService
                 .deleteDictionaries(ids)
                 .then((deleteResult) => {
-                    res.sendStatus(deleteResult.deletedCount ? 200 : 404);
+                    res.sendStatus(deleteResult.deletedCount ? StatusCodes.OK : StatusCodes.NOT_FOUND);
                 })
-                .catch(() => res.sendStatus(500));
+                .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
         });
 
         this.router.get('/download', (req: Request, res: Response) => {
             const { id } = req.query;
             if (id === undefined) {
-                res.sendStatus(400);
+                res.sendStatus(StatusCodes.BAD_REQUEST);
                 return;
             }
             // eslint-disable-next-line no-underscore-dangle
@@ -114,7 +114,7 @@ export class DictionaryController {
                 .getDictionary(id as string)
                 .then((dictionary) => {
                     if (!dictionary) {
-                        res.sendStatus(404);
+                        res.sendStatus(StatusCodes.NOT_FOUND);
                         return;
                     }
                     const { name, description, words } = dictionary;
@@ -124,7 +124,7 @@ export class DictionaryController {
                         words,
                     });
                 })
-                .catch(() => res.sendStatus(500));
+                .catch(() => res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR));
         });
     }
 }

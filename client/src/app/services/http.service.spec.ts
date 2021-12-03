@@ -1,18 +1,23 @@
 import { TestBed } from '@angular/core/testing';
 
 import { HttpService } from './http.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpClient } from '@angular/common/http';
 import { AlertService } from '@app/services/alert.service';
 
 describe('HttpService', () => {
     let service: HttpService;
 
-    const alertServiceSpy = jasmine.createSpyObj('AlertService', ['showAlert']);
+    let alertServiceSpy: jasmine.SpyObj<AlertService>;
+    let httpClientSpy: jasmine.SpyObj<HttpClient>;
 
     beforeEach(() => {
+        alertServiceSpy = jasmine.createSpyObj('AlertService', ['showAlert']);
+        httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'put', 'delete']);
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            providers: [{ provide: AlertService, useValue: alertServiceSpy }],
+            providers: [
+                { provide: AlertService, useValue: alertServiceSpy },
+                { provide: HttpClient, useValue: httpClientSpy },
+            ],
         });
         service = TestBed.inject(HttpService);
     });

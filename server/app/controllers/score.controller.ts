@@ -1,6 +1,7 @@
 import { Service } from 'typedi';
 import { Request, Response, Router } from 'express';
 import { DatabaseService } from '@app/services/database.service';
+import { StatusCodes } from 'http-status-codes';
 
 @Service()
 export class ScoreController {
@@ -17,7 +18,7 @@ export class ScoreController {
             const gameMode = Number(req.query.gameMode);
             if (!gameMode) {
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                res.sendStatus(400);
+                res.sendStatus(StatusCodes.BAD_REQUEST);
                 return;
             }
             this.dbService
@@ -27,7 +28,7 @@ export class ScoreController {
                 })
                 .catch(() => {
                     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                    res.sendStatus(500);
+                    res.sendStatus(StatusCodes.CONFLICT);
                 });
         });
     }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { catchError, timeout } from 'rxjs/operators';
 import { DEFAULT_TIMEOUT } from '@app/classes/config';
@@ -10,9 +10,6 @@ const basePath = `${environment.serverUrl}/api`;
 const scorePath = `${basePath}/score`;
 const botPath = `${basePath}/bot`;
 const dictPath = `${basePath}/dict`;
-const ERROR_409 = 409;
-const ERROR_404 = 404;
-const ERROR_413 = 413;
 
 @Injectable({
     providedIn: 'root',
@@ -42,7 +39,7 @@ export class HttpService {
         return this.http.post(botPath, { name, difficulty }, { responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
-                this.catchHttpErrorWithStatus(err, ERROR_409, () => {
+                this.catchHttpErrorWithStatus(err, HttpStatusCode.Conflict, () => {
                     this.alertService.showAlert(`Un joueur virtuel avec le nom ${name} existe déjà`);
                 }),
             ),
@@ -56,7 +53,7 @@ export class HttpService {
         return this.http.delete(botPath, { body: { ids, difficulty }, responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
-                this.catchHttpErrorWithStatus(err, ERROR_404, () => {
+                this.catchHttpErrorWithStatus(err, HttpStatusCode.NotFound, () => {
                     this.alertService.showAlert(
                         `${ids.length > 1 ? 'Les joueurs virtuels' : 'Le joueur virtuel'} que vous voulez supprimer n'existe pas`,
                     );
@@ -72,12 +69,12 @@ export class HttpService {
         return this.http.put(botPath, { id, name, difficulty }, { responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
-                this.catchHttpErrorWithStatus(err, ERROR_409, () => {
+                this.catchHttpErrorWithStatus(err, HttpStatusCode.Conflict, () => {
                     this.alertService.showAlert(`Un joueur virtuel avec le nom ${name} existe déjà`);
                 }),
             ),
             catchError((err) =>
-                this.catchHttpErrorWithStatus(err, ERROR_404, () => {
+                this.catchHttpErrorWithStatus(err, HttpStatusCode.NotFound, () => {
                     this.alertService.showAlert("Le joueur virtuel que vous voulez modifier n'existe pas");
                 }),
             ),
@@ -100,12 +97,12 @@ export class HttpService {
         return this.http.post(dictPath, { name, description, words }, { responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
-                this.catchHttpErrorWithStatus(err, ERROR_413, () => {
+                this.catchHttpErrorWithStatus(err, HttpStatusCode.PayloadTooLarge, () => {
                     this.alertService.showAlert('Le dictionnaire est trop large');
                 }),
             ),
             catchError((err) =>
-                this.catchHttpErrorWithStatus(err, ERROR_409, () => {
+                this.catchHttpErrorWithStatus(err, HttpStatusCode.Conflict, () => {
                     this.alertService.showAlert(`Un dictionnaire avec le nom ${name} existe déjà`);
                 }),
             ),
@@ -119,7 +116,7 @@ export class HttpService {
         return this.http.delete(dictPath, { body: { ids }, responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
-                this.catchHttpErrorWithStatus(err, ERROR_404, () => {
+                this.catchHttpErrorWithStatus(err, HttpStatusCode.NotFound, () => {
                     this.alertService.showAlert(`${ids.length > 1 ? 'Les dictionnaires' : 'Le dictionnaire'} que vous voulez supprimer n'existe pas`);
                 }),
             ),
@@ -133,12 +130,12 @@ export class HttpService {
         return this.http.put(dictPath, { id, name, description }, { responseType: 'text' }).pipe(
             timeout(DEFAULT_TIMEOUT),
             catchError((err) =>
-                this.catchHttpErrorWithStatus(err, ERROR_409, () => {
+                this.catchHttpErrorWithStatus(err, HttpStatusCode.Conflict, () => {
                     this.alertService.showAlert(`Un dictionnaire le nom ${name} existe déjà`);
                 }),
             ),
             catchError((err) =>
-                this.catchHttpErrorWithStatus(err, ERROR_404, () => {
+                this.catchHttpErrorWithStatus(err, HttpStatusCode.NotFound, () => {
                     this.alertService.showAlert("Le dictionnaire que vous voulez modifier n'existe pas");
                 }),
             ),
