@@ -10,7 +10,7 @@ import { WebsocketService } from '@app/services/websocket.service';
 import { Subject } from 'rxjs';
 import { GridLettersService } from './grid-letter.service';
 
-fdescribe('GridService', () => {
+describe('GridService', () => {
     let service: GridService;
     let websocketServiceSpy: jasmine.SpyObj<LetterExchangeService>;
     let ctxStub: CanvasRenderingContext2D;

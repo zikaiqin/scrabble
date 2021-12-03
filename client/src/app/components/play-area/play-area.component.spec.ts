@@ -6,6 +6,7 @@ import { WebsocketService } from '@app/services/websocket.service';
 import { GridService } from '@app/services/grid.service';
 import { Subject } from 'rxjs';
 import { GameInit } from '@app/classes/game-info';
+import { MatDialogModule } from '@angular/material/dialog';
 
 describe('PlayAreaComponent', () => {
     let component: PlayAreaComponent;
@@ -32,6 +33,7 @@ describe('PlayAreaComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
+            imports: [MatDialogModule],
             declarations: [PlayAreaComponent],
             providers: [
                 { provide: WebsocketService, useValue: websocketServiceSpy },

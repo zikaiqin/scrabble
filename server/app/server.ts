@@ -13,6 +13,7 @@ import { ObjectivesService } from '@app/services/objectives';
 import { DatabaseService } from '@app/services/database.service';
 import { TurnService } from '@app/services/turn.service';
 import { GameDisplayService } from '@app/services/game-display.service';
+import { DATABASE } from '@app/classes/config';
 
 @Service()
 export class Server {
@@ -52,7 +53,7 @@ export class Server {
         this.server = http.createServer(this.application.app);
 
         this.databaseService
-            .databaseConnect()
+            .databaseConnect(DATABASE.url)
             .then(() => {
                 // eslint-disable-next-line no-console
                 console.log('Database connection successful !');

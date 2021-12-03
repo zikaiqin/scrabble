@@ -63,3 +63,10 @@ body {
     background-color: green;
     color: #fff;
 }
+.button {
+    position: absolute;
+    top:5%;
+    right: 0;
+    width: 120px;
+    transform: translateY(-50%);
+}

@@ -68,10 +68,10 @@ describe('SocketService', () => {
             clientSocket.emit('createGame', configs, (response: { status: string }) => {
                 void response;
             });
-        }, DEFAULT_BASE_DELAY);
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY + INCREMENT_DELAY);
         setTimeout(() => {
             clientSocket.emit('fetchObjectives');
-        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY);
+        }, DEFAULT_BASE_DELAY + INCREMENT_DELAY + INCREMENT_DELAY + INCREMENT_DELAY);
 
         setTimeout(() => {
             expect(publicObjContainer[0][0]).greaterThan(0);
@@ -79,7 +79,7 @@ describe('SocketService', () => {
             expect(privateObjContainer[0]).greaterThan(0);
             expect(counter).greaterThan(0);
             done();
-        }, DEFAULT_DELAY);
+        }, DEFAULT_DELAY + DEFAULT_DELAY);
     });
 
     it('convertGame should call the right functions', (done) => {
