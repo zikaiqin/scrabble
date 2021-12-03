@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DatabaseResetDialogComponent } from './database-reset-dialog.component';
+import { BasicActionDialogComponent } from './basic-action-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 describe('DatabaseResetDialogComponent', () => {
-    let component: DatabaseResetDialogComponent;
-    let fixture: ComponentFixture<DatabaseResetDialogComponent>;
+    let component: BasicActionDialogComponent;
+    let fixture: ComponentFixture<BasicActionDialogComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [MatDialogModule],
-            declarations: [DatabaseResetDialogComponent],
+            declarations: [BasicActionDialogComponent],
             providers: [
                 { provide: MatDialogRef, useValue: {} },
                 { provide: MAT_DIALOG_DATA, useValue: {} },
@@ -19,7 +19,7 @@ describe('DatabaseResetDialogComponent', () => {
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(DatabaseResetDialogComponent);
+        fixture = TestBed.createComponent(BasicActionDialogComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

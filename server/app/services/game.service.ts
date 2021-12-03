@@ -1,5 +1,3 @@
-/* eslint-disable max-lines */
-// TODO remove this after refactoring game.service
 import { Timer } from '@app/classes/timer';
 import { Game } from '@app/classes/game';
 import { Board } from '@app/classes/board';

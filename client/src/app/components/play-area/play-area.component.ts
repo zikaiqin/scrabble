@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { BasicActionDialogComponent } from '@app/components/basic-action-dialog/basic-action-dialog.component';
 import { CommandService } from '@app/services/command.service';
 import { GridService } from '@app/services/grid.service';
 import { TextboxService } from '@app/services/textbox.service';
@@ -6,6 +7,7 @@ import { WebsocketService } from '@app/services/websocket.service';
 import { MessageType } from '@app/classes/message';
 import { Vec2 } from '@app/classes/vec2';
 import { CHARCODE_SMALL_A } from '@app/classes/config';
+import { MatDialog } from '@angular/material/dialog';
 
 // TODO : Avoir un fichier séparé pour les constantes!
 const DEFAULT_WIDTH_ALL = 650; // 525
@@ -26,7 +28,7 @@ export enum MouseButton {
 @Component({
     selector: 'app-play-area',
     templateUrl: './play-area.component.html',
-    styleUrls: ['./play-area.component.scss'],
+    styleUrls: ['../../styles.scss', './play-area.component.scss'],
 })
 export class PlayAreaComponent implements AfterViewInit {
     @Input() playerHand: string[] = [];
@@ -35,7 +37,6 @@ export class PlayAreaComponent implements AfterViewInit {
     mousePosition: Vec2 = { x: 0, y: 0 };
     initPosition: Vec2 = { x: 0, y: 0 };
     buttonPressed = '';
-    isVisible: boolean;
     temp: [string, string][] = [];
 
     isEventReceiver: boolean = false;
@@ -49,6 +50,7 @@ export class PlayAreaComponent implements AfterViewInit {
     private canvasSize = { x: DEFAULT_WIDTH_ALL, y: DEFAULT_HEIGHT_ALL };
     // DON'T REMOVE MY COMMENTS MIGHT USEFUL FOP ME LATER
     constructor(
+        public dialog: MatDialog,
         private readonly gridService: GridService,
         private commandService: CommandService,
         private eRef: ElementRef,
@@ -220,12 +222,13 @@ export class PlayAreaComponent implements AfterViewInit {
         window.location.reload();
     }
 
-    openConfirmWindow(): void {
-        this.isVisible = true;
-    }
-
-    cancel(): void {
-        this.isVisible = false;
+    openDialog(): void {
+        const dialogRef = this.dialog.open(BasicActionDialogComponent, {
+            data: { title: 'Abandonner la partie?', action: 'Abandonner', cancel: 'Annuler' },
+        });
+        dialogRef.afterClosed().subscribe((resign) => {
+            if (resign) this.redirectTo();
+        });
     }
 
     verifyIsInHand(): boolean {

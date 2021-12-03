@@ -24,7 +24,7 @@ import { WaitingRoomComponent } from './components/waiting-room/waiting-room.com
 import { WaitingRoomDialogComponent } from './components/waiting-room-dialog/waiting-room-dialog.component';
 import { ObjectivesComponent } from './components/objectives/objectives.component';
 import { ScoreboardComponent } from './components/scoreboard/scoreboard.component';
-import { DatabaseResetDialogComponent } from './components/database-reset-dialog/database-reset-dialog.component';
+import { BasicActionDialogComponent } from './components/basic-action-dialog/basic-action-dialog.component';
 import { BotConfigComponent } from './components/bot-config/bot-config.component';
 import { BotConfigSelectComponent } from './components/bot-config/bot-config-select.component';
 import { BotConfigDialogComponent } from './components/bot-config-dialog/bot-config-dialog.component';
@@ -58,7 +58,7 @@ import { DictConfigDialogComponent } from './components/dict-config-dialog/dict-
         WaitingRoomDialogComponent,
         ObjectivesComponent,
         ScoreboardComponent,
-        DatabaseResetDialogComponent,
+        BasicActionDialogComponent,
         BotConfigComponent,
         BotConfigSelectComponent,
         BotConfigDialogComponent,
