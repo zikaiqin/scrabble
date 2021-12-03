@@ -23,7 +23,15 @@
         <mat-form-field>
             <mat-label>Dictionnaire utilisé</mat-label>
             <mat-select formControlName="dictionary" placeholder="Défaut">
-                <mat-option *ngFor="let dict of dictionaries" matTooltipPosition="right" matTooltipHideDelay="150" matTooltipShowDelay="150" [matTooltip]="dict.description" [value]="dict.id">{{ dict.name }}</mat-option>
+                <mat-option
+                    *ngFor="let dict of dictionaries"
+                    matTooltipPosition="right"
+                    matTooltipHideDelay="150"
+                    matTooltipShowDelay="150"
+                    [matTooltip]="dict.description"
+                    [value]="dict.id"
+                    >{{ dict.name }}</mat-option
+                >
             </mat-select>
         </mat-form-field>
 

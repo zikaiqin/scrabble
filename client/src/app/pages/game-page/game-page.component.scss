@@ -6,23 +6,20 @@
 .play-area-container {
     overflow: auto;
     flex: 1 1 auto;
-
 }
 
 .play-area {
     display: grid;
     width: min-content;
     outline: none;
-
 }
 
 .paneau-container {
     position: absolute;
     top: 0;
     right: 0;
-
 }
-.popup{
+.popup {
     flex: auto;
     display: block; /* Make the buttons appear below each other */
 }
