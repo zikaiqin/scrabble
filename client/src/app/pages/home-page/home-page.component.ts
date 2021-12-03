@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { GameInfo, GameMode, GameType } from '@app/classes/game-info';
+import { Dictionary, GameInfo, GameMode, GameType } from '@app/classes/game-info';
 import { WebsocketService } from '@app/services/websocket.service';
+import { HttpService } from '@app/services/http.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -15,8 +16,9 @@ export class HomePageComponent {
     showWaitingRoom = false;
     showScoreboard = false;
     gameConfigs: Partial<GameInfo>;
+    dictionaries: Dictionary[];
 
-    constructor(private router: Router, private webSocketService: WebsocketService) {
+    constructor(private router: Router, private httpService: HttpService, private webSocketService: WebsocketService) {
         this.webSocketService.status.subscribe((event) => {
             if (event === 'connectionLost') {
                 if (this.showWaitingRoom) {
@@ -35,6 +37,9 @@ export class HomePageComponent {
         }
         if (button === 'Single' || button === 'Multi') {
             this.gameType = GameType[button];
+            this.httpService.getDicts().subscribe((res) => {
+                this.dictionaries = res as Dictionary[];
+            });
         }
         if (button === 'Browse') {
             this.webSocketService.connect();

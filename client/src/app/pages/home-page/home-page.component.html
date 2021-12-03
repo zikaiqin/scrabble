@@ -10,6 +10,7 @@
             *ngIf="showMenu() === 'NewGame'"
             [gameMode]="gameMode"
             [gameType]="gameType"
+            [dictionaries]="dictionaries"
             (buttonClick)="handleClick($event)"
             (newGame)="createGame($event)"
         ></app-new-game-menu>

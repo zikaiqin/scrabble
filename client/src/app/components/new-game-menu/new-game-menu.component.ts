@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { GameMode, GameType, GameInfo, GameDifficulty } from '@app/classes/game-info';
+import { GameMode, GameType, GameInfo, GameDifficulty, Dictionary } from '@app/classes/game-info';
 import { DEFAULT_DICTIONARY_ID, DEFAULT_TURN_LENGTH, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/classes/config';
 
 @Component({
@@ -11,6 +11,7 @@ import { DEFAULT_DICTIONARY_ID, DEFAULT_TURN_LENGTH, MAX_NAME_LENGTH, MIN_NAME_L
 export class NewGameMenuComponent implements OnInit {
     @Input() gameMode: number;
     @Input() gameType: number;
+    @Input() dictionaries: Dictionary[];
     @Output() readonly buttonClick = new EventEmitter<string>();
     @Output() readonly newGame = new EventEmitter<Partial<GameInfo>>();
 
@@ -19,12 +20,12 @@ export class NewGameMenuComponent implements OnInit {
     readonly form: FormGroup;
     turnLength: number = DEFAULT_TURN_LENGTH;
     randomized: boolean = false;
-    private dictID = DEFAULT_DICTIONARY_ID;
 
     constructor(private formBuilder: FormBuilder) {
         this.form = this.formBuilder.group({
             username: ['', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]],
-            difficulty: '',
+            dictionary: DEFAULT_DICTIONARY_ID,
+            difficulty: GameDifficulty.Easy,
         });
     }
 
@@ -43,12 +44,12 @@ export class NewGameMenuComponent implements OnInit {
     }
 
     getNameHint(): string {
-        return `Entrer un nom entre ${MIN_NAME_LENGTH} et ${MAX_NAME_LENGTH} caractères`;
+        return this.form.touched ? '' : `Entrez un nom entre ${MIN_NAME_LENGTH} et ${MAX_NAME_LENGTH} caractères`;
     }
 
     getNameError(): string {
         if (this.username.hasError('required')) {
-            return 'Veuillez entrer un nom';
+            return `Entrez un nom entre ${MIN_NAME_LENGTH} et ${MAX_NAME_LENGTH} caractères`;
         }
         if (this.username.hasError('minlength')) {
             return `Le nom doit contenir au moins ${MIN_NAME_LENGTH} caractères`;
@@ -75,12 +76,16 @@ export class NewGameMenuComponent implements OnInit {
             gameMode: this.gameMode,
             gameType: this.gameType,
             difficulty: this.difficulty.value,
-            dictID: this.dictID,
+            dictID: this.dictionary.value,
         });
     }
 
     get username() {
         return this.form.controls.username;
+    }
+
+    get dictionary() {
+        return this.form.controls.dictionary;
     }
 
     get difficulty() {
