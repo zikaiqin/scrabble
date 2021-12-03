@@ -7,14 +7,12 @@ import { GridLettersService } from './grid-letter.service';
 
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 600;
-
 const DEFAULT_NB_CASES = 16;
 const STROKE_RANGE = 4;
 const ARROW_SIZE = 15;
 const ARROW_SIZE2 = 25;
 const ARROW_SIZE3 = 10;
 const ARROW_SIZE4 = 20;
-
 const SCALE_MAX = 1.5;
 const SCALE_MIN = 0.8;
 const TEXT_DEFAULT_PX = 20;
@@ -29,6 +27,9 @@ export class GridService {
     mousePosition: Vec2 = { x: 0, y: 0 };
     mousePositionSubject = new Subject<Vec2>();
     isPlacing: boolean = false;
+
+    turnState: boolean;
+
     private counter: number = 0;
     private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
@@ -43,6 +44,10 @@ export class GridService {
     private bonuses = new Map<string, string>();
     private letters = new Map<string, string>();
     constructor(private websocketService: WebsocketService, private readonly gridLettersService: GridLettersService) {
+        this.websocketService.turn.subscribe((turn) => {
+            this.turnState = turn;
+            this.drawGrid();
+        });
         this.mousePositionSubject.asObservable().subscribe((mousePos) => {
             this.mousePosition = mousePos;
         });
@@ -103,7 +108,10 @@ export class GridService {
         this.gridContext.lineWidth = 1;
         this.gridContext.fillStyle = 'black';
         this.gridContext.strokeStyle = 'black';
-
+        if (this.turnState) {
+            this.gridContext.fillStyle = 'lightgreen';
+            this.gridContext.fillRect(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        }
         // tracer le border
         this.drawBorder();
         // Afficher les coordonnes

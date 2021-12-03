@@ -44,6 +44,8 @@ export class GridLettersService {
      * @description Function that draw the coordinates listed on the side
      */
     drawCoords(gridContext: CanvasRenderingContext2D) {
+        gridContext.fillStyle = 'black';
+
         for (let i = 1; i < DEFAULT_NB_CASES; i++) {
             gridContext.font = '17px serif';
 

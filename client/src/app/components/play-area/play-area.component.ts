@@ -29,7 +29,7 @@ export class PlayAreaComponent implements AfterViewInit {
     commandHand: string[] = [];
     isPlacing: boolean = false;
     placedLetters: Map<string, string> = new Map<string, string>();
-    private turnState: boolean;
+    turnState: boolean;
     private gameBoard: Map<string, string> = new Map<string, string>();
     private upperCaseButtonPressed: string;
     private canvasSize = { x: DEFAULT_WIDTH_ALL, y: DEFAULT_HEIGHT_ALL };
