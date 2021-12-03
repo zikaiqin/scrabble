@@ -1,4 +1,8 @@
 /* eslint-disable max-classes-per-file */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable no-unused-expressions */
+// To make testing easier
 import { Board } from '@app/classes/board';
 import { DEFAULT_BONUSES } from '@app/classes/config';
 import { Game } from '@app/classes/game';
@@ -7,10 +11,11 @@ import { Reserve } from '@app/classes/reserve';
 import { EndGameService } from '@app/services/end-game.service';
 import { GameDisplayService } from '@app/services/game-display.service';
 import { expect } from 'chai';
-import { createSandbox } from 'sinon';
-import { SocketService } from '@app/services/socket.service'
-import { Server } from '@app/server';
-import Container from 'typedi';
+import { createSandbox, createStubInstance, SinonStubbedInstance } from 'sinon';
+import { SocketService } from '@app/services/socket.service';
+import { Server } from 'http';
+import { DatabaseService } from './database.service';
+import { ValidationService } from './validation.service';
 
 class MockPlayer extends Player {
     name: string;
@@ -40,8 +45,8 @@ class MockReserve extends Reserve {
 
 describe('End Game Service', () => {
     let endGameService: EndGameService;
+    let socketService: SocketService;
     let fakeGameDisplayService: GameDisplayService;
-    let fakeSocketService: SocketService;
     let player: MockPlayer;
     let opponent: MockPlayer;
     const randomLetters1: string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
@@ -51,14 +56,16 @@ describe('End Game Service', () => {
     const room2 = 'room2';
     const sandBox = createSandbox();
     let server: Server;
+    let database: DatabaseService;
+    let validation: SinonStubbedInstance<ValidationService>;
 
     beforeEach(() => {
+        validation = createStubInstance(ValidationService);
         fakeGameDisplayService = new GameDisplayService();
+        socketService = new SocketService(server, database, validation);
         endGameService = new EndGameService(fakeGameDisplayService);
-        /* eslint-disable */
         endGameService.turnSkipMap.set(room1, 3);
         endGameService.turnSkipMap.set(room2, 6);
-        /* eslint-enable */
         player = new MockPlayer('John');
         player.addAll(randomLetters1);
         opponent = new MockPlayer('Lao');
@@ -67,14 +74,8 @@ describe('End Game Service', () => {
         reserve.setLetters(randomLetters2);
     });
 
-    before(() => {
-        server = Container.get(Server);
-        server.init();
-    });
-
     it('should increment the turn skipped counter by 1 to the right room', () => {
         endGameService.incrementTurnSkipCount(room1);
-        // eslint-disable-next-line
         expect(endGameService.turnSkipMap.get(room1)).to.equals(4);
     });
 
@@ -92,7 +93,6 @@ describe('End Game Service', () => {
 
     it('should reset the turn skipped counter on the right room', () => {
         endGameService.resetTurnSkipCount(room1);
-        // eslint-disable-next-line
         expect(endGameService.turnSkipMap.get(room1)).to.equals(0);
     });
 
@@ -112,10 +112,8 @@ describe('End Game Service', () => {
     });
 
     it('should deduct points to the player in parameter', () => {
-        // eslint-disable-next-line
         player.setScore(100);
         endGameService.deductPoints(player);
-        // eslint-disable-next-line
         expect(player.score).to.equals(84);
     });
 
@@ -124,13 +122,11 @@ describe('End Game Service', () => {
         player.clearHand();
         player.add('*');
         endGameService.deductPoints(player);
-        // eslint-disable-next-line
         expect(player.score).to.equals(1);
     });
 
     it('should add points to the player by the number of letters left in opponent hand', () => {
         endGameService.addPoints(player, opponent.hand);
-        // eslint-disable-next-line
         expect(player.score).to.equals(27);
     });
 
@@ -161,62 +157,53 @@ describe('End Game Service', () => {
     });
 
     it('should return the name of the player with the highest score', () => {
-        /* eslint-disable */
         player.setScore(30);
         opponent.setScore(43);
-        /* eslint-enable */
         expect(endGameService.getWinner(player, opponent)).to.equals(opponent.name);
     });
 
     it('should return the name of the other player with the highest score', () => {
-        /* eslint-disable */
         player.setScore(60);
         opponent.setScore(43);
-        /* eslint-enable */
         expect(endGameService.getWinner(player, opponent)).to.equals(player.name);
     });
 
     it('should return the name of both players when they have the same score', () => {
-        /* eslint-disable */
         player.setScore(30);
         opponent.setScore(30);
-        /* eslint-enable */
         expect(endGameService.getWinner(player, opponent)).to.equals(player.name + ' et ' + opponent.name);
     });
 
     it('should set the final score of each player', () => {
         player.clearHand();
-        /* eslint-disable */
         player.setScore(30);
         opponent.setScore(100);
-        /* eslint-enable */
         endGameService.setPoints(player, opponent);
-        /* eslint-disable */
         expect(player.score).to.equals(57);
         expect(opponent.score).to.equals(73);
-        /* eslint-enable */
     });
 
     it('should set the final score of each player with no empty hands', () => {
-        /* eslint-disable */
         player.setScore(30);
         opponent.setScore(100);
-        /* eslint-enable */
         endGameService.setPoints(player, opponent);
-        /* eslint-disable */
         expect(player.score).to.equals(14);
         expect(opponent.score).to.equals(73);
-        /* eslint-enable */
     });
 
     it('should make the appropriate actions when calling gameEnded if the game has ended', () => {
-        fakeSocketService = server['socketService'];
-        const socketServiceSpy1 = sandBox.spy(fakeSocketService, 'gameEnded');
-        const socketServiceSpy2 = sandBox.spy(fakeSocketService, 'sendMessage');
-        const socketServiceSpy3 = sandBox.spy(fakeSocketService, 'updateTurn');
-        const players = new Map<string, MockPlayer>([['test1', player], ['test2', opponent]]);
-        const fakeGame = new Game(new Board(DEFAULT_BONUSES), players, [[1, false], [2, false]]);
-        const game = endGameService.gameEnded(room2, fakeGame, player, opponent, fakeSocketService);
+        const socketServiceSpy1 = sandBox.spy(socketService, 'gameEnded');
+        const socketServiceSpy2 = sandBox.spy(socketService, 'sendMessage');
+        const socketServiceSpy3 = sandBox.spy(socketService, 'updateTurn');
+        const players = new Map<string, MockPlayer>([
+            ['test1', player],
+            ['test2', opponent],
+        ]);
+        const fakeGame = new Game(new Board(DEFAULT_BONUSES), players, [
+            [1, false],
+            [2, false],
+        ]);
+        const game = endGameService.gameEnded(room2, fakeGame, player, opponent, socketService);
         expect(socketServiceSpy1.called);
         expect(socketServiceSpy2.called);
         expect(socketServiceSpy3.called);
@@ -224,10 +211,15 @@ describe('End Game Service', () => {
     });
 
     it('should should return false and do nothing when calling gameEnded if the game has not ended', () => {
-        fakeSocketService = server['socketService'];
-        const players = new Map<string, MockPlayer>([['test1', player], ['test2', opponent]]);
-        const fakeGame = new Game(new Board(DEFAULT_BONUSES), players, [[1, false], [2, false]]);
-        const game = endGameService.gameEnded(room1, fakeGame, player, opponent, fakeSocketService);
+        const players = new Map<string, MockPlayer>([
+            ['test1', player],
+            ['test2', opponent],
+        ]);
+        const fakeGame = new Game(new Board(DEFAULT_BONUSES), players, [
+            [1, false],
+            [2, false],
+        ]);
+        const game = endGameService.gameEnded(room1, fakeGame, player, opponent, socketService);
         expect(game).to.be.false;
     });
 });
