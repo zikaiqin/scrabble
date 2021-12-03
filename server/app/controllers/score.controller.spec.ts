@@ -43,7 +43,7 @@ describe('ScoreController', () => {
         );
     });
 
-    it('should return error 500', async () => {
+    it('should return error 409', async () => {
         dataBaseService.getHighScores.rejects(new Error('service error'));
 
         return (
@@ -51,7 +51,7 @@ describe('ScoreController', () => {
                 .get('/api/score')
                 .query({ gameMode: 1 })
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                .expect(500)
+                .expect(409)
                 .then((response) => {
                     expect(response.body).to.deep.equal({});
                 })
