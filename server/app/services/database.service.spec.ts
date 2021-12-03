@@ -125,19 +125,21 @@ describe('Database service', () => {
       }
     });
 
-    /*it('should change the name of a bot identified with its id and difficulty', async () => {
+    it('should change the name of a bot identified with its id and difficulty', async () => {
       const mongoUri = await mongoServer.getUri();
       await databaseService.databaseConnect(mongoUri);
       let botList = await databaseService.getBots(GameDifficulty.Hard);
-      let bot = botList[0];
-      await databaseService.editBot(bot._id as string, 'Gridman', GameDifficulty.Hard);
+      setTimeout( () => {
+        let bot = botList[0];
+        databaseService.editBot(bot._id as string, 'Gridman', GameDifficulty.Hard);
+      }, 5000);
       botList = await databaseService.getBots(GameDifficulty.Hard);
       for (const it of botList) {
         if (it.name = 'Gridman') {
           expect(it.name).to.equal('Gridman');
         }
       }
-    });*/
+    });
 
     it('should return the number of bots of the same name in each difficulty', async () => {
       const mongoUri = await mongoServer.getUri();
