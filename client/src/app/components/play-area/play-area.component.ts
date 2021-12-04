@@ -140,7 +140,7 @@ export class PlayAreaComponent implements AfterViewInit {
             // TE already existed on the board so not from hand
             // we need to remove TE from commandHand
             while (!this.placedLetters.has(this.positionStr())) {
-                this.commandHand.splice(0, 1);
+                this.commandHand.splice(this.commandHand.length - 1, 1);
                 this.stepBack();
             }
             // update gameBoard
@@ -155,8 +155,8 @@ export class PlayAreaComponent implements AfterViewInit {
 
             // update playerHand
             if (this.commandHand[0] === this.commandHand[0].toUpperCase()) this.playerHand.push('*');
-            else this.playerHand.push(this.commandHand[0]);
-            this.commandHand.splice(0, 1);
+            else this.playerHand.push(this.commandHand[this.commandHand.length - 1]);
+            this.commandHand.splice(this.commandHand.length - 1, 1);
         }
 
         this.gridService.drawGrid();
