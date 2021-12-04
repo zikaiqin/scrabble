@@ -10,6 +10,9 @@ export class TurnService {
     constructor(private botService: BotService) {}
 
     changeTurn(roomID: string, timer: Timer, socket: SocketService): void {
+        if (timer === undefined) {
+            return;
+        }
         if (timer.isLocked) {
             socket.updateTurn(roomID, false);
         } else {
