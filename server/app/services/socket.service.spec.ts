@@ -44,7 +44,6 @@ describe('SocketService', () => {
 
     before(() => {
         server = Container.get(Server);
-        server.init();
         clientSocket = io(url);
         clientSocket.connect();
         clientSocket2 = io(url);
