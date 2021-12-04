@@ -1,4 +1,5 @@
 import { AfterViewInit, Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { WebsocketService } from '@app/services/websocket.service';
 
 @Component({
@@ -9,7 +10,7 @@ import { WebsocketService } from '@app/services/websocket.service';
 export class GamePageComponent implements AfterViewInit {
     isInit = false;
 
-    constructor(private websocketService: WebsocketService) {
+    constructor(private router: Router, private websocketService: WebsocketService) {
         this.websocketService.init.subscribe(() => {
             this.isInit = true;
         });
@@ -17,7 +18,7 @@ export class GamePageComponent implements AfterViewInit {
 
     ngAfterViewInit(): void {
         if (!this.isInit) {
-            /* this.router.navigateByUrl('/home');*/
+            this.router.navigateByUrl('/home');
         }
     }
 }
