@@ -1,6 +1,7 @@
-<button mat-flat-button color="primary" (click)="exchange()">
+<button mat-flat-button color="primary" *ngIf="isContainSelectedCard" (click)="exchange()">
     <mat-icon>swap_horiz</mat-icon>
 </button>
+
 <button mat-flat-button color="warn" *ngIf="isContainSelectedCard" (click)="resetExchange()">
     <mat-icon>clear</mat-icon>
 </button>
