@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/quotes */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PanneauInfoComponent } from './panneau-info.component';
@@ -14,17 +15,20 @@ describe('PanneauInfoComponent', () => {
     const opponentLetter = ['c', 't'];
     const player = 0;
     const opponent = 1;
-    const reserve = ['a', 'b', 'c'];
-    const bon: [string, string][] = [['a','b'], ['c', 'd']];
+    const reserveContainer = ['a', 'b', 'c'];
+    const bon: [string, string][] = [
+        ['a', 'b'],
+        ['c', 'd'],
+    ];
     const game = {
-        self: 'John', 
-        opponent: 'Rab', 
-        bonuses: bon, 
-        reserve: reserve,
+        self: 'John',
+        opponent: 'Rab',
+        bonuses: bon,
+        reserve: reserveContainer,
         hand: playerLetter,
-        gameMode: 1, 
+        gameMode: 1,
         turnState: true,
-    }
+    };
 
     const gameInit = new Subject<GameInit>();
     const gameTime = new Subject<number>();
@@ -72,17 +76,17 @@ describe('PanneauInfoComponent', () => {
     it('should return the current turn when calling getTurnState', () => {
         gameTurn.next(true);
         const turn = component.getTurnState();
-        expect(typeof(turn)).toEqual('boolean');
+        expect(typeof turn).toEqual('boolean');
     });
 
     it('should return the size of the reserve when calling getReserveMessage', () => {
-        gameReserve.next(reserve);
+        gameReserve.next(reserveContainer);
         const reserveLetter = component.getReserveMessage();
         expect(reserveLetter).toEqual(`Il reste 3 pièces dans la réserve`);
     });
 
     it('should return the size of the hand of the wanted player when getHandMessage is called', () => {
-        gameHands.next({ownHand: playerLetter, opponentHand: opponentLetter});
+        gameHands.next({ ownHand: playerLetter, opponentHand: opponentLetter });
         const playerLettersCount = component.getHandMessage(player);
         const opponentLettersCount = component.getHandMessage(opponent);
         expect(playerLettersCount).toEqual(`3 pièces en main`);
