@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
 
 const MOUSE_POSITION_PIXEL = 300;
 const MOUSE_POSITION = 3;
-fdescribe('PlayAreaComponent', () => {
+describe('PlayAreaComponent', () => {
     let component: PlayAreaComponent;
     let fixture: ComponentFixture<PlayAreaComponent>;
     let mouseEvent: MouseEvent;
