@@ -1,19 +1,19 @@
 import { Application } from '@app/app';
+import { DATABASE } from '@app/classes/config';
+import { BotService } from '@app/services/bot.service';
+import { DatabaseService } from '@app/services/database.service';
+import { EndGameService } from '@app/services/end-game.service';
+import { ExchangeService } from '@app/services/exchange.service';
+import { GameDisplayService } from '@app/services/game-display.service';
+import { ObjectivesService } from '@app/services/objectives';
+import { PlacingService } from '@app/services/placing.service';
+import { SocketService } from '@app/services/socket.service';
+import { TurnService } from '@app/services/turn.service';
+import { ValidationService } from '@app/services/validation.service';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
-import { SocketService } from '@app/services/socket.service';
 import { GameService } from './services/game.service';
-import { BotService } from '@app/services/bot.service';
-import { EndGameService } from '@app/services/end-game.service';
-import { ExchangeService } from '@app/services/exchange.service';
-import { PlacingService } from '@app/services/placing.service';
-import { ValidationService } from '@app/services/validation.service';
-import { ObjectivesService } from '@app/services/objectives';
-import { DatabaseService } from '@app/services/database.service';
-import { TurnService } from '@app/services/turn.service';
-import { GameDisplayService } from '@app/services/game-display.service';
-import { DATABASE } from '@app/classes/config';
 
 @Service()
 export class Server {
@@ -52,17 +52,9 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
-        this.databaseService
-            .databaseConnect(DATABASE.url)
-            .then(() => {
-                // eslint-disable-next-line no-console
-                console.log('Database connection successful !');
-            })
-            .catch(() => {
-                // eslint-disable-next-line no-console
-                console.error('Database connection failed !');
-                process.exit(1);
-            });
+        this.databaseService.databaseConnect(DATABASE.url).catch(() => {
+            process.exit(1);
+        });
 
         this.socketService = new SocketService(this.server, this.databaseService, this.validationService);
         this.socketService.handleSockets();
