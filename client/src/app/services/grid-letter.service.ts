@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CHARCODE_SMALL_A } from '@app/classes/config';
-
-const DEFAULT_WIDTH = 600;
-const DEFAULT_HEIGHT = 600;
-const DEFAULT_NB_CASES = 16;
+import { DEFAULT_HEIGHT, DEFAULT_NB_CASES, DEFAULT_WIDTH } from '@app/classes/grid';
 @Injectable({
     providedIn: 'root',
 })
@@ -44,6 +41,8 @@ export class GridLettersService {
      * @description Function that draw the coordinates listed on the side
      */
     drawCoords(gridContext: CanvasRenderingContext2D) {
+        gridContext.fillStyle = 'black';
+
         for (let i = 1; i < DEFAULT_NB_CASES; i++) {
             gridContext.font = '17px serif';
 
@@ -61,5 +60,12 @@ export class GridLettersService {
         // reset les pos pour si jamais reappeler cette methode
         this.startLetterPos = DEFAULT_HEIGHT / DEFAULT_NB_CASES;
         this.startNumberPos = DEFAULT_WIDTH / DEFAULT_NB_CASES;
+    }
+
+    /**
+     * @description Function to wipe the board (nothing is left behind)
+     */
+    clearGrid(gridContext: CanvasRenderingContext2D) {
+        gridContext.clearRect(0, 0, DEFAULT_WIDTH * 2, DEFAULT_HEIGHT * 2);
     }
 }

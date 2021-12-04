@@ -4,16 +4,13 @@ button {
     padding: 10px 30px 10px 30px;
 }
 
-.grid-container {
-    padding: 10px;
-}
-
 .panneau {
     border-radius: 15px;
     border: 5px solid black;
-    width: 350px;
-    height: 900px;
+    width: 400px;
+    height: 100%;
     background-color: rgb(170, 231, 228);
+    margin-right: 150px;
 }
 .joueur-container {
     border-top-left-radius: 15px;

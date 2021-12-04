@@ -19,3 +19,7 @@
     top: 0;
     right: 0;
 }
+.popup {
+    flex: auto;
+    display: block; /* Make the buttons appear below each other */
+}

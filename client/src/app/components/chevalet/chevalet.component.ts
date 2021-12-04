@@ -1,8 +1,8 @@
 import { Component, ElementRef, HostListener, Input } from '@angular/core';
-import { CommandService } from '@app/services/command.service';
-import { TextboxService } from '@app/services/textbox.service';
 import { MessageType } from '@app/classes/message';
-
+import { CommandService } from '@app/services/command.service';
+import { GridService } from '@app/services/grid.service';
+import { TextboxService } from '@app/services/textbox.service';
 const HAND_SIZE = 7;
 const MINUS1 = -1;
 @Component({
@@ -13,14 +13,18 @@ const MINUS1 = -1;
 export class ChevaletComponent {
     @Input() playerHand: string[];
     currentHand: string[] = [];
-    isExchangeActif: boolean = true;
     isContainSelectedCard = false;
+    isManipulating: boolean = false;
     isClicked: boolean[] = [false, false, false, false, false, false, false];
     activeLetter: boolean[] = [false, false, false, false, false, false, false];
     isYourTurn: boolean = true;
     isEventReceiver: boolean = false;
-
-    constructor(private eRef: ElementRef, private commandService: CommandService, private textboxService: TextboxService) {
+    constructor(
+        private eRef: ElementRef,
+        private commandService: CommandService,
+        private textboxService: TextboxService,
+        private gridService: GridService,
+    ) {
         this.addWindowListener();
     }
     @HostListener('document:click', ['$event'])
@@ -73,13 +77,13 @@ export class ChevaletComponent {
         }
     }
     onRightClick(event: MouseEvent, letter: string, index: number) {
-        let isManipulating = false;
+        this.isManipulating = false;
         for (const isActiveLetter of this.activeLetter) {
             if (!isActiveLetter) continue;
-            isManipulating = true;
+            this.isManipulating = true;
         }
 
-        if (!isManipulating) {
+        if (!this.isManipulating && !this.gridService.isPlacing) {
             event.preventDefault();
             this.isClicked[index] = !this.isClicked[index];
             if (this.isClicked[index]) {

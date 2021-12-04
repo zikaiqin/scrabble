@@ -1,24 +1,22 @@
 import { Injectable } from '@angular/core';
+import { CHARCODE_SMALL_A } from '@app/classes/config';
+import {
+    ARROW_POSITION1,
+    ARROW_POSITION2,
+    ARROW_POSITION3,
+    ARROW_POSITION5,
+    DEFAULT_HEIGHT,
+    DEFAULT_NB_CASES,
+    DEFAULT_WIDTH,
+    SCALE_MAX,
+    SCALE_MIN,
+    STROKE_RANGE,
+    TEXT_DEFAULT_PX,
+} from '@app/classes/grid';
 import { Vec2 } from '@app/classes/vec2';
 import { WebsocketService } from '@app/services/websocket.service';
 import { Subject } from 'rxjs';
 import { GridLettersService } from './grid-letter.service';
-import { CHARCODE_SMALL_A } from '@app/classes/config';
-
-const DEFAULT_WIDTH = 600;
-const DEFAULT_HEIGHT = 600;
-
-const DEFAULT_NB_CASES = 16;
-const STROKE_RANGE = 4;
-const ARROW_POSITION1 = 635;
-const ARROW_POSITION2 = 400;
-const ARROW_POSITION3 = 615;
-const ARROW_POSITION4 = 625;
-const ARROW_POSITION5 = 425;
-const ARROW_POSITION6 = 225;
-const SCALE_MAX = 1.5;
-const SCALE_MIN = 0.8;
-const TEXT_DEFAULT_PX = 20;
 @Injectable({
     providedIn: 'root',
 })
@@ -28,6 +26,10 @@ export class GridService {
     arrowDirection: boolean = false; // false = horizontal; true = vertival
     mousePosition: Vec2 = { x: 0, y: 0 };
     mousePositionSubject = new Subject<Vec2>();
+    isPlacing: boolean = false;
+    // drawarrow positions container
+    arrowPosition: Vec2[] = [];
+    turnState: boolean;
     private counter: number = 0;
     private tuileSize = DEFAULT_WIDTH / DEFAULT_NB_CASES;
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
@@ -42,9 +44,12 @@ export class GridService {
     private bonuses = new Map<string, string>();
     private letters = new Map<string, string>();
     constructor(private websocketService: WebsocketService, private readonly gridLettersService: GridLettersService) {
+        this.websocketService.turn.subscribe((turn) => {
+            this.turnState = turn;
+            this.drawGrid();
+        });
         this.mousePositionSubject.asObservable().subscribe((mousePos) => {
             this.mousePosition = mousePos;
-            this.drawArrow();
         });
         this.websocketService.init.subscribe((init) => {
             this.bonuses = new Map<string, string>(init.bonuses);
@@ -58,32 +63,38 @@ export class GridService {
         });
     }
 
-    drawArrow() {
+    calculateArrow(xPosition: number, yPosition: number, posX: number, posY: number) {
+        this.arrowPosition = [];
+
         if (this.arrowDirection) {
-            // down
-            this.gridContext.lineWidth = 20;
-            this.gridContext.beginPath();
-            this.gridContext.moveTo(ARROW_POSITION1, ARROW_POSITION2);
-            this.gridContext.lineTo(ARROW_POSITION3, ARROW_POSITION2);
-            this.gridContext.lineTo(ARROW_POSITION4, ARROW_POSITION5);
-            this.gridContext.closePath();
-            this.gridContext.stroke();
-            this.gridContext.moveTo(ARROW_POSITION4, ARROW_POSITION6);
-            this.gridContext.lineTo(ARROW_POSITION4, ARROW_POSITION2);
-            this.gridContext.stroke();
-        } else {
-            // left
-            this.gridContext.lineWidth = 20;
-            this.gridContext.beginPath();
-            this.gridContext.moveTo(ARROW_POSITION2, ARROW_POSITION1);
-            this.gridContext.lineTo(ARROW_POSITION2, ARROW_POSITION3);
-            this.gridContext.lineTo(ARROW_POSITION5, ARROW_POSITION4);
-            this.gridContext.closePath();
-            this.gridContext.stroke();
-            this.gridContext.moveTo(ARROW_POSITION6, ARROW_POSITION4);
-            this.gridContext.lineTo(ARROW_POSITION2, ARROW_POSITION4);
-            this.gridContext.stroke();
+            // draw down arrow positions container
+            this.arrowPosition.push({ x: ARROW_POSITION1 + xPosition, y: ARROW_POSITION1 + yPosition + this.tuileSize });
+            this.arrowPosition.push({ x: ARROW_POSITION3 + xPosition, y: ARROW_POSITION1 + yPosition + this.tuileSize });
+            this.arrowPosition.push({ x: ARROW_POSITION2 + xPosition, y: ARROW_POSITION2 + yPosition + this.tuileSize });
+            this.arrowPosition.push({ x: ARROW_POSITION2 + xPosition, y: yPosition + this.tuileSize });
+            this.drawArrow();
         }
+
+        if (!this.arrowDirection && posY < DEFAULT_NB_CASES - 1 && posX < DEFAULT_NB_CASES - 2) {
+            // draw left arrow positions container
+            this.arrowPosition.push({ x: ARROW_POSITION5 + xPosition + this.tuileSize, y: ARROW_POSITION1 + yPosition });
+            this.arrowPosition.push({ x: ARROW_POSITION5 + xPosition + this.tuileSize, y: ARROW_POSITION3 + yPosition });
+            this.arrowPosition.push({ x: ARROW_POSITION2 + xPosition + this.tuileSize, y: ARROW_POSITION2 + yPosition });
+            this.arrowPosition.push({ x: xPosition + this.tuileSize, y: ARROW_POSITION2 + yPosition });
+            this.drawArrow();
+        }
+    }
+    drawArrow() {
+        this.gridContext.lineWidth = 5;
+        this.gridContext.beginPath();
+        this.gridContext.moveTo(this.arrowPosition[0].x, this.arrowPosition[0].y);
+        this.gridContext.lineTo(this.arrowPosition[1].x, this.arrowPosition[1].y);
+        this.gridContext.lineTo(this.arrowPosition[2].x, this.arrowPosition[2].y);
+        this.gridContext.closePath();
+        this.gridContext.stroke();
+        this.gridContext.moveTo(this.arrowPosition[2].x, this.arrowPosition[2].y);
+        this.gridContext.lineTo(this.arrowPosition[3].x, this.arrowPosition[3].y);
+        this.gridContext.stroke();
     }
     selectSquare(posX: number, posY: number): void {
         if (posY < DEFAULT_NB_CASES - 1 && posX < DEFAULT_NB_CASES - 1 && posX >= 0 && posY >= 0) {
@@ -106,10 +117,7 @@ export class GridService {
 
             this.gridContext.strokeStyle = 'purple';
             this.gridContext.strokeRect(tuileX + 2, tuileY + 2, this.tuileSize - STROKE_RANGE, this.tuileSize - STROKE_RANGE);
-            this.drawArrow();
-
-            // console.log(this.samePosY);
-            // console.log(this.samePosX);
+            this.calculateArrow(tuileX, tuileY, posX, posY);
         }
         // return this.arrowDirection;
     }
@@ -117,10 +125,14 @@ export class GridService {
      * @description Wrapper function to draw the entirety of the board
      */
     drawGrid() {
-        this.clearGrid();
+        this.gridLettersService.clearGrid(this.gridContext);
         this.gridContext.lineWidth = 1;
         this.gridContext.fillStyle = 'black';
         this.gridContext.strokeStyle = 'black';
+        if (this.turnState) {
+            this.gridContext.fillStyle = 'lightgreen';
+            this.gridContext.fillRect(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        }
 
         // tracer le border
         this.drawBorder();
@@ -306,17 +318,11 @@ export class GridService {
             this.drawLetter(it[1], positionX - 1, positionY);
         }
     }
-
-    /**
-     * @description Function to wipe the board (nothing is left behind)
-     */
-    clearGrid() {
-        this.gridContext.clearRect(0, 0, DEFAULT_WIDTH * 2, DEFAULT_HEIGHT * 2);
-    }
     /**
      * @description Function that makes the grid bigger
      */
     maxGrid() {
+        this.gridLettersService.clearGrid(this.gridContext);
         if (this.scaleCounter < SCALE_MAX) {
             this.scaleCounter += 0.1;
             this.size = String(this.scaleCounter * TEXT_DEFAULT_PX);
@@ -327,6 +333,7 @@ export class GridService {
      * @description Function that makes the grid smaller
      */
     minGrid() {
+        this.gridLettersService.clearGrid(this.gridContext);
         if (this.scaleCounter > SCALE_MIN) {
             this.scaleCounter -= 0.1;
             this.size = String(this.scaleCounter * TEXT_DEFAULT_PX);
@@ -337,7 +344,6 @@ export class GridService {
     get width(): number {
         return this.canvasSize.x;
     }
-
     get height(): number {
         return this.canvasSize.y;
     }

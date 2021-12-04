@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CommandService } from '@app/services/command.service';
+import { GridService } from '@app/services/grid.service';
 import { ChevaletComponent } from './chevalet.component';
 
 describe('ChevaletComponent', () => {
@@ -7,14 +8,18 @@ describe('ChevaletComponent', () => {
     let fixture: ComponentFixture<ChevaletComponent>;
     let commandServiceSpy: jasmine.SpyObj<CommandService>;
     let mouseEvent: MouseEvent;
-
+    let gridServiceSpy: jasmine.SpyObj<GridService>;
     beforeEach(async () => {
+        gridServiceSpy = jasmine.createSpyObj('GridService', ['alterWidth'], {});
         commandServiceSpy = jasmine.createSpyObj('CommandService', ['parseCommand']);
         await TestBed.configureTestingModule({
             declarations: [ChevaletComponent],
-            providers: [{ provide: CommandService, useValue: commandServiceSpy }],
-        }).compileComponents();
 
+            providers: [
+                { provide: CommandService, useValue: commandServiceSpy },
+                { provide: GridService, useValue: gridServiceSpy },
+            ],
+        }).compileComponents();
         fixture = TestBed.createComponent(ChevaletComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
