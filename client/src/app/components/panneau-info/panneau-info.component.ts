@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { DEFAULT_HAND_SIZE } from '@app/classes/config';
-import { MessageType } from '@app/classes/message';
 import { CommandService } from '@app/services/command.service';
 import { TextboxService } from '@app/services/textbox.service';
 import { WebsocketService } from '@app/services/websocket.service';
+import { MessageType } from '@app/classes/message';
 
 enum PlayerType {
     Self,
@@ -82,7 +82,7 @@ export class PanneauInfoComponent {
     }
 
     getTurnColor(): string {
-        return this.turnState === undefined ? 'LightGray' : this.turnState ? 'lightgreen' : 'lightcoral ';
+        return this.turnState === undefined ? 'LightGray' : this.turnState ? 'Green' : 'Red';
     }
 
     getTurnMessage(): string {

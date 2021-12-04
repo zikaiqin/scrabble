@@ -3,6 +3,14 @@
     display: flex;
 }
 
+.objectives {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: stretch;
+}
+
 .play-area-container {
     overflow: auto;
     flex: 1 1 auto;
@@ -14,12 +22,19 @@
     outline: none;
 }
 
-.paneau-container {
-    position: absolute;
-    top: 0;
-    right: 0;
+.panel {
+    padding: 6px;
+    min-width: 320px;
+    width: 20vw;
+    height: 100vh;
 }
-.popup {
-    flex: auto;
-    display: block; /* Make the buttons appear below each other */
+
+.stretch-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+}
+
+.stretch-col-content {
+    flex-grow: 1;
 }

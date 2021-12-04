@@ -10,7 +10,6 @@ import { HomePageComponent } from './pages/home-page/home-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { ChevaletComponent } from './components/chevalet/chevalet.component';
 import { EndGameComponent } from './components/end-game/end-game.component';
 import { InputbarComponent } from './components/inputbar/inputbar.component';
@@ -44,7 +43,6 @@ import { DictConfigDialogComponent } from './components/dict-config-dialog/dict-
         GamePageComponent,
         AdminPageComponent,
         PlayAreaComponent,
-        SidebarComponent,
         ChevaletComponent,
         PanneauInfoComponent,
         TextboxComponent,
